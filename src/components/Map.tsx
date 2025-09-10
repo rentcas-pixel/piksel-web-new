@@ -1,8 +1,9 @@
 'use client';
 
-import { useEffect, useRef } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { LEDScreen } from '@/lib/supabase';
 import { useLEDScreens } from '@/hooks/useLEDScreens';
+import MapMobile from './MapMobile';
 
 interface MapProps {
   selectedCity: string;
@@ -15,8 +16,20 @@ interface MapProps {
 }
 
 export default function Map({ selectedCity, selectedScreens, screenCities, selectedDateRange, onClearFilter, onSelectScreen, onDateRangeChange }: MapProps) {
+  // Check if mobile
+  const [isMobile, setIsMobile] = useState(false);
   const mapRef = useRef<HTMLDivElement>(null);
   const { screens: ledScreens, loading, error } = useLEDScreens();
+  
+  useEffect(() => {
+    const checkMobile = () => {
+      setIsMobile(window.innerWidth < 768);
+    };
+    
+    checkMobile();
+    window.addEventListener('resize', checkMobile);
+    return () => window.removeEventListener('resize', checkMobile);
+  }, []);
 
   useEffect(() => {
     if (loading || error) return;
@@ -697,7 +710,83 @@ export default function Map({ selectedCity, selectedScreens, screenCities, selec
         (window as any).mapInstance = undefined;
       }
     };
-  }, [loading, error, ledScreens, selectedCity, selectedScreens]);
+  }, [loading, error, ledScreens, selectedCity, selectedScreens, isMobile]);
+
+  // Use mobile component for mobile devices
+  if (isMobile) {
+    return (
+      <MapMobile 
+        selectedCity={selectedCity}
+        selectedScreens={selectedScreens}
+        screenCities={screenCities}
+        selectedDateRange={selectedDateRange}
+        onClearFilter={onClearFilter}
+        onSelectScreen={onSelectScreen}
+        onDateRangeChange={onDateRangeChange}
+      />
+    );
+  }
+
+  // Mobile popup template
+  const getMobilePopupHTML = (screen: LEDScreen, sideName: string = '') => {
+    const fullName = sideName ? `${screen.name} - ${sideName}` : screen.name;
+    return `
+      <div style="font-family: ui-sans-serif, system-ui, -apple-system, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, 'Noto Sans', sans-serif; width: 320px; max-width: 90vw; background: white; border-radius: 12px; overflow: hidden; box-shadow: 0 10px 25px rgba(0,0,0,0.15);">
+        <!-- Photo -->
+        <div style="width: 100%; height: 200px; position: relative; background: #ddd; overflow: hidden;">
+          <img src="${screen.image_url}" alt="${fullName}"
+               style="width: 100%; height: 100%; object-fit: cover;"/>
+          
+          <!-- Copy URL Button -->
+          <button onclick="navigator.clipboard.writeText(window.location.origin + '/ekranas/${screen.id}${sideName ? '-' + sideName.toLowerCase() : ''}'); this.style.background='#10b981'; setTimeout(() => this.style.background='rgba(0,0,0,0.8)', 1000);" 
+                  style="position: absolute; top: 10px; right: 10px; width: 28px; height: 28px; background: rgba(0,0,0,0.8); color: white; border: none; border-radius: 6px; display: flex; align-items: center; justify-content: center; cursor: pointer; z-index: 1000; transition: all 0.2s ease;"
+                  title="Kopijuoti URL">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect>
+              <path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path>
+            </svg>
+          </button>
+        </div>
+        
+        <!-- Card -->
+        <div style="padding: 16px; display: flex; flex-direction: column; gap: 12px;">
+          <!-- Header -->
+          <header>
+            <h1 style="font-weight: 700; font-size: 18px; margin: 0; color: #111827;">${fullName}</h1>
+            <p style="color: #6b7280; margin: 4px 0 0 0; font-size: 14px;">${screen.address}</p>
+          </header>
+          
+          <!-- Specs -->
+          <div style="border-top: 1px solid #e5e7eb; padding-top: 12px;">
+            <div style="display: flex; justify-content: space-between; align-items: center; padding: 8px 0; border-bottom: 1px solid #e5e7eb; font-size: 14px;">
+              <span style="color: #6b7280;">Dydis</span>
+              <span style="font-weight: 500; color: #111827;">${screen.size || '8x4'}</span>
+            </div>
+            <div style="display: flex; justify-content: space-between; align-items: center; padding: 8px 0; border-bottom: 1px solid #e5e7eb; font-size: 14px;">
+              <span style="color: #6b7280;">Raiška</span>
+              <span style="font-weight: 500; color: #111827;">${screen.resolution || '1152x576'}</span>
+            </div>
+            <div style="display: flex; justify-content: space-between; align-items: center; padding: 8px 0; border-bottom: 1px solid #e5e7eb; font-size: 14px;">
+              <span style="color: #6b7280;">Srautas</span>
+              <span style="font-weight: 500; color: #111827;">${screen.traffic || '300.258'}</span>
+            </div>
+            <div style="display: flex; justify-content: space-between; align-items: center; padding: 8px 0; font-size: 14px;">
+              <span style="color: #6b7280;">Kaina</span>
+              <span style="font-weight: 500; color: #111827;">${screen.price ? `${screen.price} EUR` : '70 EUR'}</span>
+            </div>
+          </div>
+          
+          <!-- Button -->
+          <div style="display: flex; justify-content: center; padding-top: 8px;">
+            <button onclick="window.selectScreen('${fullName}')"
+                     style="appearance: none; border: 1px solid #d1d5db; background: #f9fafb; padding: 8px 16px; border-radius: 8px; font-weight: 500; cursor: pointer; font-size: 14px; color: #4b5563; transition: background-color 0.2s;">
+              ${selectedScreens && selectedScreens.includes(fullName) ? '✓ Pridėtas' : '+ Pridėti'}
+            </button>
+          </div>
+        </div>
+      </div>
+    `;
+  };
 
   if (loading) {
     return (
