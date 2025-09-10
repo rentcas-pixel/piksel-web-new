@@ -218,6 +218,7 @@ export default function Home() {
           onSelectScreen={handleSelectScreen}
           onDateRangeChange={handleDateRangeChange}
           onClearFilter={handleClearFilter}
+          onCityChange={setSelectedCity}
         />
       </div>
 

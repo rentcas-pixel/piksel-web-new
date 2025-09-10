@@ -12,9 +12,10 @@ interface MapProps {
   onClearFilter?: () => void;
   onSelectScreen?: (screenName: string) => void;
   onDateRangeChange?: (from: string, to: string) => void;
+  onCityChange?: (city: string) => void;
 }
 
-export default function Map({ selectedCity, selectedScreens, screenCities, selectedDateRange, onClearFilter, onSelectScreen, onDateRangeChange }: MapProps) {
+export default function Map({ selectedCity, selectedScreens, screenCities, selectedDateRange, onClearFilter, onSelectScreen, onDateRangeChange, onCityChange }: MapProps) {
   const mapRef = useRef<HTMLDivElement>(null);
   const { screens: ledScreens, loading, error } = useLEDScreens();
   
@@ -404,78 +405,119 @@ export default function Map({ selectedCity, selectedScreens, screenCities, selec
   }
 
   return (
-    <div className="w-full h-screen relative">
-      {/* Filter Bar */}
-      {(selectedCity || (selectedScreens && selectedScreens.length > 0)) && (
-        <div className={`absolute top-4 z-[1000] bg-white rounded-lg shadow-lg border border-gray-200 px-4 py-3 flex flex-col gap-3 ${isMobile ? 'left-4 right-4' : 'left-[66px]'}`}>
-          <div className="flex items-center gap-3 flex-wrap">
-            <div className="text-sm font-medium text-gray-700">Pasirinkite:</div>
-            {screenCities && Object.keys(screenCities).length > 0 && (
-              <>
-                {Object.entries(screenCities).reduce((acc, [screenName, city]) => {
-                  if (!acc.find(([_, c]) => c === city)) {
-                    acc.push([city, city]);
-                  }
-                  return acc;
-                }, [] as [string, string][]).map(([city, _]) => (
-                  <div key={city} className="flex items-center gap-2">
-                    <div className="bg-blue-100 text-blue-800 px-3 py-1 rounded-full text-sm font-medium">
-                      {city}
-                    </div>
-                    {selectedScreens && selectedScreens
-                      .filter(screen => screenCities[screen] === city)
-                      .map((screen, index) => (
-                        <div key={index} className="bg-green-100 text-green-800 px-3 py-1 rounded-full text-sm font-medium flex items-center gap-2">
-                          {screen}
-                          <button 
-                            onClick={() => onSelectScreen && onSelectScreen(screen)}
-                            className="text-green-600 hover:text-green-800 text-sm font-bold ml-1"
-                            title="Išimti ekraną"
-                          >
-                            ×
-                          </button>
-                        </div>
-                      ))}
-                  </div>
-                ))}
-              </>
-            )}
-            <button 
-              onClick={onClearFilter}
-              className="text-gray-400 hover:text-gray-600 text-sm"
-            >
-              ×
+    <div className="w-full h-screen flex flex-col">
+      {/* Main Sidebar - Horizontal */}
+      <div className="bg-white border-b border-gray-200 px-4 py-3">
+        <div className="flex items-center justify-between">
+          <div className="flex items-center gap-3">
+            <div className="text-lg font-bold text-gray-900">Piksel</div>
+            <div className="text-sm text-gray-500">LED ekranai</div>
+          </div>
+          <div className="flex items-center gap-2">
+            <button className="px-3 py-1 bg-blue-500 text-white rounded text-sm">
+              Paslaugos
+            </button>
+            <button className="px-3 py-1 bg-gray-100 text-gray-700 rounded text-sm">
+              Kontaktai
             </button>
           </div>
-          
-          {/* Date Range Mockup - Only show when screens are selected */}
-          {selectedScreens && selectedScreens.length > 0 && (
-            <div className="flex items-center gap-3 pt-2 border-t border-gray-100">
-              <div className="text-sm font-medium text-gray-700">Reklamos periodas:</div>
-              <div className="flex items-center gap-2">
-                <input
-                  type="date"
-                  value={selectedDateRange?.from || ''}
-                  onChange={(e) => onDateRangeChange && onDateRangeChange(e.target.value, selectedDateRange?.to || '')}
-                  className="px-3 py-1 border border-gray-300 rounded text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
-                  placeholder="Nuo"
-                />
-                <span className="text-gray-500 text-sm">iki</span>
-                <input
-                  type="date"
-                  value={selectedDateRange?.to || ''}
-                  onChange={(e) => onDateRangeChange && onDateRangeChange(selectedDateRange?.from || '', e.target.value)}
-                  className="px-3 py-1 border border-gray-300 rounded text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
-                  placeholder="Iki"
-                />
-              </div>
-            </div>
-          )}
         </div>
-      )}
+      </div>
 
-      {/* Map Container */}
-      <div ref={mapRef} className="w-full h-full"></div>
+      {/* Additional Sidebar - Horizontal */}
+      <div className="bg-gray-50 border-b border-gray-200 px-4 py-2">
+        <div className="flex items-center gap-3 flex-wrap">
+          <div className="text-sm font-medium text-gray-700">Miestai:</div>
+          {ledScreens && Object.keys(ledScreens.reduce((acc, screen) => {
+            if (!acc[screen.city]) acc[screen.city] = true;
+            return acc;
+          }, {} as {[key: string]: boolean})).map(city => (
+            <button
+              key={city}
+              onClick={() => onCityChange && onCityChange(city)}
+              className={`px-3 py-1 rounded-full text-sm font-medium ${
+                selectedCity === city 
+                  ? 'bg-blue-500 text-white' 
+                  : 'bg-white text-gray-700 border border-gray-300'
+              }`}
+            >
+              {city}
+            </button>
+          ))}
+        </div>
+      </div>
+
+      {/* Map Container - Takes remaining space */}
+      <div ref={mapRef} className="flex-1 relative">
+        {/* Filter Bar - Only show when screens are selected */}
+        {(selectedScreens && selectedScreens.length > 0) && (
+          <div className="absolute top-4 left-4 right-4 z-[1000] bg-white rounded-lg shadow-lg border border-gray-200 px-4 py-3">
+            <div className="flex items-center gap-3 flex-wrap">
+              <div className="text-sm font-medium text-gray-700">Pasirinkite:</div>
+              {screenCities && Object.keys(screenCities).length > 0 && (
+                <>
+                  {Object.entries(screenCities).reduce((acc, [screenName, city]) => {
+                    if (!acc.find(([_, c]) => c === city)) {
+                      acc.push([city, city]);
+                    }
+                    return acc;
+                  }, [] as [string, string][]).map(([city, _]) => (
+                    <div key={city} className="flex items-center gap-2">
+                      <div className="bg-blue-100 text-blue-800 px-3 py-1 rounded-full text-sm font-medium">
+                        {city}
+                      </div>
+                      {selectedScreens && selectedScreens
+                        .filter(screen => screenCities[screen] === city)
+                        .map((screen, index) => (
+                          <div key={index} className="bg-green-100 text-green-800 px-3 py-1 rounded-full text-sm font-medium flex items-center gap-2">
+                            {screen}
+                            <button 
+                              onClick={() => onSelectScreen && onSelectScreen(screen)}
+                              className="text-green-600 hover:text-green-800 text-sm font-bold ml-1"
+                              title="Išimti ekraną"
+                            >
+                              ×
+                            </button>
+                          </div>
+                        ))}
+                    </div>
+                  ))}
+                </>
+              )}
+              <button 
+                onClick={onClearFilter}
+                className="text-gray-400 hover:text-gray-600 text-sm"
+              >
+                ×
+              </button>
+            </div>
+            
+            {/* Date Range Mockup - Only show when screens are selected */}
+            {selectedScreens && selectedScreens.length > 0 && (
+              <div className="flex items-center gap-3 pt-2 border-t border-gray-100">
+                <div className="text-sm font-medium text-gray-700">Reklamos periodas:</div>
+                <div className="flex items-center gap-2">
+                  <input
+                    type="date"
+                    value={selectedDateRange?.from || ''}
+                    onChange={(e) => onDateRangeChange && onDateRangeChange(e.target.value, selectedDateRange?.to || '')}
+                    className="px-3 py-1 border border-gray-300 rounded text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+                    placeholder="Nuo"
+                  />
+                  <span className="text-gray-500 text-sm">iki</span>
+                  <input
+                    type="date"
+                    value={selectedDateRange?.to || ''}
+                    onChange={(e) => onDateRangeChange && onDateRangeChange(selectedDateRange?.from || '', e.target.value)}
+                    className="px-3 py-1 border border-gray-300 rounded text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+                    placeholder="Iki"
+                  />
+                </div>
+              </div>
+            )}
+          </div>
+        )}
+      </div>
     </div>
   );
 }

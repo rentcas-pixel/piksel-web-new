@@ -13,9 +13,10 @@ interface MapProps {
   onClearFilter?: () => void;
   onSelectScreen?: (screenName: string) => void;
   onDateRangeChange?: (from: string, to: string) => void;
+  onCityChange?: (city: string) => void;
 }
 
-export default function Map({ selectedCity, selectedScreens, screenCities, selectedDateRange, onClearFilter, onSelectScreen, onDateRangeChange }: MapProps) {
+export default function Map({ selectedCity, selectedScreens, screenCities, selectedDateRange, onClearFilter, onSelectScreen, onDateRangeChange, onCityChange }: MapProps) {
   // Check if mobile
   const [isMobile, setIsMobile] = useState(false);
   const mapRef = useRef<HTMLDivElement>(null);
@@ -723,6 +724,7 @@ export default function Map({ selectedCity, selectedScreens, screenCities, selec
         onClearFilter={onClearFilter}
         onSelectScreen={onSelectScreen}
         onDateRangeChange={onDateRangeChange}
+        onCityChange={onCityChange}
       />
     );
   }
