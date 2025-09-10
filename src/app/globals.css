@@ -2,7 +2,12 @@
 
 :root {
   --background: #ffffff;
-  --foreground: #171717;
+  --foreground: #000000;
+  --samsung-blue: #000000;
+  --samsung-light-blue: #333333;
+  --samsung-gray: #f8f9fa;
+  --samsung-dark-gray: #2c2c2c;
+  --samsung-accent: #666666;
 }
 
 @theme inline {
@@ -22,5 +27,107 @@
 body {
   background: var(--background);
   color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+  font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  font-feature-settings: "rlig" 1, "calt" 1;
+}
+
+.font-manrope {
+  font-family: var(--font-manrope), -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+}
+
+/* Samsung Design System Components - Black & White */
+.samsung-card {
+  background: white;
+  border-radius: 24px;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.15);
+  border: 1px solid rgba(0, 0, 0, 0.1);
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.samsung-card:hover {
+  box-shadow: 0 8px 40px rgba(0, 0, 0, 0.2);
+  transform: translateY(-2px);
+}
+
+.samsung-button-primary {
+  background: linear-gradient(135deg, #000000 0%, #333333 100%);
+  color: white;
+  padding: 16px 32px;
+  border-radius: 16px;
+  font-weight: 600;
+  font-size: 16px;
+  border: none;
+  cursor: pointer;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.3);
+}
+
+.samsung-button-primary:hover {
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.4);
+  transform: translateY(-1px);
+}
+
+.samsung-button-secondary {
+  background: white;
+  color: #000000;
+  border: 2px solid #000000;
+  padding: 14px 30px;
+  border-radius: 16px;
+  font-weight: 600;
+  font-size: 16px;
+  cursor: pointer;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.samsung-button-secondary:hover {
+  background: #000000;
+  color: white;
+  transform: translateY(-1px);
+}
+
+.samsung-gradient {
+  background: linear-gradient(135deg, #000000 0%, #333333 100%);
+}
+
+.samsung-text-gradient {
+  background: linear-gradient(135deg, #000000 0%, #333333 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+.samsung-section {
+  padding: 96px 16px;
+}
+
+@media (min-width: 640px) {
+  .samsung-section {
+    padding: 96px 24px;
+  }
+}
+
+@media (min-width: 1024px) {
+  .samsung-section {
+    padding: 96px 32px;
+  }
+}
+
+.samsung-container {
+  max-width: 1280px;
+  margin: 0 auto;
+}
+
+/* LED Screen Marker Styles */
+.led-marker {
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  border: 4px solid white;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.4);
+  transition: all 0.3s ease;
+}
+
+.led-marker:hover {
+  transform: scale(1.2);
+  box-shadow: 0 6px 20px rgba(167, 177, 245, 0.7);
 }

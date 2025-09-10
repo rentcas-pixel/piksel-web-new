@@ -1,0 +1,226 @@
+<!DOCTYPE html>
+<html lang="lt">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>LED Ekrano Kortelė</title>
+  <style>
+    :root {
+      /* Spalvos */
+      --bg-color: #f3f4f6;
+      --card-bg: #ffffff;
+      --text-primary: #111827;
+      --text-muted: #6b7280;
+      --border-color: #e5e7eb;
+      --button-bg: #f3f4f6;
+      --button-hover: #e5e7eb;
+      
+      /* Tarpai */
+      --spacing-xs: 8px;
+      --spacing-sm: 16px;
+      --spacing-md: 24px;
+      --spacing-lg: 32px;
+      --spacing-xl: 40px;
+      
+      /* Dydžiai */
+      --border-radius: 20px;
+      --border-radius-sm: 16px;
+      --border-radius-btn: 999px;
+      --shadow: 0 10px 24px rgba(0, 0, 0, 0.08);
+      
+      /* Tipografija */
+      --font-family: ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial, "Noto Sans", sans-serif;
+      --font-size-sm: 16px;
+      --font-size-md: 20px;
+      --font-size-lg: 28px;
+      --font-weight-normal: 400;
+      --font-weight-semibold: 600;
+      --font-weight-bold: 800;
+      
+      /* Layout */
+      --max-width: 1200px;
+      --breakpoint-mobile: 1024px;
+    }
+
+    * {
+      box-sizing: border-box;
+    }
+
+    body {
+      margin: 0;
+      background: var(--bg-color);
+      color: var(--text-primary);
+      font-family: var(--font-family);
+      line-height: 1.5;
+    }
+
+    .container {
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: var(--spacing-lg);
+    }
+
+    .card-wrapper {
+      width: 100%;
+      max-width: var(--max-width);
+      display: grid;
+      grid-template-columns: 1.6fr 1fr;
+      gap: var(--spacing-lg);
+      align-items: start;
+    }
+
+    .photo-section {
+      background: #ddd;
+      border-radius: var(--border-radius-sm);
+      overflow: hidden;
+      box-shadow: var(--shadow);
+    }
+
+    .photo-section img {
+      display: block;
+      width: 100%;
+      height: auto;
+    }
+
+    .info-card {
+      background: var(--card-bg);
+      border-radius: var(--border-radius);
+      box-shadow: var(--shadow);
+      padding: var(--spacing-lg) var(--spacing-lg) calc(var(--spacing-lg) - 4px);
+      display: flex;
+      flex-direction: column;
+      gap: 18px;
+    }
+
+    .card-header {
+      margin-bottom: var(--spacing-xs);
+    }
+
+    .card-title {
+      font-weight: var(--font-weight-bold);
+      font-size: var(--font-size-lg);
+      margin: 0 0 var(--spacing-xs) 0;
+      color: var(--text-primary);
+    }
+
+    .card-subtitle {
+      color: var(--text-muted);
+      margin: 0;
+      font-size: var(--font-size-sm);
+    }
+
+    .specs-section {
+      margin-top: 4px;
+      border-top: 1px solid var(--border-color);
+    }
+
+    .spec-row {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 14px 0;
+      border-bottom: 1px solid var(--border-color);
+      font-size: var(--font-size-sm);
+    }
+
+    .spec-row:last-child {
+      border-bottom: none;
+    }
+
+    .spec-label {
+      color: var(--text-muted);
+      font-weight: var(--font-weight-normal);
+    }
+
+    .spec-value {
+      font-weight: var(--font-weight-bold);
+      color: var(--text-primary);
+    }
+
+    .button-section {
+      display: flex;
+      justify-content: center;
+      padding-top: var(--spacing-xs);
+    }
+
+    .buy-button {
+      appearance: none;
+      border: 0;
+      background: var(--button-bg);
+      padding: 12px 24px;
+      border-radius: var(--border-radius-btn);
+      font-weight: var(--font-weight-semibold);
+      cursor: pointer;
+      font-size: var(--font-size-sm);
+      color: var(--text-primary);
+      transition: background-color 0.2s ease;
+    }
+
+    .buy-button:hover {
+      background: var(--button-hover);
+    }
+
+    /* Responsive design */
+    @media (max-width: 1024px) {
+      .card-wrapper {
+        grid-template-columns: 1fr;
+        gap: var(--spacing-md);
+      }
+      
+      .container {
+        padding: var(--spacing-sm);
+      }
+      
+      .info-card {
+        padding: var(--spacing-md);
+      }
+      
+      .card-title {
+        font-size: var(--font-size-md);
+      }
+    }
+  </style>
+</head>
+<body>
+  <main class="container">
+    <section class="card-wrapper">
+      <figure class="photo-section">
+        <!-- Pakeisk src į savo nuotrauką -->
+        <img src="foto/vilnius-2.jpg" alt="LED ekranas Senukai" />
+      </figure>
+
+      <aside class="info-card" aria-label="Vietos informacija">
+        <header class="card-header">
+          <h1 class="card-title">Senukai</h1>
+          <p class="card-subtitle">Ukmergės g. 248</p>
+        </header>
+
+        <div class="specs-section">
+          <div class="spec-row">
+            <span class="spec-label">Dydis</span>
+            <span class="spec-value">8x4</span>
+          </div>
+          <div class="spec-row">
+            <span class="spec-label">Raiška</span>
+            <span class="spec-value">1152x576</span>
+          </div>
+          <div class="spec-row">
+            <span class="spec-label">Srautas</span>
+            <span class="spec-value">300.258</span>
+          </div>
+          <div class="spec-row">
+            <span class="spec-label">Kaina</span>
+            <span class="spec-value">70 EUR</span>
+          </div>
+        </div>
+
+        <div class="button-section">
+          <button class="buy-button" type="button">Pirkti</button>
+        </div>
+      </aside>
+    </section>
+  </main>
+</body>
+</html>

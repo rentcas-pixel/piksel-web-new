@@ -1,0 +1,481 @@
+<!DOCTYPE html>
+<html lang="lt">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Traffic Layer Mockup - Piksel</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: #f5f5f5;
+            padding: 20px;
+        }
+
+        .mockup-container {
+            max-width: 1200px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 12px;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.1);
+            overflow: hidden;
+        }
+
+        .header {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 20px;
+            text-align: center;
+        }
+
+        .header h1 {
+            font-size: 24px;
+            margin-bottom: 8px;
+        }
+
+        .header p {
+            opacity: 0.9;
+            font-size: 14px;
+        }
+
+        .map-container {
+            position: relative;
+            height: 600px;
+            background: linear-gradient(45deg, #e8f4fd 0%, #f0f8ff 100%);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            overflow: hidden;
+        }
+
+        .map-placeholder {
+            width: 100%;
+            height: 100%;
+            background: 
+                radial-gradient(circle at 20% 30%, rgba(59, 130, 246, 0.1) 0%, transparent 50%),
+                radial-gradient(circle at 80% 70%, rgba(16, 185, 129, 0.1) 0%, transparent 50%),
+                linear-gradient(135deg, #f8fafc 0%, #e2e8f0 100%);
+            position: relative;
+        }
+
+        .map-controls {
+            position: absolute;
+            top: 20px;
+            right: 20px;
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+            z-index: 1000;
+        }
+
+        .control-button {
+            background: white;
+            border: 1px solid #e2e8f0;
+            border-radius: 8px;
+            padding: 12px 16px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-size: 14px;
+            font-weight: 500;
+            color: #374151;
+            transition: all 0.2s ease;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+            min-width: 120px;
+        }
+
+        .control-button:hover {
+            background: #f8fafc;
+            border-color: #cbd5e1;
+            transform: translateY(-1px);
+            box-shadow: 0 4px 8px rgba(0,0,0,0.15);
+        }
+
+        .control-button.active {
+            background: #3b82f6;
+            color: white;
+            border-color: #3b82f6;
+        }
+
+        .control-button.active:hover {
+            background: #2563eb;
+        }
+
+        .traffic-icon {
+            font-size: 16px;
+        }
+
+        .map-markers {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+        }
+
+        .marker {
+            position: absolute;
+            width: 20px;
+            height: 20px;
+            background: #ef4444;
+            border: 3px solid white;
+            border-radius: 50%;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.3);
+            animation: pulse 2s infinite;
+        }
+
+        .marker:nth-child(1) { top: 30%; left: 25%; }
+        .marker:nth-child(2) { top: 45%; left: 60%; }
+        .marker:nth-child(3) { top: 65%; left: 35%; }
+
+        @keyframes pulse {
+            0% { transform: scale(1); opacity: 1; }
+            50% { transform: scale(1.1); opacity: 0.8; }
+            100% { transform: scale(1); opacity: 1; }
+        }
+
+        .traffic-overlay {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+            opacity: 0;
+            transition: opacity 0.3s ease;
+        }
+
+        .traffic-overlay.active {
+            opacity: 1;
+        }
+
+        .traffic-line {
+            position: absolute;
+            height: 4px;
+            background: linear-gradient(90deg, #10b981, #f59e0b, #ef4444);
+            border-radius: 2px;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.2);
+        }
+
+        .traffic-line:nth-child(1) {
+            top: 25%;
+            left: 20%;
+            width: 200px;
+            background: linear-gradient(90deg, #10b981 0%, #f59e0b 50%, #ef4444 100%);
+        }
+
+        .traffic-line:nth-child(2) {
+            top: 40%;
+            left: 55%;
+            width: 150px;
+            background: linear-gradient(90deg, #10b981 0%, #ef4444 100%);
+        }
+
+        .traffic-line:nth-child(3) {
+            top: 60%;
+            left: 30%;
+            width: 180px;
+            background: linear-gradient(90deg, #f59e0b 0%, #ef4444 100%);
+        }
+
+        .traffic-line:nth-child(4) {
+            top: 70%;
+            left: 10%;
+            width: 120px;
+            background: #10b981;
+        }
+
+        .legend {
+            position: absolute;
+            bottom: 20px;
+            left: 20px;
+            background: rgba(255, 255, 255, 0.95);
+            padding: 16px;
+            border-radius: 8px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+            backdrop-filter: blur(10px);
+            opacity: 0;
+            transform: translateY(20px);
+            transition: all 0.3s ease;
+        }
+
+        .legend.active {
+            opacity: 1;
+            transform: translateY(0);
+        }
+
+        .legend h3 {
+            font-size: 14px;
+            font-weight: 600;
+            color: #374151;
+            margin-bottom: 12px;
+        }
+
+        .legend-item {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            margin-bottom: 6px;
+            font-size: 12px;
+            color: #6b7280;
+        }
+
+        .legend-color {
+            width: 16px;
+            height: 4px;
+            border-radius: 2px;
+        }
+
+        .legend-color.green { background: #10b981; }
+        .legend-color.yellow { background: #f59e0b; }
+        .legend-color.red { background: #ef4444; }
+        .legend-color.black { background: #374151; }
+
+        .demo-controls {
+            padding: 20px;
+            background: #f8fafc;
+            border-top: 1px solid #e2e8f0;
+        }
+
+        .demo-controls h3 {
+            font-size: 16px;
+            color: #374151;
+            margin-bottom: 12px;
+        }
+
+        .demo-buttons {
+            display: flex;
+            gap: 12px;
+            flex-wrap: wrap;
+        }
+
+        .demo-button {
+            background: white;
+            border: 1px solid #d1d5db;
+            border-radius: 6px;
+            padding: 8px 16px;
+            cursor: pointer;
+            font-size: 14px;
+            color: #374151;
+            transition: all 0.2s ease;
+        }
+
+        .demo-button:hover {
+            background: #f3f4f6;
+            border-color: #9ca3af;
+        }
+
+        .demo-button.active {
+            background: #3b82f6;
+            color: white;
+            border-color: #3b82f6;
+        }
+
+        .info-panel {
+            position: absolute;
+            top: 20px;
+            left: 20px;
+            background: rgba(255, 255, 255, 0.95);
+            padding: 16px;
+            border-radius: 8px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+            backdrop-filter: blur(10px);
+            max-width: 300px;
+        }
+
+        .info-panel h4 {
+            font-size: 14px;
+            color: #374151;
+            margin-bottom: 8px;
+        }
+
+        .info-panel p {
+            font-size: 12px;
+            color: #6b7280;
+            line-height: 1.4;
+        }
+
+        .status-indicator {
+            display: inline-block;
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            margin-right: 6px;
+        }
+
+        .status-indicator.online {
+            background: #10b981;
+            animation: pulse-green 2s infinite;
+        }
+
+        .status-indicator.offline {
+            background: #ef4444;
+        }
+
+        @keyframes pulse-green {
+            0% { opacity: 1; }
+            50% { opacity: 0.5; }
+            100% { opacity: 1; }
+        }
+    </style>
+</head>
+<body>
+    <div class="mockup-container">
+        <div class="header">
+            <h1>🚦 Traffic Layer Mockup</h1>
+            <p>Real-time eismo duomenys žemėlapyje</p>
+        </div>
+
+        <div class="map-container">
+            <div class="map-placeholder">
+                <!-- Map Markers -->
+                <div class="map-markers">
+                    <div class="marker"></div>
+                    <div class="marker"></div>
+                    <div class="marker"></div>
+                </div>
+
+                <!-- Traffic Overlay -->
+                <div class="traffic-overlay" id="trafficOverlay">
+                    <div class="traffic-line"></div>
+                    <div class="traffic-line"></div>
+                    <div class="traffic-line"></div>
+                    <div class="traffic-line"></div>
+                </div>
+
+                <!-- Info Panel -->
+                <div class="info-panel">
+                    <h4>📊 Eismo situacija</h4>
+                    <p><span class="status-indicator online"></span>Real-time duomenys</p>
+                    <p>Atnaujinama kas 5 min</p>
+                </div>
+
+                <!-- Map Controls -->
+                <div class="map-controls">
+                    <button class="control-button" id="trafficToggle" onclick="toggleTraffic()">
+                        <span class="traffic-icon">🚦</span>
+                        Traffic Layer
+                    </button>
+                    <button class="control-button" onclick="toggleLegend()">
+                        <span>📋</span>
+                        Legend
+                    </button>
+                </div>
+
+                <!-- Legend -->
+                <div class="legend" id="legend">
+                    <h3>Eismo spalvos</h3>
+                    <div class="legend-item">
+                        <div class="legend-color green"></div>
+                        <span>Laisvas eismas</span>
+                    </div>
+                    <div class="legend-item">
+                        <div class="legend-color yellow"></div>
+                        <span>Vidutinis eismas</span>
+                    </div>
+                    <div class="legend-item">
+                        <div class="legend-color red"></div>
+                        <span>Lėtas eismas</span>
+                    </div>
+                    <div class="legend-item">
+                        <div class="legend-color black"></div>
+                        <span>Kamštis</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="demo-controls">
+            <h3>🎮 Demo Controls</h3>
+            <div class="demo-buttons">
+                <button class="demo-button" onclick="simulateTraffic('morning')">🌅 Ryto eismas</button>
+                <button class="demo-button" onclick="simulateTraffic('evening')">🌆 Vakaro eismas</button>
+                <button class="demo-button" onclick="simulateTraffic('weekend')">🏖️ Savaitgalis</button>
+                <button class="demo-button" onclick="simulateTraffic('clear')">✨ Aiškus eismas</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        let trafficActive = false;
+        let legendActive = false;
+
+        function toggleTraffic() {
+            const button = document.getElementById('trafficToggle');
+            const overlay = document.getElementById('trafficOverlay');
+            
+            trafficActive = !trafficActive;
+            
+            if (trafficActive) {
+                button.classList.add('active');
+                overlay.classList.add('active');
+                button.innerHTML = '<span class="traffic-icon">🚦</span> Traffic ON';
+            } else {
+                button.classList.remove('active');
+                overlay.classList.remove('active');
+                button.innerHTML = '<span class="traffic-icon">🚦</span> Traffic Layer';
+            }
+        }
+
+        function toggleLegend() {
+            const legend = document.getElementById('legend');
+            legendActive = !legendActive;
+            
+            if (legendActive) {
+                legend.classList.add('active');
+            } else {
+                legend.classList.remove('active');
+            }
+        }
+
+        function simulateTraffic(type) {
+            const buttons = document.querySelectorAll('.demo-button');
+            buttons.forEach(btn => btn.classList.remove('active'));
+            event.target.classList.add('active');
+
+            const overlay = document.getElementById('trafficOverlay');
+            const lines = overlay.querySelectorAll('.traffic-line');
+            
+            // Reset all lines
+            lines.forEach(line => {
+                line.style.background = '#10b981';
+            });
+
+            switch(type) {
+                case 'morning':
+                    lines[0].style.background = 'linear-gradient(90deg, #ef4444 0%, #f59e0b 50%, #10b981 100%)';
+                    lines[1].style.background = 'linear-gradient(90deg, #ef4444 0%, #f59e0b 100%)';
+                    lines[2].style.background = 'linear-gradient(90deg, #f59e0b 0%, #ef4444 100%)';
+                    break;
+                case 'evening':
+                    lines[0].style.background = 'linear-gradient(90deg, #ef4444 0%, #f59e0b 50%, #10b981 100%)';
+                    lines[1].style.background = 'linear-gradient(90deg, #ef4444 0%, #f59e0b 100%)';
+                    lines[2].style.background = 'linear-gradient(90deg, #f59e0b 0%, #ef4444 100%)';
+                    lines[3].style.background = '#ef4444';
+                    break;
+                case 'weekend':
+                    lines[0].style.background = 'linear-gradient(90deg, #10b981 0%, #f59e0b 100%)';
+                    lines[1].style.background = '#10b981';
+                    lines[2].style.background = 'linear-gradient(90deg, #10b981 0%, #f59e0b 100%)';
+                    break;
+                case 'clear':
+                    lines.forEach(line => {
+                        line.style.background = '#10b981';
+                    });
+                    break;
+            }
+        }
+
+        // Auto-toggle traffic for demo
+        setTimeout(() => {
+            toggleTraffic();
+        }, 2000);
+    </script>
+</body>
+</html>
