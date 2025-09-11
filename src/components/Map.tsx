@@ -21,7 +21,7 @@ export default function Map({ selectedCity, selectedScreens, screenCities, selec
   const [isMobile, setIsMobile] = useState(false);
   const mapRef = useRef<HTMLDivElement>(null);
   const { screens: ledScreens, loading, error } = useLEDScreens();
-  
+
   useEffect(() => {
     const checkMobile = () => {
       setIsMobile(window.innerWidth < 768);
