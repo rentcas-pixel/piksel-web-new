@@ -24,12 +24,18 @@ export default function Map({ selectedCity, selectedScreens, screenCities, selec
   
   useEffect(() => {
     const checkMobile = () => {
-      setIsMobile(window.innerWidth < 768);
+      if (typeof window !== 'undefined') {
+        const mediaQuery = window.matchMedia('(max-width: 767px)');
+        setIsMobile(mediaQuery.matches);
+      }
     };
     
     checkMobile();
-    window.addEventListener('resize', checkMobile);
-    return () => window.removeEventListener('resize', checkMobile);
+    if (typeof window !== 'undefined') {
+      const mediaQuery = window.matchMedia('(max-width: 767px)');
+      mediaQuery.addEventListener('change', checkMobile);
+      return () => mediaQuery.removeEventListener('change', checkMobile);
+    }
   }, []);
 
   // Mobile popup template
@@ -183,6 +189,64 @@ export default function Map({ selectedCity, selectedScreens, screenCities, selec
               if (Math.abs(latLng.lat - screen.coordinates[0]) < 0.0001 && 
                   Math.abs(latLng.lng - screen.coordinates[1]) < 0.0001) {
                 layer.openPopup();
+              }
+            }
+          });
+        }
+      };
+
+      // Add window function for screen selection
+      (window as any).selectScreen = (screenName: string) => {
+        if (onSelectScreen) {
+          onSelectScreen(screenName);
+        }
+      };
+
+      // Add function to hide cards and show popup
+      (window as any).scrollToMapAndShowPopup = (screenId: string) => {
+        // Find the screen first
+        const screen = ledScreens?.find(s => s.id === screenId);
+        if (screen && map) {
+          // Hide the screen cards section
+          const cardsSection = document.querySelector('[data-screen-cards]');
+          if (cardsSection) {
+            (cardsSection as HTMLElement).style.display = 'none';
+          }
+          
+          // Show popup immediately
+          const popupContent = `
+            <div style="text-align: center; min-width: 200px;">
+              <div style="margin-bottom: 12px;">
+                <img src="${screen.image_url}" alt="${screen.name}" 
+                     style="width: 100%; height: 120px; object-fit: cover; border-radius: 8px; margin-bottom: 8px;">
+              </div>
+              <h3 style="font-size: 16px; font-weight: 600; color: #111827; margin-bottom: 8px;">
+                ${screen.name}
+              </h3>
+              <p style="font-size: 14px; color: #6b7280; margin-bottom: 8px;">
+                ${screen.address}
+              </p>
+              <div style="display: flex; justify-content: center; padding-top: 8px;">
+                <button onclick="window.selectScreen('${screen.name}')"
+                         style="appearance: none; border: 1px solid #d1d5db; background: #f9fafb; padding: 8px 16px; border-radius: 8px; font-weight: 500; cursor: pointer; font-size: 14px; color: #4b5563; transition: background-color 0.2s;">
+                  ${selectedScreens && selectedScreens.includes(screen.name) ? '✓ Pridėtas' : '+ Pridėti'}
+                </button>
+              </div>
+            </div>
+          `;
+          
+          // Center map on the screen with higher zoom to show marker in center
+          map.setView([screen.coordinates[0], screen.coordinates[1]], 15);
+          
+          // Find and open popup on existing marker
+          map.eachLayer((layer) => {
+            if (layer instanceof L.Marker) {
+              const markerLatLng = layer.getLatLng();
+              const screenLatLng = L.latLng(screen.coordinates[0], screen.coordinates[1]);
+              
+              // Check if this marker is close to our screen coordinates
+              if (markerLatLng.distanceTo(screenLatLng) < 10) { // 10 meters tolerance
+                layer.bindPopup(popupContent).openPopup();
               }
             }
           });
@@ -405,41 +469,85 @@ export default function Map({ selectedCity, selectedScreens, screenCities, selec
   }
 
   return (
-    <div className="w-full h-screen flex flex-col">
+    <div style={{ 
+      width: '100vw', 
+      height: '100vh', 
+      display: 'flex', 
+      flexDirection: 'column',
+      backgroundColor: '#f0f0f0',
+      position: 'fixed',
+      top: 0,
+      left: 0,
+      zIndex: 1000,
+      overflow: 'hidden'
+    }}>
+      
       {/* Main Sidebar - Horizontal */}
-      <div className="bg-white border-b border-gray-200 px-4 py-3">
-        <div className="flex items-center justify-between">
-          <div className="flex items-center gap-3">
-            <div className="text-lg font-bold text-gray-900">Piksel</div>
-            <div className="text-sm text-gray-500">LED ekranai</div>
+      <div style={{ 
+        backgroundColor: 'white', 
+        borderBottom: '1px solid #e5e7eb', 
+        padding: '24px 32px',
+        flexShrink: 0
+      }}>
+        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+          <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
+            <img 
+              src="/Piksel-logo-black-2023.png" 
+              alt="Piksel Logo" 
+              style={{ height: '22px', width: 'auto' }}
+            />
           </div>
-          <div className="flex items-center gap-2">
-            <button className="px-3 py-1 bg-blue-500 text-white rounded text-sm">
-              Paslaugos
-            </button>
-            <button className="px-3 py-1 bg-gray-100 text-gray-700 rounded text-sm">
-              Kontaktai
+          <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+            <button style={{ 
+              padding: '8px', 
+              backgroundColor: '#f3f4f6', 
+              color: '#374151', 
+              borderRadius: '6px', 
+              fontSize: '16px',
+              border: 'none',
+              cursor: 'pointer',
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              width: '32px',
+              height: '32px'
+            }}>
+              📞
             </button>
           </div>
         </div>
       </div>
 
       {/* Additional Sidebar - Horizontal */}
-      <div className="bg-gray-50 border-b border-gray-200 px-4 py-2">
-        <div className="flex items-center gap-3 flex-wrap">
-          <div className="text-sm font-medium text-gray-700">Miestai:</div>
-          {ledScreens && Object.keys(ledScreens.reduce((acc, screen) => {
-            if (!acc[screen.city]) acc[screen.city] = true;
-            return acc;
-          }, {} as {[key: string]: boolean})).map(city => (
+      <div style={{ 
+        backgroundColor: '#f9fafb', 
+        borderBottom: '1px solid #e5e7eb', 
+        padding: '14px 16px',
+        flexShrink: 0
+      }}>
+        <div style={{ 
+          display: 'flex', 
+          alignItems: 'center', 
+          gap: '6px', 
+          overflowX: 'auto',
+          paddingBottom: '4px'
+        }}>
+          {['Vilnius', 'Kaunas', 'Klaipėda', 'Šiauliai', 'Panevėžys', 'Regionai', 'Klipai', 'DUK'].map(city => (
             <button
               key={city}
               onClick={() => onCityChange && onCityChange(city)}
-              className={`px-3 py-1 rounded-full text-sm font-medium ${
-                selectedCity === city 
-                  ? 'bg-blue-500 text-white' 
-                  : 'bg-white text-gray-700 border border-gray-300'
-              }`}
+              style={{
+                padding: '6px 12px',
+                borderRadius: '9999px',
+                fontSize: '13px',
+                fontWeight: '500',
+                backgroundColor: selectedCity === city ? '#3b82f6' : 'white',
+                color: selectedCity === city ? 'white' : '#374151',
+                border: selectedCity === city ? 'none' : '1px solid #d1d5db',
+                cursor: 'pointer',
+                whiteSpace: 'nowrap',
+                flexShrink: 0
+              }}
             >
               {city}
             </button>
@@ -447,8 +555,122 @@ export default function Map({ selectedCity, selectedScreens, screenCities, selec
         </div>
       </div>
 
+      {/* Screen Cards - Show when city is selected */}
+      {selectedCity && selectedCity !== 'Klipai' && selectedCity !== 'DUK' && (
+        <div data-screen-cards style={{ 
+          backgroundColor: 'white', 
+          borderBottom: '1px solid #e5e7eb', 
+          padding: '12px 16px',
+          flexShrink: 0,
+          position: 'relative',
+          zIndex: 2
+        }}>
+          <div style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
+            {ledScreens && ledScreens
+              .filter(screen => screen.city === selectedCity)
+              .map(screen => (
+                <div key={screen.id} style={{ 
+                  backgroundColor: 'white',
+                  borderRadius: '8px',
+                  border: '1px solid #e5e7eb',
+                  padding: '16px',
+                  boxShadow: '0 1px 2px rgba(0, 0, 0, 0.05)'
+                }}>
+                  {/* Screen Image */}
+                  <div style={{ marginBottom: '12px' }}>
+                    <img 
+                      src={screen.image_url} 
+                      alt={screen.name}
+                      style={{ 
+                        width: '100%', 
+                        height: '176px', 
+                        objectFit: 'cover', 
+                        borderRadius: '6px'
+                      }}
+                    />
+                  </div>
+                  
+                  {/* Screen Info */}
+                  <div style={{ marginBottom: '12px' }}>
+                    <div style={{ fontSize: '16px', fontWeight: '600', color: '#111827', marginBottom: '4px' }}>
+                      {screen.name}
+                    </div>
+                    <div style={{ fontSize: '14px', color: '#6b7280' }}>
+                      <div style={{ display: 'flex', alignItems: 'center', gap: '4px', marginBottom: '4px' }}>
+                        <span style={{ fontSize: '12px', color: '#9ca3af' }}>📍</span>
+                        <span style={{ fontWeight: '500' }}>Adresas:</span>
+                      </div>
+                      <p style={{ color: '#374151', marginLeft: '16px' }}>{screen.address}</p>
+                    </div>
+                  </div>
+                  
+                  {/* Action Buttons */}
+                  <div style={{ display: 'flex', gap: '8px' }}>
+                    <button
+                      onClick={() => {
+                        // Scroll to map and show popup
+                        if (typeof window !== 'undefined' && (window as any).scrollToMapAndShowPopup) {
+                          (window as any).scrollToMapAndShowPopup(screen.id);
+                        }
+                      }}
+                      style={{
+                        flex: 1,
+                        backgroundColor: '#f9fafb',
+                        color: '#6b7280',
+                        border: '1px solid #e5e7eb',
+                        borderRadius: '6px',
+                        padding: '8px 12px',
+                        fontSize: '14px',
+                        fontWeight: '500',
+                        cursor: 'pointer',
+                        display: 'flex',
+                        alignItems: 'center',
+                        justifyContent: 'center',
+                        gap: '8px'
+                      }}
+                    >
+                      <span style={{ fontSize: '12px' }}>+</span>
+                      Pridėti
+                    </button>
+                    <button 
+                      onClick={() => {
+                        // Info logic
+                        console.log('Info for screen:', screen.id);
+                      }}
+                      style={{
+                        flex: 1,
+                        backgroundColor: '#f9fafb',
+                        color: '#6b7280',
+                        border: '1px solid #e5e7eb',
+                        borderRadius: '6px',
+                        padding: '8px 12px',
+                        fontSize: '14px',
+                        fontWeight: '500',
+                        cursor: 'pointer',
+                        display: 'flex',
+                        alignItems: 'center',
+                        justifyContent: 'center',
+                        gap: '8px'
+                      }}
+                    >
+                      <span style={{ fontSize: '12px' }}>ℹ</span>
+                      Info
+                    </button>
+                  </div>
+                </div>
+              ))}
+          </div>
+        </div>
+      )}
+
       {/* Map Container - Takes remaining space */}
-      <div ref={mapRef} className="flex-1 relative">
+      <div ref={mapRef} id="map-container" style={{ 
+        flex: 1, 
+        position: 'relative', 
+        backgroundColor: '#f8f9fa',
+        minHeight: 0,
+        zIndex: 1
+      }}>
         {/* Filter Bar - Only show when screens are selected */}
         {(selectedScreens && selectedScreens.length > 0) && (
           <div className="absolute top-4 left-4 right-4 z-[1000] bg-white rounded-lg shadow-lg border border-gray-200 px-4 py-3">
