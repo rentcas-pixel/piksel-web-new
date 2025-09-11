@@ -24,12 +24,18 @@ export default function Map({ selectedCity, selectedScreens, screenCities, selec
 
   useEffect(() => {
     const checkMobile = () => {
-      setIsMobile(window.innerWidth < 768);
+      if (typeof window !== 'undefined') {
+        const mediaQuery = window.matchMedia('(max-width: 767px)');
+        setIsMobile(mediaQuery.matches);
+      }
     };
     
     checkMobile();
-    window.addEventListener('resize', checkMobile);
-    return () => window.removeEventListener('resize', checkMobile);
+    if (typeof window !== 'undefined') {
+      const mediaQuery = window.matchMedia('(max-width: 767px)');
+      mediaQuery.addEventListener('change', checkMobile);
+      return () => mediaQuery.removeEventListener('change', checkMobile);
+    }
   }, []);
 
   useEffect(() => {
