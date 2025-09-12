@@ -3,6 +3,7 @@
 import { Download, Image, Video } from 'lucide-react';
 import { ledScreens } from '@/data/ledScreens';
 import { useState } from 'react';
+import Link from 'next/link';
 
 export default function KlipaiMobile() {
   const [showContactPopup, setShowContactPopup] = useState(false);
@@ -56,13 +57,13 @@ export default function KlipaiMobile() {
       }}>
         <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
           <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
-            <a href="/" style={{ textDecoration: 'none' }}>
+            <Link href="/" style={{ textDecoration: 'none' }}>
               <img 
                 src="/Piksel-logo-black-2023.png" 
                 alt="Piksel Logo" 
                 style={{ height: '22px', width: 'auto' }}
               />
-            </a>
+            </Link>
           </div>
           <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
             <button 
