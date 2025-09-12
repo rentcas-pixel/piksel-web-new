@@ -15,12 +15,63 @@ interface MapProps {
   onCityChange?: (city: string) => void;
 }
 
-export default function Map({ selectedCity, selectedScreens, screenCities, selectedDateRange, onClearFilter, onSelectScreen, onDateRangeChange, onCityChange }: MapProps) {
+export default function Map({ selectedCity, selectedScreens: propSelectedScreens, screenCities: propScreenCities, selectedDateRange: propSelectedDateRange, onClearFilter, onSelectScreen, onDateRangeChange, onCityChange }: MapProps) {
   const mapRef = useRef<HTMLDivElement>(null);
   const { screens: ledScreens, loading, error } = useLEDScreens();
   
+  // Local state for mobile
+  const [selectedScreens, setSelectedScreens] = useState<string[]>(propSelectedScreens || []);
+  const [screenCities, setScreenCities] = useState<{[screenName: string]: string}>(propScreenCities || {});
+  const [selectedDateRange, setSelectedDateRange] = useState<{from: string; to: string} | null>(propSelectedDateRange || null);
+  const [showInquiryForm, setShowInquiryForm] = useState(false);
+  
   // Check if mobile
   const [isMobile, setIsMobile] = useState(false);
+  
+  // Handle screen selection
+  const handleSelectScreen = (screenName: string) => {
+    if (selectedScreens.includes(screenName)) {
+      // Remove screen
+      setSelectedScreens(prev => prev.filter(s => s !== screenName));
+      setScreenCities(prev => {
+        const newScreenCities = { ...prev };
+        delete newScreenCities[screenName];
+        return newScreenCities;
+      });
+    } else {
+      // Add screen
+      setSelectedScreens(prev => [...prev, screenName]);
+      setScreenCities(prev => ({
+        ...prev,
+        [screenName]: selectedCity
+      }));
+    }
+  };
+
+  // Handle date range change
+  const handleDateRangeChange = (from: string, to: string) => {
+    const newRange = { from, to };
+    setSelectedDateRange(newRange);
+    if (onDateRangeChange) {
+      onDateRangeChange(from, to);
+    }
+    
+    // Show inquiry form when end date is selected
+    if (to) {
+      setShowInquiryForm(true);
+    }
+  };
+
+  // Clear all filters
+  const handleClearFilter = () => {
+    setSelectedScreens([]);
+    setScreenCities({});
+    setSelectedDateRange(null);
+    setShowInquiryForm(false);
+    if (onClearFilter) {
+      onClearFilter();
+    }
+  };
   
   useEffect(() => {
     const checkMobile = () => {
@@ -522,7 +573,7 @@ export default function Map({ selectedCity, selectedScreens, screenCities, selec
       <div style={{ 
         backgroundColor: '#f9fafb', 
         borderBottom: '1px solid #e5e7eb', 
-        padding: '14px 16px',
+        padding: '18px 16px',
         flexShrink: 0
       }}>
         <div style={{ 
@@ -532,7 +583,7 @@ export default function Map({ selectedCity, selectedScreens, screenCities, selec
           overflowX: 'auto',
           paddingBottom: '4px'
         }}>
-          {['Vilnius', 'Kaunas', 'Klaipėda', 'Šiauliai', 'Panevėžys', 'Regionai', 'Klipai', 'DUK'].map(city => (
+          {['Vilnius', 'Kaunas', 'Klaipėda', 'Šiauliai', 'Panevėžys', 'Regionai'].map(city => (
             <button
               key={city}
               onClick={() => onCityChange && onCityChange(city)}
@@ -553,19 +604,212 @@ export default function Map({ selectedCity, selectedScreens, screenCities, selec
             </button>
           ))}
         </div>
-      </div>
+        </div>
+        
+        {/* Filter Bar - Show when screens are selected */}
+        {selectedScreens && selectedScreens.length > 0 && (
+          <div style={{
+            backgroundColor: 'white',
+            borderBottom: '1px solid #e5e7eb',
+            padding: '12px 16px',
+            flexShrink: 0
+          }}>
+            <div style={{ display: 'flex', alignItems: 'center', gap: '12px', flexWrap: 'wrap', marginBottom: '8px' }}>
+              <div style={{ fontSize: '14px', fontWeight: '500', color: '#374151' }}>Pasirinkite:</div>
+              {screenCities && Object.keys(screenCities).length > 0 && (
+                <>
+                  {Object.entries(screenCities).reduce((acc, [screenName, city]) => {
+                    if (!acc.find(([_, c]) => c === city)) {
+                      acc.push([city, city]);
+                    }
+                    return acc;
+                  }, [] as [string, string][]).map(([city, _]) => (
+                    <div key={city} style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                      <div style={{
+                        backgroundColor: '#dbeafe',
+                        color: '#1e40af',
+                        padding: '4px 12px',
+                        borderRadius: '20px',
+                        fontSize: '12px',
+                        fontWeight: '500'
+                      }}>
+                        {city}
+                      </div>
+                      {selectedScreens && selectedScreens
+                        .filter(screen => screenCities[screen] === city)
+                        .map((screen, index) => (
+                          <div key={index} style={{
+                            backgroundColor: '#dcfce7',
+                            color: '#166534',
+                            padding: '4px 12px',
+                            borderRadius: '20px',
+                            fontSize: '12px',
+                            fontWeight: '500',
+                            display: 'flex',
+                            alignItems: 'center',
+                            gap: '4px'
+                          }}>
+                            {screen}
+                            <button
+                              onClick={() => handleSelectScreen(screen)}
+                              style={{
+                                color: '#16a34a',
+                                fontWeight: 'bold',
+                                fontSize: '14px',
+                                background: 'none',
+                                border: 'none',
+                                cursor: 'pointer',
+                                padding: '0',
+                                marginLeft: '4px'
+                              }}
+                              title="Išimti ekraną"
+                            >
+                              ×
+                            </button>
+                          </div>
+                        ))}
+                    </div>
+                  ))}
+                </>
+              )}
+              <button
+                onClick={handleClearFilter}
+                style={{
+                  color: '#9ca3af',
+                  fontSize: '14px',
+                  background: 'none',
+                  border: 'none',
+                  cursor: 'pointer',
+                  padding: '4px'
+                }}
+              >
+                ×
+              </button>
+            </div>
 
-      {/* Screen Cards - Show when city is selected */}
-      {selectedCity && selectedCity !== 'Klipai' && selectedCity !== 'DUK' && (
+            {/* Date Range - Only show when screens are selected */}
+            {selectedScreens && selectedScreens.length > 0 && (
+              <div style={{ display: 'flex', alignItems: 'center', gap: '12px', paddingTop: '8px', borderTop: '1px solid #f3f4f6' }}>
+                <div style={{ fontSize: '14px', fontWeight: '500', color: '#374151' }}>Reklamos periodas:</div>
+                <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                  <input
+                    type="date"
+                    value={selectedDateRange?.from || ''}
+                    onChange={(e) => handleDateRangeChange(e.target.value, selectedDateRange?.to || '')}
+                    style={{
+                      padding: '6px 8px',
+                      border: '1px solid #d1d5db',
+                      borderRadius: '6px',
+                      fontSize: '12px',
+                      outline: 'none'
+                    }}
+                    placeholder="Nuo"
+                  />
+                  <span style={{ color: '#6b7280', fontSize: '12px' }}>iki</span>
+                  <input
+                    type="date"
+                    value={selectedDateRange?.to || ''}
+                    onChange={(e) => handleDateRangeChange(selectedDateRange?.from || '', e.target.value)}
+                    style={{
+                      padding: '6px 8px',
+                      border: '1px solid #d1d5db',
+                      borderRadius: '6px',
+                      fontSize: '12px',
+                      outline: 'none'
+                    }}
+                    placeholder="Iki"
+                  />
+                </div>
+              </div>
+            )}
+          </div>
+        )}
+        
+        {/* Inquiry Form - Show when end date is selected */}
+        {showInquiryForm && selectedDateRange?.to && (
+          <div style={{
+            backgroundColor: 'white',
+            borderBottom: '1px solid #e5e7eb',
+            padding: '16px',
+            flexShrink: 0
+          }}>
+            <h3 style={{ fontSize: '16px', fontWeight: '600', color: '#111827', marginBottom: '12px' }}>
+              Užklausos forma
+            </h3>
+            <div style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
+              <input
+                type="text"
+                placeholder="Jūsų vardas"
+                style={{
+                  padding: '8px 12px',
+                  border: '1px solid #d1d5db',
+                  borderRadius: '6px',
+                  fontSize: '14px',
+                  outline: 'none'
+                }}
+              />
+              <input
+                type="email"
+                placeholder="El. paštas"
+                style={{
+                  padding: '8px 12px',
+                  border: '1px solid #d1d5db',
+                  borderRadius: '6px',
+                  fontSize: '14px',
+                  outline: 'none'
+                }}
+              />
+              <input
+                type="tel"
+                placeholder="Telefono numeris"
+                style={{
+                  padding: '8px 12px',
+                  border: '1px solid #d1d5db',
+                  borderRadius: '6px',
+                  fontSize: '14px',
+                  outline: 'none'
+                }}
+              />
+              <textarea
+                placeholder="Papildoma informacija"
+                rows={3}
+                style={{
+                  padding: '8px 12px',
+                  border: '1px solid #d1d5db',
+                  borderRadius: '6px',
+                  fontSize: '14px',
+                  outline: 'none',
+                  resize: 'vertical'
+                }}
+              />
+              <button
+                style={{
+                  backgroundColor: '#2563eb',
+                  color: 'white',
+                  padding: '10px 16px',
+                  borderRadius: '6px',
+                  fontSize: '14px',
+                  fontWeight: '500',
+                  border: 'none',
+                  cursor: 'pointer'
+                }}
+              >
+                Siųsti užklausą
+              </button>
+            </div>
+          </div>
+        )}
+        
+        {/* Screen Cards - Show when city is selected */}
+        {selectedCity && (
         <div data-screen-cards style={{ 
           backgroundColor: 'white', 
-          borderBottom: '1px solid #e5e7eb', 
           padding: '12px 16px',
-          flexShrink: 0,
+          flex: 1,
           position: 'relative',
           zIndex: 2
         }}>
-          <div style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
+          <div style={{ display: 'flex', flexDirection: 'column', gap: '12px', overflowY: 'auto', maxHeight: 'calc(100vh - 200px)', paddingBottom: '8px' }}>
             {ledScreens && ledScreens
               .filter(screen => screen.city === selectedCity)
               .map(screen => (
@@ -574,7 +818,8 @@ export default function Map({ selectedCity, selectedScreens, screenCities, selec
                   borderRadius: '8px',
                   border: '1px solid #e5e7eb',
                   padding: '16px',
-                  boxShadow: '0 1px 2px rgba(0, 0, 0, 0.05)'
+                  boxShadow: '0 1px 2px rgba(0, 0, 0, 0.05)',
+                  width: '100%'
                 }}>
                   {/* Screen Image */}
                   <div style={{ marginBottom: '12px' }}>
@@ -605,19 +850,13 @@ export default function Map({ selectedCity, selectedScreens, screenCities, selec
                   </div>
                   
                   {/* Action Buttons */}
-                  <div style={{ display: 'flex', gap: '8px' }}>
+                  <div style={{ display: 'flex', gap: '8px', justifyContent: 'flex-end' }}>
                     <button
-                      onClick={() => {
-                        // Scroll to map and show popup
-                        if (typeof window !== 'undefined' && (window as any).scrollToMapAndShowPopup) {
-                          (window as any).scrollToMapAndShowPopup(screen.id);
-                        }
-                      }}
+                      onClick={() => handleSelectScreen(screen.name)}
                       style={{
-                        flex: 1,
-                        backgroundColor: '#f9fafb',
-                        color: '#6b7280',
-                        border: '1px solid #e5e7eb',
+                        backgroundColor: selectedScreens.includes(screen.name) ? '#f0fdf4' : '#f9fafb',
+                        color: selectedScreens.includes(screen.name) ? '#16a34a' : '#6b7280',
+                        border: selectedScreens.includes(screen.name) ? '1px solid #16a34a' : '1px solid #e5e7eb',
                         borderRadius: '6px',
                         padding: '8px 12px',
                         fontSize: '14px',
@@ -629,32 +868,10 @@ export default function Map({ selectedCity, selectedScreens, screenCities, selec
                         gap: '8px'
                       }}
                     >
-                      <span style={{ fontSize: '12px' }}>+</span>
-                      Pridėti
-                    </button>
-                    <button 
-                      onClick={() => {
-                        // Info logic
-                        console.log('Info for screen:', screen.id);
-                      }}
-                      style={{
-                        flex: 1,
-                        backgroundColor: '#f9fafb',
-                        color: '#6b7280',
-                        border: '1px solid #e5e7eb',
-                        borderRadius: '6px',
-                        padding: '8px 12px',
-                        fontSize: '14px',
-                        fontWeight: '500',
-                        cursor: 'pointer',
-                        display: 'flex',
-                        alignItems: 'center',
-                        justifyContent: 'center',
-                        gap: '8px'
-                      }}
-                    >
-                      <span style={{ fontSize: '12px' }}>ℹ</span>
-                      Info
+                      <span style={{ fontSize: '12px' }}>
+                        {selectedScreens.includes(screen.name) ? '✓' : '+'}
+                      </span>
+                      {selectedScreens.includes(screen.name) ? 'Pridėtas' : 'Pridėti'}
                     </button>
                   </div>
                 </div>
@@ -663,83 +880,6 @@ export default function Map({ selectedCity, selectedScreens, screenCities, selec
         </div>
       )}
 
-      {/* Map Container - Takes remaining space */}
-      <div ref={mapRef} id="map-container" style={{ 
-        flex: 1, 
-        position: 'relative', 
-        backgroundColor: '#f8f9fa',
-        minHeight: 0,
-        zIndex: 1
-      }}>
-        {/* Filter Bar - Only show when screens are selected */}
-        {(selectedScreens && selectedScreens.length > 0) && (
-          <div className="absolute top-4 left-4 right-4 z-[1000] bg-white rounded-lg shadow-lg border border-gray-200 px-4 py-3">
-            <div className="flex items-center gap-3 flex-wrap">
-              <div className="text-sm font-medium text-gray-700">Pasirinkite:</div>
-              {screenCities && Object.keys(screenCities).length > 0 && (
-                <>
-                  {Object.entries(screenCities).reduce((acc, [screenName, city]) => {
-                    if (!acc.find(([_, c]) => c === city)) {
-                      acc.push([city, city]);
-                    }
-                    return acc;
-                  }, [] as [string, string][]).map(([city, _]) => (
-                    <div key={city} className="flex items-center gap-2">
-                      <div className="bg-blue-100 text-blue-800 px-3 py-1 rounded-full text-sm font-medium">
-                        {city}
-                      </div>
-                      {selectedScreens && selectedScreens
-                        .filter(screen => screenCities[screen] === city)
-                        .map((screen, index) => (
-                          <div key={index} className="bg-green-100 text-green-800 px-3 py-1 rounded-full text-sm font-medium flex items-center gap-2">
-                            {screen}
-                            <button 
-                              onClick={() => onSelectScreen && onSelectScreen(screen)}
-                              className="text-green-600 hover:text-green-800 text-sm font-bold ml-1"
-                              title="Išimti ekraną"
-                            >
-                              ×
-                            </button>
-                          </div>
-                        ))}
-                    </div>
-                  ))}
-                </>
-              )}
-              <button 
-                onClick={onClearFilter}
-                className="text-gray-400 hover:text-gray-600 text-sm"
-              >
-                ×
-              </button>
-            </div>
-            
-            {/* Date Range Mockup - Only show when screens are selected */}
-            {selectedScreens && selectedScreens.length > 0 && (
-              <div className="flex items-center gap-3 pt-2 border-t border-gray-100">
-                <div className="text-sm font-medium text-gray-700">Reklamos periodas:</div>
-                <div className="flex items-center gap-2">
-                  <input
-                    type="date"
-                    value={selectedDateRange?.from || ''}
-                    onChange={(e) => onDateRangeChange && onDateRangeChange(e.target.value, selectedDateRange?.to || '')}
-                    className="px-3 py-1 border border-gray-300 rounded text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
-                    placeholder="Nuo"
-                  />
-                  <span className="text-gray-500 text-sm">iki</span>
-                  <input
-                    type="date"
-                    value={selectedDateRange?.to || ''}
-                    onChange={(e) => onDateRangeChange && onDateRangeChange(selectedDateRange?.from || '', e.target.value)}
-                    className="px-3 py-1 border border-gray-300 rounded text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
-                    placeholder="Iki"
-                  />
-                </div>
-              </div>
-            )}
-          </div>
-        )}
-      </div>
     </div>
   );
 }
