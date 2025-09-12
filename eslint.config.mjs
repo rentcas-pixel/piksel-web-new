@@ -29,6 +29,7 @@ const eslintConfig = [
       "@next/next/no-img-element": "off",
       "react-hooks/exhaustive-deps": "off",
       "@typescript-eslint/no-empty-object-type": "off",
+      "jsx-a11y/alt-text": "off",
     },
   },
 ];

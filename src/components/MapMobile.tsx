@@ -295,7 +295,7 @@ export default function Map({ selectedCity, selectedScreens: propSelectedScreens
           map.setView([screen.coordinates[0], screen.coordinates[1]], 15);
           
           // Find and open popup on existing marker
-          map.eachLayer((layer) => {
+          map.eachLayer((layer: any) => {
             if (layer instanceof L.Marker) {
               const markerLatLng = layer.getLatLng();
               const screenLatLng = L.latLng(screen.coordinates[0], screen.coordinates[1]);
