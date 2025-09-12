@@ -108,7 +108,7 @@ export default function Home() {
   const mapCity = selectedCity;
 
   const handleClearFilter = () => {
-    setSelectedCity('');
+    setSelectedCity('Vilnius');
     setSelectedScreens([]);
     setScreenCities({});
     setDateRange(null);

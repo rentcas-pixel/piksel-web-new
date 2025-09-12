@@ -25,6 +25,7 @@ export default function Map({ selectedCity, selectedScreens: propSelectedScreens
   const [selectedDateRange, setSelectedDateRange] = useState<{from: string; to: string} | null>(propSelectedDateRange || null);
   const [showInquiryForm, setShowInquiryForm] = useState(false);
   const [showContactPopup, setShowContactPopup] = useState(false);
+  const [showHamburgerMenu, setShowHamburgerMenu] = useState(false);
   
   // Check if mobile
   const [isMobile, setIsMobile] = useState(false);
@@ -69,6 +70,9 @@ export default function Map({ selectedCity, selectedScreens: propSelectedScreens
     setScreenCities({});
     setSelectedDateRange(null);
     setShowInquiryForm(false);
+    if (onCityChange) {
+      onCityChange('Vilnius');
+    }
     if (onClearFilter) {
       onClearFilter();
     }
@@ -531,7 +535,7 @@ export default function Map({ selectedCity, selectedScreens: propSelectedScreens
       top: 0,
       left: 0,
       zIndex: 1000,
-      overflow: 'hidden'
+      overflow: 'auto'
     }}>
       
       {/* Main Sidebar - Horizontal */}
@@ -551,12 +555,32 @@ export default function Map({ selectedCity, selectedScreens: propSelectedScreens
           </div>
           <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
             <button 
+              onClick={() => setShowHamburgerMenu(true)}
+              style={{ 
+                padding: '8px', 
+                backgroundColor: '#3b82f6', 
+                color: 'white', 
+                borderRadius: '11px', 
+                fontSize: '16px',
+                fontWeight: 'bold',
+                border: 'none',
+                cursor: 'pointer',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                width: '32px',
+                height: '32px'
+              }}
+            >
+              ☰
+            </button>
+            <button 
               onClick={() => setShowContactPopup(true)}
               style={{ 
                 padding: '8px', 
-                backgroundColor: '#2563eb', 
+                backgroundColor: '#3b82f6', 
                 color: 'white', 
-                borderRadius: '6px', 
+                borderRadius: '11px', 
                 fontSize: '16px',
                 fontWeight: 'bold',
                 border: 'none',
@@ -758,7 +782,9 @@ export default function Map({ selectedCity, selectedScreens: propSelectedScreens
             backgroundColor: '#eff6ff',
             borderBottom: '1px solid #e5e7eb',
             padding: '12px 16px',
-            flexShrink: 0
+            flexShrink: 0,
+            position: 'relative',
+            zIndex: 1
           }}>
             <div style={{ display: 'flex', alignItems: 'center', gap: '12px', flexWrap: 'wrap', marginBottom: '8px' }}>
               <div style={{ fontSize: '14px', fontWeight: '500', color: '#374151' }}>Pasirinkite:</div>
@@ -963,7 +989,8 @@ export default function Map({ selectedCity, selectedScreens: propSelectedScreens
           padding: '12px 16px',
           flex: 1,
           position: 'relative',
-          zIndex: 2
+          zIndex: 10,
+          minHeight: '200px'
         }}>
           <div style={{ display: 'flex', flexDirection: 'column', gap: '12px', overflowY: 'auto', maxHeight: 'calc(100vh - 200px)', paddingBottom: '8px' }}>
             {ledScreens && ledScreens
@@ -1032,6 +1059,120 @@ export default function Map({ selectedCity, selectedScreens: propSelectedScreens
                   </div>
                 </div>
               ))}
+          </div>
+        </div>
+      )}
+
+      {/* Hamburger Menu */}
+      {showHamburgerMenu && (
+        <div style={{
+          position: 'fixed',
+          top: 0,
+          left: 0,
+          right: 0,
+          bottom: 0,
+          backgroundColor: 'rgba(0, 0, 0, 0.5)',
+          zIndex: 2000,
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'center'
+        }}>
+          <div style={{
+            backgroundColor: 'white',
+            borderRadius: '16px',
+            padding: '24px',
+            maxWidth: '320px',
+            width: '90%',
+            maxHeight: '80vh',
+            overflowY: 'auto',
+            boxShadow: '0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04)',
+            backdropFilter: 'blur(10px)'
+          }}>
+            {/* Header */}
+            <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '20px' }}>
+              <img 
+                src="/Piksel-logo-black-2023.png" 
+                alt="Piksel Logo" 
+                style={{ height: '22px', width: 'auto' }}
+              />
+              <button
+                onClick={() => setShowHamburgerMenu(false)}
+                style={{
+                  background: 'rgba(107, 114, 128, 0.1)',
+                  border: 'none',
+                  fontSize: '20px',
+                  color: '#6b7280',
+                  cursor: 'pointer',
+                  padding: '8px',
+                  borderRadius: '50%',
+                  width: '36px',
+                  height: '36px',
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  transition: 'all 0.2s ease'
+                }}
+              >
+                ×
+              </button>
+            </div>
+
+            {/* Menu Items */}
+            <div style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
+              <a 
+                href="/klipai-mobile"
+                style={{
+                  display: 'flex',
+                  alignItems: 'center',
+                  padding: '16px',
+                  backgroundColor: '#f8fafc',
+                  borderRadius: '12px',
+                  textDecoration: 'none',
+                  color: '#374151',
+                  fontSize: '16px',
+                  fontWeight: '500',
+                  transition: 'all 0.2s ease',
+                  border: '1px solid #e5e7eb'
+                }}
+                onMouseEnter={(e) => {
+                  e.currentTarget.style.backgroundColor = '#3b82f6';
+                  e.currentTarget.style.color = 'white';
+                }}
+                onMouseLeave={(e) => {
+                  e.currentTarget.style.backgroundColor = '#f8fafc';
+                  e.currentTarget.style.color = '#374151';
+                }}
+              >
+                📹 Klipai
+              </a>
+              
+              <a 
+                href="/duk-mobile"
+                style={{
+                  display: 'flex',
+                  alignItems: 'center',
+                  padding: '16px',
+                  backgroundColor: '#f8fafc',
+                  borderRadius: '12px',
+                  textDecoration: 'none',
+                  color: '#374151',
+                  fontSize: '16px',
+                  fontWeight: '500',
+                  transition: 'all 0.2s ease',
+                  border: '1px solid #e5e7eb'
+                }}
+                onMouseEnter={(e) => {
+                  e.currentTarget.style.backgroundColor = '#3b82f6';
+                  e.currentTarget.style.color = 'white';
+                }}
+                onMouseLeave={(e) => {
+                  e.currentTarget.style.backgroundColor = '#f8fafc';
+                  e.currentTarget.style.color = '#374151';
+                }}
+              >
+                ❓ DUK
+              </a>
+            </div>
           </div>
         </div>
       )}
