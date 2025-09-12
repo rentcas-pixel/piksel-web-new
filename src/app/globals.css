@@ -131,3 +131,40 @@ body {
   transform: scale(1.2);
   box-shadow: 0 6px 20px rgba(167, 177, 245, 0.7);
 }
+
+/* Mobile date input improvements */
+input[type="date"] {
+  color-scheme: light;
+}
+
+input[type="date"]::-webkit-calendar-picker-indicator {
+  background: transparent;
+  bottom: 0;
+  color: transparent;
+  cursor: pointer;
+  height: auto;
+  left: 0;
+  position: absolute;
+  right: 0;
+  top: 0;
+  width: auto;
+}
+
+input[type="date"]::-webkit-datetime-edit {
+  color: #111827;
+  font-weight: 500;
+}
+
+input[type="date"]::-webkit-datetime-edit-fields-wrapper {
+  color: #111827;
+}
+
+input[type="date"]::-webkit-datetime-edit-text {
+  color: #111827;
+}
+
+input[type="date"]::-webkit-datetime-edit-month-field,
+input[type="date"]::-webkit-datetime-edit-day-field,
+input[type="date"]::-webkit-datetime-edit-year-field {
+  color: #111827;
+}

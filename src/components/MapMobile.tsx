@@ -883,7 +883,9 @@ export default function Map({ selectedCity, selectedScreens: propSelectedScreens
                       border: '1px solid #d1d5db',
                       borderRadius: '6px',
                       fontSize: '14px',
-                      outline: 'none'
+                      outline: 'none',
+                      color: '#111827',
+                      backgroundColor: 'white'
                     }}
                   />
                   <span style={{ color: '#6b7280', fontSize: '12px', flexShrink: 0 }}>iki</span>
@@ -898,7 +900,9 @@ export default function Map({ selectedCity, selectedScreens: propSelectedScreens
                       border: '1px solid #d1d5db',
                       borderRadius: '6px',
                       fontSize: '14px',
-                      outline: 'none'
+                      outline: 'none',
+                      color: '#111827',
+                      backgroundColor: 'white'
                     }}
                   />
                 </div>
