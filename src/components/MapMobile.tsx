@@ -24,6 +24,7 @@ export default function Map({ selectedCity, selectedScreens: propSelectedScreens
   const [screenCities, setScreenCities] = useState<{[screenName: string]: string}>(propScreenCities || {});
   const [selectedDateRange, setSelectedDateRange] = useState<{from: string; to: string} | null>(propSelectedDateRange || null);
   const [showInquiryForm, setShowInquiryForm] = useState(false);
+  const [showContactPopup, setShowContactPopup] = useState(false);
   
   // Check if mobile
   const [isMobile, setIsMobile] = useState(false);
@@ -549,25 +550,170 @@ export default function Map({ selectedCity, selectedScreens: propSelectedScreens
             />
           </div>
           <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-            <button style={{ 
-              padding: '8px', 
-              backgroundColor: '#f3f4f6', 
-              color: '#374151', 
-              borderRadius: '6px', 
-              fontSize: '16px',
-              border: 'none',
-              cursor: 'pointer',
-              display: 'flex',
-              alignItems: 'center',
-              justifyContent: 'center',
-              width: '32px',
-              height: '32px'
-            }}>
-              📞
+            <button 
+              onClick={() => setShowContactPopup(true)}
+              style={{ 
+                padding: '8px', 
+                backgroundColor: '#2563eb', 
+                color: 'white', 
+                borderRadius: '6px', 
+                fontSize: '16px',
+                fontWeight: 'bold',
+                border: 'none',
+                cursor: 'pointer',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                width: '32px',
+                height: '32px'
+              }}
+            >
+              i
             </button>
           </div>
         </div>
       </div>
+
+      {/* Contact Popup */}
+      {showContactPopup && (
+        <div style={{
+          position: 'fixed',
+          top: 0,
+          left: 0,
+          right: 0,
+          bottom: 0,
+          backgroundColor: 'rgba(0, 0, 0, 0.5)',
+          zIndex: 2000,
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'center',
+          padding: '20px'
+        }}>
+          <div style={{
+            backgroundColor: 'white',
+            borderRadius: '20px',
+            padding: '32px',
+            maxWidth: '420px',
+            width: '100%',
+            boxShadow: '0 25px 50px -12px rgba(0, 0, 0, 0.25)',
+            border: '1px solid rgba(255, 255, 255, 0.2)',
+            backdropFilter: 'blur(10px)',
+            fontFamily: "'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif"
+          }}>
+            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '28px' }}>
+              <img 
+                src="/Piksel-logo-black-2023.png" 
+                alt="Piksel Logo" 
+                style={{ height: '22px', width: 'auto' }}
+              />
+              <button
+                onClick={() => setShowContactPopup(false)}
+                style={{
+                  background: 'rgba(107, 114, 128, 0.1)',
+                  border: 'none',
+                  fontSize: '20px',
+                  color: '#6b7280',
+                  cursor: 'pointer',
+                  padding: '8px',
+                  borderRadius: '50%',
+                  width: '36px',
+                  height: '36px',
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  transition: 'all 0.2s ease'
+                }}
+                onMouseOver={(e) => {
+                  e.currentTarget.style.background = 'rgba(107, 114, 128, 0.2)';
+                  e.currentTarget.style.color = '#374151';
+                }}
+                onMouseOut={(e) => {
+                  e.currentTarget.style.background = 'rgba(107, 114, 128, 0.1)';
+                  e.currentTarget.style.color = '#6b7280';
+                }}
+              >
+                ×
+              </button>
+            </div>
+            
+            <div style={{ display: 'flex', flexDirection: 'column', gap: '20px' }}>
+              <div style={{
+                backgroundColor: '#f8fafc',
+                borderRadius: '12px',
+                padding: '20px',
+                border: '1px solid #e2e8f0'
+              }}>
+                <div style={{ display: 'flex', alignItems: 'center', gap: '12px', marginBottom: '8px' }}>
+                  <div style={{
+                    width: '48px',
+                    height: '48px',
+                    backgroundColor: '#2563eb',
+                    borderRadius: '10px',
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    color: 'white',
+                    fontSize: '22px'
+                  }}>
+                    <span style={{ filter: 'brightness(0) invert(1)' }}>📞</span>
+                  </div>
+                  <h3 style={{ fontSize: '16px', fontWeight: '600', color: '#1e293b', margin: 0 }}>Telefonas</h3>
+                </div>
+                <a 
+                  href="tel:+37069066633" 
+                  style={{ 
+                    fontSize: '18px', 
+                    color: '#000000', 
+                    textDecoration: 'none',
+                    fontWeight: '400',
+                    display: 'block',
+                    padding: '8px 0'
+                  }}
+                >
+                  +370 690 666 33
+                </a>
+              </div>
+              
+              <div style={{
+                backgroundColor: '#f8fafc',
+                borderRadius: '12px',
+                padding: '20px',
+                border: '1px solid #e2e8f0'
+              }}>
+                <div style={{ display: 'flex', alignItems: 'center', gap: '12px', marginBottom: '8px' }}>
+                  <div style={{
+                    width: '48px',
+                    height: '48px',
+                    backgroundColor: '#2563eb',
+                    borderRadius: '10px',
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    color: 'white',
+                    fontSize: '22px'
+                  }}>
+                    <span style={{ filter: 'brightness(0) invert(1)' }}>✉️</span>
+                  </div>
+                  <h3 style={{ fontSize: '16px', fontWeight: '600', color: '#1e293b', margin: 0 }}>El. paštas</h3>
+                </div>
+                <a 
+                  href="mailto:info@piksel.lt" 
+                  style={{ 
+                    fontSize: '18px', 
+                    color: '#000000', 
+                    textDecoration: 'none',
+                    fontWeight: '400',
+                    display: 'block',
+                    padding: '8px 0'
+                  }}
+                >
+                  info@piksel.lt
+                </a>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
 
       {/* Additional Sidebar - Horizontal */}
       <div style={{ 
@@ -609,7 +755,7 @@ export default function Map({ selectedCity, selectedScreens: propSelectedScreens
         {/* Filter Bar - Show when screens are selected */}
         {selectedScreens && selectedScreens.length > 0 && (
           <div style={{
-            backgroundColor: 'white',
+            backgroundColor: '#eff6ff',
             borderBottom: '1px solid #e5e7eb',
             padding: '12px 16px',
             flexShrink: 0
@@ -675,12 +821,20 @@ export default function Map({ selectedCity, selectedScreens: propSelectedScreens
               <button
                 onClick={handleClearFilter}
                 style={{
-                  color: '#9ca3af',
-                  fontSize: '14px',
-                  background: 'none',
+                  color: 'white',
+                  fontSize: '12px',
+                  fontWeight: 'bold',
+                  background: 'black',
                   border: 'none',
+                  borderRadius: '50%',
                   cursor: 'pointer',
-                  padding: '4px'
+                  padding: '4px',
+                  marginLeft: 'auto',
+                  width: '21px',
+                  height: '21px',
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center'
                 }}
               >
                 ×
@@ -689,35 +843,37 @@ export default function Map({ selectedCity, selectedScreens: propSelectedScreens
 
             {/* Date Range - Only show when screens are selected */}
             {selectedScreens && selectedScreens.length > 0 && (
-              <div style={{ display: 'flex', alignItems: 'center', gap: '12px', paddingTop: '8px', borderTop: '1px solid #f3f4f6' }}>
-                <div style={{ fontSize: '14px', fontWeight: '500', color: '#374151' }}>Reklamos periodas:</div>
-                <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+              <div style={{ paddingTop: '8px', borderTop: '1px solid #f3f4f6' }}>
+                <div style={{ fontSize: '14px', fontWeight: '500', color: '#374151', marginBottom: '8px' }}>Reklamos periodas:</div>
+                <div style={{ display: 'flex', alignItems: 'center', gap: '8px', flexWrap: 'wrap' }}>
                   <input
                     type="date"
                     value={selectedDateRange?.from || ''}
                     onChange={(e) => handleDateRangeChange(e.target.value, selectedDateRange?.to || '')}
                     style={{
-                      padding: '6px 8px',
+                      flex: 1,
+                      minWidth: '120px',
+                      padding: '8px 12px',
                       border: '1px solid #d1d5db',
                       borderRadius: '6px',
-                      fontSize: '12px',
+                      fontSize: '14px',
                       outline: 'none'
                     }}
-                    placeholder="Nuo"
                   />
-                  <span style={{ color: '#6b7280', fontSize: '12px' }}>iki</span>
+                  <span style={{ color: '#6b7280', fontSize: '12px', flexShrink: 0 }}>iki</span>
                   <input
                     type="date"
                     value={selectedDateRange?.to || ''}
                     onChange={(e) => handleDateRangeChange(selectedDateRange?.from || '', e.target.value)}
                     style={{
-                      padding: '6px 8px',
+                      flex: 1,
+                      minWidth: '120px',
+                      padding: '8px 12px',
                       border: '1px solid #d1d5db',
                       borderRadius: '6px',
-                      fontSize: '12px',
+                      fontSize: '14px',
                       outline: 'none'
                     }}
-                    placeholder="Iki"
                   />
                 </div>
               </div>
