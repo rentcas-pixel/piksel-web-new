@@ -11,9 +11,10 @@ interface ScreenListProps {
   onSelectScreen: (screenName: string) => void;
   onShowPopup?: (screenId: string) => void;
   isLoading?: boolean;
+  searchResults?: any[];
 }
 
-export default function ScreenList({ selectedCity, selectedScreens, onSelectScreen, onShowPopup, isLoading = false }: ScreenListProps) {
+export default function ScreenList({ selectedCity, selectedScreens, onSelectScreen, onShowPopup, isLoading = false, searchResults = [] }: ScreenListProps) {
   // Get LED screens from Supabase
   const { screens: ledScreens, loading, error } = useLEDScreens();
   
@@ -21,6 +22,9 @@ export default function ScreenList({ selectedCity, selectedScreens, onSelectScre
   const filteredScreens = selectedCity === 'Regionai' 
     ? ledScreens.filter(screen => !['Vilnius', 'Kaunas', 'Klaipėda', 'Šiauliai', 'Panevėžys'].includes(screen.city))
     : ledScreens.filter(screen => screen.city === selectedCity);
+  
+  // Use search results if available, otherwise use filtered screens
+  const displayScreens = searchResults.length > 0 ? searchResults : filteredScreens;
 
   if (loading) {
     return (
@@ -52,9 +56,19 @@ export default function ScreenList({ selectedCity, selectedScreens, onSelectScre
   return (
     <div className="fixed left-80 top-0 w-80 h-screen bg-gray-50 border-r border-gray-200 z-30 overflow-y-auto">
       <div className="p-4">
+        {searchResults.length > 0 && (
+          <div className="mb-4 p-3 bg-blue-50 border border-blue-200 rounded-lg">
+            <div className="text-sm font-medium text-blue-900 mb-1">
+              🔍 Paieškos rezultatai
+            </div>
+            <div className="text-xs text-blue-700">
+              Rasta {searchResults.length} ekranų
+            </div>
+          </div>
+        )}
         
         <div className="space-y-3">
-          {filteredScreens.map((screen) => {
+          {displayScreens.map((screen) => {
             const isSelected = selectedScreens.includes(screen.name);
             return (
               <div

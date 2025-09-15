@@ -21,6 +21,7 @@ export default function Home() {
   const [dateRange, setDateRange] = useState<{from: string; to: string} | null>(null);
   const [showInquiryForm, setShowInquiryForm] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
+  const [searchResults, setSearchResults] = useState<any[]>([]);
   
   // Get LED screens from Supabase
   const { screens: ledScreens, loading, error } = useLEDScreens();
@@ -101,7 +102,12 @@ export default function Home() {
 
   const handleCityFilter = (city: string) => {
     setSelectedCity(city);
+    setSearchResults([]); // Clear search results when changing city
     console.log('Selected city:', city);
+  };
+  
+  const handleSearchResults = (results: any[]) => {
+    setSearchResults(results);
   };
 
   // Get the selected city for map display
@@ -197,6 +203,7 @@ export default function Home() {
       <Sidebar 
         onCityFilter={handleCityFilter}
         selectedCity={selectedCity}
+        onSearchResults={handleSearchResults}
       />
       
       {/* Screen List */}
@@ -206,6 +213,7 @@ export default function Home() {
         onSelectScreen={handleSelectScreen}
         onShowPopup={handleShowPopup}
         isLoading={isLoading}
+        searchResults={searchResults}
       />
       
       {/* Map - Full Width with margin for sidebar */}

@@ -3,6 +3,7 @@
 import { useEffect, useRef, useState } from 'react';
 import { LEDScreen } from '@/lib/supabase';
 import { useLEDScreens } from '@/hooks/useLEDScreens';
+import ResponsiveImage from './ResponsiveImage';
 
 interface MapProps {
   selectedCity: string;
@@ -22,7 +23,8 @@ export default function Map({ selectedCity, selectedScreens: propSelectedScreens
   // Local state for mobile
   const [selectedScreens, setSelectedScreens] = useState<string[]>(propSelectedScreens || []);
   const [screenCities, setScreenCities] = useState<{[screenName: string]: string}>(propScreenCities || {});
-  const [selectedDateRange, setSelectedDateRange] = useState<{from: string; to: string} | null>(propSelectedDateRange || null);
+  const [fromDate, setFromDate] = useState<string>(propSelectedDateRange?.from || '');
+  const [toDate, setToDate] = useState<string>(propSelectedDateRange?.to || '');
   const [showInquiryForm, setShowInquiryForm] = useState(false);
   const [showContactPopup, setShowContactPopup] = useState(false);
   const [showHamburgerMenu, setShowHamburgerMenu] = useState(false);
@@ -52,14 +54,18 @@ export default function Map({ selectedCity, selectedScreens: propSelectedScreens
 
   // Handle date range change
   const handleDateRangeChange = (from: string, to: string) => {
-    const newRange = { from, to };
-    setSelectedDateRange(newRange);
+    const newRange = { 
+      from: from || propSelectedDateRange?.from || '', 
+      to: to || propSelectedDateRange?.to || '' 
+    };
+    setFromDate(newRange.from);
+    setToDate(newRange.to);
     if (onDateRangeChange) {
-      onDateRangeChange(from, to);
+      onDateRangeChange(newRange.from, newRange.to);
     }
     
     // Show inquiry form when end date is selected
-    if (to) {
+    if (newRange.to) {
       setShowInquiryForm(true);
     }
   };
@@ -68,7 +74,8 @@ export default function Map({ selectedCity, selectedScreens: propSelectedScreens
   const handleClearFilter = () => {
     setSelectedScreens([]);
     setScreenCities({});
-    setSelectedDateRange(null);
+    setFromDate('');
+    setToDate('');
     setShowInquiryForm(false);
     if (onCityChange) {
       onCityChange('Vilnius');
@@ -746,12 +753,15 @@ export default function Map({ selectedCity, selectedScreens: propSelectedScreens
         padding: '18px 16px',
         flexShrink: 0
       }}>
-        <div style={{ 
+        <div className="city-buttons-container" style={{ 
           display: 'flex', 
           alignItems: 'center', 
           gap: '6px', 
           overflowX: 'auto',
-          paddingBottom: '4px'
+          paddingBottom: '4px',
+          scrollbarWidth: 'none',
+          msOverflowStyle: 'none',
+          WebkitOverflowScrolling: 'touch'
         }}>
           {['Vilnius', 'Kaunas', 'Klaipėda', 'Šiauliai', 'Panevėžys', 'Regionai'].map(city => (
             <button
@@ -779,15 +789,15 @@ export default function Map({ selectedCity, selectedScreens: propSelectedScreens
         {/* Filter Bar - Show when screens are selected */}
         {selectedScreens && selectedScreens.length > 0 && (
           <div style={{
-            backgroundColor: '#eff6ff',
+            backgroundColor: '#ebe7e2',
             borderBottom: '1px solid #e5e7eb',
-            padding: '12px 16px',
+            padding: '16px 16px',
             flexShrink: 0,
             position: 'relative',
             zIndex: 1
           }}>
             <div style={{ display: 'flex', alignItems: 'center', gap: '12px', flexWrap: 'wrap', marginBottom: '8px' }}>
-              <div style={{ fontSize: '14px', fontWeight: '500', color: '#374151' }}>Pasirinkite:</div>
+              <div style={{ fontSize: '14px', fontWeight: '500', color: '#374151' }}>Pasirinkta:</div>
               {screenCities && Object.keys(screenCities).length > 0 && (
                 <>
                   {Object.entries(screenCities).reduce((acc, [screenName, city]) => {
@@ -798,8 +808,8 @@ export default function Map({ selectedCity, selectedScreens: propSelectedScreens
                   }, [] as [string, string][]).map(([city, _]) => (
                     <div key={city} style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
                       <div style={{
-                        backgroundColor: '#dbeafe',
-                        color: '#1e40af',
+                        backgroundColor: '#bfdbfe',
+                        color: '#1e3a8a',
                         padding: '4px 12px',
                         borderRadius: '20px',
                         fontSize: '12px',
@@ -870,12 +880,18 @@ export default function Map({ selectedCity, selectedScreens: propSelectedScreens
             {/* Date Range - Only show when screens are selected */}
             {selectedScreens && selectedScreens.length > 0 && (
               <div style={{ paddingTop: '8px', borderTop: '1px solid #f3f4f6' }}>
-                <div style={{ fontSize: '14px', fontWeight: '500', color: '#374151', marginBottom: '8px' }}>Reklamos periodas:</div>
+                <div style={{ fontSize: '14px', fontWeight: '500', color: '#374151', marginBottom: '8px' }}>Periodas:</div>
                 <div style={{ display: 'flex', alignItems: 'center', gap: '8px', flexWrap: 'wrap' }}>
                   <input
                     type="date"
-                    value={selectedDateRange?.from || ''}
-                    onChange={(e) => handleDateRangeChange(e.target.value, selectedDateRange?.to || '')}
+                    value={fromDate}
+                    onChange={(e) => {
+                      console.log('From date changed:', e.target.value);
+                      setFromDate(e.target.value);
+                      if (onDateRangeChange) {
+                        onDateRangeChange(e.target.value, toDate);
+                      }
+                    }}
                     style={{
                       flex: 1,
                       minWidth: '120px',
@@ -885,14 +901,24 @@ export default function Map({ selectedCity, selectedScreens: propSelectedScreens
                       fontSize: '14px',
                       outline: 'none',
                       color: '#111827',
-                      backgroundColor: 'white'
+                      backgroundColor: '#f7f4f0'
                     }}
                   />
                   <span style={{ color: '#6b7280', fontSize: '12px', flexShrink: 0 }}>iki</span>
                   <input
                     type="date"
-                    value={selectedDateRange?.to || ''}
-                    onChange={(e) => handleDateRangeChange(selectedDateRange?.from || '', e.target.value)}
+                    value={toDate}
+                    onChange={(e) => {
+                      console.log('To date changed:', e.target.value);
+                      setToDate(e.target.value);
+                      if (onDateRangeChange) {
+                        onDateRangeChange(fromDate, e.target.value);
+                      }
+                      if (e.target.value) {
+                        setShowInquiryForm(true);
+                      }
+                    }}
+                    min={fromDate || undefined}
                     style={{
                       flex: 1,
                       minWidth: '120px',
@@ -902,7 +928,7 @@ export default function Map({ selectedCity, selectedScreens: propSelectedScreens
                       fontSize: '14px',
                       outline: 'none',
                       color: '#111827',
-                      backgroundColor: 'white'
+                      backgroundColor: '#f7f4f0'
                     }}
                   />
                 </div>
@@ -912,7 +938,7 @@ export default function Map({ selectedCity, selectedScreens: propSelectedScreens
         )}
         
         {/* Inquiry Form - Show when end date is selected */}
-        {showInquiryForm && selectedDateRange?.to && (
+        {showInquiryForm && toDate && (
           <div style={{
             backgroundColor: 'white',
             borderBottom: '1px solid #e5e7eb',
@@ -1010,15 +1036,13 @@ export default function Map({ selectedCity, selectedScreens: propSelectedScreens
                 }}>
                   {/* Screen Image */}
                   <div style={{ marginBottom: '12px' }}>
-                    <img 
-                      src={screen.image_url} 
+                    <ResponsiveImage
+                      desktopSrc={screen.image_url}
+                      mobileSrc={screen.mobile_image_url}
                       alt={screen.name}
-                      style={{ 
-                        width: '100%', 
-                        height: '176px', 
-                        objectFit: 'cover', 
-                        borderRadius: '6px'
-                      }}
+                      width={300}
+                      height={176}
+                      className="w-full"
                     />
                   </div>
                   
@@ -1058,7 +1082,7 @@ export default function Map({ selectedCity, selectedScreens: propSelectedScreens
                       <span style={{ fontSize: '12px' }}>
                         {selectedScreens.includes(screen.name) ? '✓' : '+'}
                       </span>
-                      {selectedScreens.includes(screen.name) ? 'Pridėtas' : 'Pridėti'}
+                      {selectedScreens.includes(screen.name) ? 'Pridėtas' : 'Skaičiuoti'}
                     </button>
                   </div>
                 </div>

@@ -168,3 +168,8 @@ input[type="date"]::-webkit-datetime-edit-day-field,
 input[type="date"]::-webkit-datetime-edit-year-field {
   color: #111827;
 }
+
+/* Hide scrollbar for city buttons */
+.city-buttons-container::-webkit-scrollbar {
+  display: none;
+}

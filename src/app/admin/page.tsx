@@ -19,6 +19,7 @@ export default function AdminPanel() {
     latitude: '',
     longitude: '',
     image_url: '',
+    mobile_image_url: '',
     description: '',
     is_double_sided: false,
     is_video: false,
@@ -28,6 +29,8 @@ export default function AdminPanel() {
     side_b_name: '',
     side_a_image_url: '',
     side_b_image_url: '',
+    side_a_mobile_image_url: '',
+    side_b_mobile_image_url: '',
     size: '',
     resolution: '',
     traffic: '',
@@ -64,7 +67,13 @@ export default function AdminPanel() {
       const lng = parseFloat(formData.longitude)
       
       if (isNaN(lat) || isNaN(lng)) {
-        alert('Neteisingos koordinatės')
+        alert('Neteisingos koordinatės. Įveskite skaičius.')
+        return
+      }
+
+      // Validate coordinate ranges
+      if (lat < 53 || lat > 56 || lng < 20 || lng > 27) {
+        alert('Koordinatės turi būti Lietuvos teritorijoje (platuma: 53-56, ilguma: 20-27)')
         return
       }
 
@@ -129,6 +138,7 @@ export default function AdminPanel() {
         latitude: '',
         longitude: '',
         image_url: '',
+        mobile_image_url: '',
         description: '',
         is_double_sided: false,
         is_video: true,
@@ -138,6 +148,8 @@ export default function AdminPanel() {
         side_b_name: '',
         side_a_image_url: '',
         side_b_image_url: '',
+        side_a_mobile_image_url: '',
+        side_b_mobile_image_url: '',
         size: '',
         resolution: '',
         traffic: '',
@@ -183,6 +195,7 @@ export default function AdminPanel() {
       latitude: latitude,
       longitude: longitude,
       image_url: screen.image_url,
+      mobile_image_url: screen.mobile_image_url || '',
       description: screen.description || '',
       is_double_sided: screen.is_double_sided || false,
       is_video: screen.is_video || false,
@@ -192,6 +205,8 @@ export default function AdminPanel() {
       side_b_name: screen.side_b_name || '',
       side_a_image_url: screen.side_a_image_url || '',
       side_b_image_url: screen.side_b_image_url || '',
+      side_a_mobile_image_url: screen.side_a_mobile_image_url || '',
+      side_b_mobile_image_url: screen.side_b_mobile_image_url || '',
       size: screen.size || '',
       resolution: screen.resolution || '',
       traffic: screen.traffic || '',
@@ -218,9 +233,22 @@ export default function AdminPanel() {
     }
   }
 
-  const handleImageUpload = async (file: File, type: 'main' | 'side_a' | 'side_b' = 'main') => {
+  const handleImageUpload = async (file: File, type: 'main' | 'mobile' | 'side_a' | 'side_b' = 'main') => {
     try {
       setUploading(true)
+      
+      // Validate file type
+      const allowedTypes = ['image/jpeg', 'image/jpg', 'image/png', 'image/webp']
+      if (!allowedTypes.includes(file.type)) {
+        alert('Priimami tik JPG, PNG ir WebP formatai')
+        return
+      }
+
+      // Validate file size (max 5MB)
+      if (file.size > 5 * 1024 * 1024) {
+        alert('Failo dydis negali viršyti 5MB')
+        return
+      }
       
       // Create unique filename
       const fileExt = file.name.split('.').pop()
@@ -242,6 +270,7 @@ export default function AdminPanel() {
       setFormData(prev => ({
         ...prev,
         ...(type === 'main' && { image_url: publicUrl }),
+        ...(type === 'mobile' && { mobile_image_url: publicUrl }),
         ...(type === 'side_a' && { side_a_image_url: publicUrl }),
         ...(type === 'side_b' && { side_b_image_url: publicUrl })
       }))
@@ -349,14 +378,14 @@ export default function AdminPanel() {
                 />
               </div>
               <div className="md:col-span-2">
-                <label className="block text-sm font-medium text-gray-700 mb-1">Įkelkite nuotrauką</label>
+                <label className="block text-sm font-medium text-gray-700 mb-1">Desktop nuotrauka (1920x1080)</label>
                 <input
                   type="file"
                   accept="image/*"
                   onChange={(e) => {
                     const file = e.target.files?.[0]
                     if (file) {
-                      handleImageUpload(file)
+                      handleImageUpload(file, 'main')
                     }
                   }}
                   className="w-full border border-gray-300 rounded-lg px-3 py-2"
@@ -365,10 +394,33 @@ export default function AdminPanel() {
                 {uploading && <p className="text-sm text-blue-600 mt-1">Įkeliama...</p>}
                 {formData.image_url && (
                   <div className="mt-2">
-                    <img src={formData.image_url} alt="Preview" className="w-32 h-32 object-cover rounded-lg border" />
-                    <p className="text-sm text-green-600 mt-1">Nuotrauka paruošta!</p>
+                    <img src={formData.image_url} alt="Desktop Preview" className="w-32 h-32 object-cover rounded-lg border" />
+                    <p className="text-sm text-green-600 mt-1">Desktop nuotrauka paruošta!</p>
                   </div>
                 )}
+              </div>
+              <div className="md:col-span-2">
+                <label className="block text-sm font-medium text-gray-700 mb-1">Mobile nuotrauka (1080x1920) - neprivaloma</label>
+                <input
+                  type="file"
+                  accept="image/*"
+                  onChange={(e) => {
+                    const file = e.target.files?.[0]
+                    if (file) {
+                      handleImageUpload(file, 'mobile')
+                    }
+                  }}
+                  className="w-full border border-gray-300 rounded-lg px-3 py-2"
+                  disabled={uploading}
+                />
+                {uploading && <p className="text-sm text-blue-600 mt-1">Įkeliama...</p>}
+                {formData.mobile_image_url && (
+                  <div className="mt-2">
+                    <img src={formData.mobile_image_url} alt="Mobile Preview" className="w-32 h-32 object-cover rounded-lg border" />
+                    <p className="text-sm text-green-600 mt-1">Mobile nuotrauka paruošta!</p>
+                  </div>
+                )}
+                <p className="text-xs text-gray-500 mt-1">Jei neįkelsite mobile nuotraukos, bus naudojama desktop versija</p>
               </div>
               <div className="md:col-span-2">
                 <label className="block text-sm font-medium text-gray-700 mb-1">Aprašymas</label>
@@ -558,6 +610,7 @@ export default function AdminPanel() {
                       latitude: '',
                       longitude: '',
                       image_url: '',
+                      mobile_image_url: '',
                       description: '',
                       is_double_sided: false,
                       is_video: false,
@@ -567,6 +620,8 @@ export default function AdminPanel() {
                       side_b_name: '',
                       side_a_image_url: '',
                       side_b_image_url: '',
+                      side_a_mobile_image_url: '',
+                      side_b_mobile_image_url: '',
                       size: '',
                       resolution: '',
                       traffic: '',

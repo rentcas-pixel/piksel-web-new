@@ -16,7 +16,8 @@ export interface LEDScreen {
   city: string
   district: string
   address: string
-  image_url: string
+  image_url: string // Desktop version
+  mobile_image_url?: string // Mobile version (optional, falls back to image_url)
   description?: string
   is_video?: boolean
   is_static?: boolean
@@ -26,6 +27,8 @@ export interface LEDScreen {
   side_b_name?: string
   side_a_image_url?: string
   side_b_image_url?: string
+  side_a_mobile_image_url?: string // Mobile version for side A
+  side_b_mobile_image_url?: string // Mobile version for side B
   size?: string // e.g., "8x4"
   resolution?: string // e.g., "1152x576"
   traffic?: string // e.g., "300.258"

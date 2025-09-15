@@ -60,16 +60,21 @@ export default function Map({ selectedCity, selectedScreens, screenCities, selec
       (window as any).showMapPopup = (screenId: string) => {
         const screen = ledScreens.find(s => s.id === screenId);
         if (screen) {
-          // Find the marker for this screen and open its popup
-          map.eachLayer((layer: any) => {
-            if (layer instanceof (window as any).L.Marker) {
-              const latLng = layer.getLatLng();
-              if (Math.abs(latLng.lat - screen.coordinates[0]) < 0.0001 && 
-                  Math.abs(latLng.lng - screen.coordinates[1]) < 0.0001) {
-                layer.openPopup();
+          // Center the map on the screen location first
+          map.setView([screen.coordinates[0], screen.coordinates[1]], 15);
+          
+          // Wait a bit for the map to center, then find and open popup
+          setTimeout(() => {
+            map.eachLayer((layer: any) => {
+              if (layer instanceof (window as any).L.Marker) {
+                const latLng = layer.getLatLng();
+                if (Math.abs(latLng.lat - screen.coordinates[0]) < 0.0001 && 
+                    Math.abs(latLng.lng - screen.coordinates[1]) < 0.0001) {
+                  layer.openPopup();
+                }
               }
-            }
-          });
+            });
+          }, 300);
         }
       };
 
@@ -877,16 +882,14 @@ export default function Map({ selectedCity, selectedScreens, screenCities, selec
                   type="date"
                   value={selectedDateRange?.from || ''}
                   onChange={(e) => onDateRangeChange && onDateRangeChange(e.target.value, selectedDateRange?.to || '')}
-                  className="px-3 py-1 border border-gray-300 rounded text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
-                  placeholder="Nuo"
+                  className="px-3 py-1 border border-gray-300 rounded text-sm focus:outline-none"
                 />
                 <span className="text-gray-500 text-sm">iki</span>
                 <input
                   type="date"
                   value={selectedDateRange?.to || ''}
                   onChange={(e) => onDateRangeChange && onDateRangeChange(selectedDateRange?.from || '', e.target.value)}
-                  className="px-3 py-1 border border-gray-300 rounded text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
-                  placeholder="Iki"
+                  className="px-3 py-1 border border-gray-300 rounded text-sm focus:outline-none"
                 />
           </div>
           </div>
