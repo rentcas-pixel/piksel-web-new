@@ -885,7 +885,9 @@ export default function AdminPanel() {
                       size: '',
                       resolution: '',
                       traffic: '',
-                      price: ''
+                      price: '',
+                      is_last_minute: false,
+                      last_minute_date: ''
                     })
                   }}
                   className="bg-gray-500 text-white px-6 py-2 rounded-lg hover:bg-gray-600"
