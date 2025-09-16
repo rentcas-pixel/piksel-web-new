@@ -421,7 +421,7 @@ export default function AdminPanel() {
     }
   }
 
-  const handleImageUpload = async (file: File, type: 'main' | 'mobile' | 'side_a' | 'side_b' = 'main') => {
+  const handleImageUpload = async (file: File, type: 'main' | 'mobile' | 'side_a' | 'side_b') => {
     try {
       setUploading(true)
       
