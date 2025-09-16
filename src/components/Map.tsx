@@ -915,7 +915,12 @@ export default function Map({ selectedCity, selectedScreens, screenCities, selec
                       onDateRangeChange(newFromDate, toDate);
                     }
                   }}
+                  onClick={(e) => {
+                    // Prevent event bubbling in Chrome
+                    e.stopPropagation();
+                  }}
                   className="px-3 py-1 border border-gray-300 rounded text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+                  style={{ pointerEvents: 'auto', userSelect: 'none' }}
                   placeholder="Nuo"
                 />
                 <span className="text-gray-500 text-sm">iki</span>
@@ -931,7 +936,12 @@ export default function Map({ selectedCity, selectedScreens, screenCities, selec
                       onDateRangeChange(fromDate, newToDate);
                     }
                   }}
+                  onClick={(e) => {
+                    // Prevent event bubbling in Chrome
+                    e.stopPropagation();
+                  }}
                   className="px-3 py-1 border border-gray-300 rounded text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+                  style={{ pointerEvents: 'auto', userSelect: 'none' }}
                   placeholder="Iki"
                 />
           </div>
