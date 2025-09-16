@@ -22,6 +22,9 @@ export default function Map({ selectedCity, selectedScreens, screenCities, selec
   const mapRef = useRef<HTMLDivElement>(null);
   const { screens: ledScreens, loading, error } = useLEDScreens();
   
+  // Detect Chrome browser
+  const isChrome = typeof window !== 'undefined' && /Chrome/.test(navigator.userAgent) && /Google Inc/.test(navigator.vendor);
+  
   // Local state for date inputs (like in mobile)
   const [fromDate, setFromDate] = useState(selectedDateRange?.from || '');
   const [toDate, setToDate] = useState(selectedDateRange?.to || '');
@@ -919,8 +922,23 @@ export default function Map({ selectedCity, selectedScreens, screenCities, selec
                     // Prevent event bubbling in Chrome
                     e.stopPropagation();
                   }}
+                  onFocus={(e) => {
+                    // Chrome-specific: prevent focus from bubbling
+                    if (isChrome) {
+                      e.stopPropagation();
+                    }
+                  }}
                   className="px-3 py-1 border border-gray-300 rounded text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
-                  style={{ pointerEvents: 'auto', userSelect: 'none' }}
+                  style={{ 
+                    pointerEvents: 'auto', 
+                    userSelect: 'none',
+                    // Chrome-specific styles
+                    ...(isChrome && {
+                      position: 'relative',
+                      zIndex: 1000,
+                      isolation: 'isolate'
+                    })
+                  }}
                   placeholder="Nuo"
                 />
                 <span className="text-gray-500 text-sm">iki</span>
@@ -940,8 +958,23 @@ export default function Map({ selectedCity, selectedScreens, screenCities, selec
                     // Prevent event bubbling in Chrome
                     e.stopPropagation();
                   }}
+                  onFocus={(e) => {
+                    // Chrome-specific: prevent focus from bubbling
+                    if (isChrome) {
+                      e.stopPropagation();
+                    }
+                  }}
                   className="px-3 py-1 border border-gray-300 rounded text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
-                  style={{ pointerEvents: 'auto', userSelect: 'none' }}
+                  style={{ 
+                    pointerEvents: 'auto', 
+                    userSelect: 'none',
+                    // Chrome-specific styles
+                    ...(isChrome && {
+                      position: 'relative',
+                      zIndex: 1000,
+                      isolation: 'isolate'
+                    })
+                  }}
                   placeholder="Iki"
                 />
           </div>
