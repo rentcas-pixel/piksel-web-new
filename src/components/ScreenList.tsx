@@ -19,7 +19,9 @@ export default function ScreenList({ selectedCity, selectedScreens, onSelectScre
   const { screens: ledScreens, loading, error } = useLEDScreens();
   
   // Filter screens by selected city
-  const filteredScreens = selectedCity === 'Regionai' 
+  const filteredScreens = selectedCity === 'Lietuva'
+    ? ledScreens // Show all screens for Lithuania
+    : selectedCity === 'Regionai' 
     ? ledScreens.filter(screen => !['Vilnius', 'Kaunas', 'Klaipėda', 'Šiauliai', 'Panevėžys'].includes(screen.city))
     : ledScreens.filter(screen => screen.city === selectedCity);
   

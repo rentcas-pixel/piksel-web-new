@@ -173,3 +173,28 @@ input[type="date"]::-webkit-datetime-edit-year-field {
 .city-buttons-container::-webkit-scrollbar {
   display: none;
 }
+
+/* Chrome calendar input fixes */
+input[type="date"] {
+  -webkit-appearance: none;
+  -moz-appearance: none;
+  appearance: none;
+}
+
+input[type="date"]::-webkit-calendar-picker-indicator {
+  -webkit-appearance: none;
+  background: transparent;
+  color: transparent;
+  cursor: pointer;
+  height: 100%;
+  position: absolute;
+  right: 0;
+  top: 0;
+  width: 100%;
+}
+
+/* Ensure date inputs have proper focus states */
+input[type="date"]:focus {
+  outline: 2px solid #3b82f6;
+  outline-offset: 2px;
+}

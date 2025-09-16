@@ -13,9 +13,6 @@ export function DarkNeonSidebar() {
       {/* Logo Section */}
       <div className="p-6 bg-gradient-to-r from-purple-900/50 to-blue-900/50 border-b border-purple-500/30">
         <div className="flex items-center gap-4">
-          <div className="w-10 h-10 bg-gradient-to-br from-purple-500 to-blue-500 rounded-md flex items-center justify-center shadow-lg shadow-purple-500/50">
-            <span className="text-white font-bold text-lg">P</span>
-          </div>
           <div>
             <h1 className="text-xl font-bold text-white">Piksel</h1>
             <p className="text-sm text-purple-300">ryškių ekranų tinklas</p>

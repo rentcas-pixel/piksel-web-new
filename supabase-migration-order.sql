@@ -15,3 +15,5 @@ CREATE INDEX IF NOT EXISTS idx_led_screens_order ON public.led_screens(order);
 COMMENT ON COLUMN public.led_screens.order IS 'Display order in sidebar - lower numbers appear first';
 
 
+
+

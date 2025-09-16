@@ -3,12 +3,130 @@
 import { useState, useEffect } from 'react'
 import { supabase } from '@/lib/supabase'
 import { LEDScreen } from '@/lib/supabase'
+import { ClipRequirement, defaultClipsData } from '@/data/clipsData'
 
 export default function AdminPanel() {
+  const [activeTab, setActiveTab] = useState('screens')
   const [screens, setScreens] = useState<LEDScreen[]>([])
   const [loading, setLoading] = useState(true)
   const [showForm, setShowForm] = useState(false)
   const [editingScreen, setEditingScreen] = useState<LEDScreen | null>(null)
+  
+  // Clips data state
+  const [clipsData, setClipsData] = useState<ClipRequirement[]>(defaultClipsData)
+  const [draggedItem, setDraggedItem] = useState<number | null>(null)
+  const [draggedScreen, setDraggedScreen] = useState<string | null>(null)
+
+  // Drag and drop functions
+  const handleDragStart = (e: React.DragEvent, id: number) => {
+    setDraggedItem(id)
+    e.dataTransfer.effectAllowed = 'move'
+  }
+
+  const handleDragOver = (e: React.DragEvent) => {
+    e.preventDefault()
+    e.dataTransfer.dropEffect = 'move'
+  }
+
+  const handleDrop = (e: React.DragEvent, targetId: number) => {
+    e.preventDefault()
+    if (!draggedItem) return
+
+    const newClipsData = [...clipsData]
+    const draggedIndex = newClipsData.findIndex(item => item.id === draggedItem)
+    const targetIndex = newClipsData.findIndex(item => item.id === targetId)
+
+    if (draggedIndex !== -1 && targetIndex !== -1) {
+      const [draggedItemData] = newClipsData.splice(draggedIndex, 1)
+      newClipsData.splice(targetIndex, 0, draggedItemData)
+      setClipsData(newClipsData)
+    }
+
+    setDraggedItem(null)
+  }
+
+  // Screen drag and drop functions
+  const handleScreenDragStart = (e: React.DragEvent, screenId: string) => {
+    setDraggedScreen(screenId)
+    e.dataTransfer.effectAllowed = 'move'
+  }
+
+  const handleScreenDragOver = (e: React.DragEvent) => {
+    e.preventDefault()
+    e.dataTransfer.dropEffect = 'move'
+  }
+
+  const handleScreenDrop = async (e: React.DragEvent, targetScreenId: string) => {
+    e.preventDefault()
+    if (!draggedScreen || draggedScreen === targetScreenId) return
+
+    try {
+      // Get current screens
+      const newScreens = [...screens]
+      const draggedIndex = newScreens.findIndex(screen => screen.id === draggedScreen)
+      const targetIndex = newScreens.findIndex(screen => screen.id === targetScreenId)
+
+      if (draggedIndex !== -1 && targetIndex !== -1) {
+        // Move screen in array
+        const [draggedScreenData] = newScreens.splice(draggedIndex, 1)
+        newScreens.splice(targetIndex, 0, draggedScreenData)
+
+        // Update display_order for all screens
+        for (let i = 0; i < newScreens.length; i++) {
+          await supabase
+            .from('led_screens')
+            .update({ display_order: i })
+            .eq('id', newScreens[i].id)
+        }
+
+        // Update local state
+        setScreens(newScreens)
+        console.log('Screen order updated successfully')
+      }
+    } catch (error) {
+      console.error('Error updating screen order:', error)
+      alert('Klaida atnaujinant ekranų eiliškumą')
+    }
+
+    setDraggedScreen(null)
+  }
+
+  const handleTooltipChange = (id: number, newTooltip: string) => {
+    setClipsData(prev => prev.map(item => 
+      item.id === id ? { ...item, tooltip: newTooltip } : item
+    ))
+  }
+
+  const addNewClip = () => {
+    console.log('Adding new clip, current clipsData:', clipsData)
+    const newId = clipsData.length > 0 ? Math.max(...clipsData.map(item => item.id)) + 1 : 1
+    const newClip = {
+      id: newId,
+      city: 'Naujas miestas',
+      format: 'Horizontalus',
+      width: '1920',
+      height: '1080',
+      tooltip: 'Įveskite ekranų pavadinimus'
+    }
+    console.log('New clip:', newClip)
+    setClipsData(prev => {
+      console.log('Previous state:', prev)
+      const newState = [...prev, newClip]
+      console.log('New state:', newState)
+      return newState
+    })
+  }
+
+  const removeClip = (id: number) => {
+    setClipsData(prev => prev.filter(item => item.id !== id))
+  }
+
+  const saveClipsData = () => {
+    console.log('Saving clips data:', clipsData)
+    // Išsaugome localStorage
+    localStorage.setItem('clipsData', JSON.stringify(clipsData))
+    alert(`Išsaugota ${clipsData.length} eilučių!`)
+  }
 
   // Form state
   const [formData, setFormData] = useState({
@@ -34,7 +152,9 @@ export default function AdminPanel() {
     size: '',
     resolution: '',
     traffic: '',
-    price: ''
+    price: '',
+    is_last_minute: false,
+    last_minute_date: ''
   })
   const [uploading, setUploading] = useState(false)
 
@@ -47,7 +167,7 @@ export default function AdminPanel() {
       const { data, error } = await supabase
         .from('led_screens')
         .select('*')
-        .order('created_at', { ascending: false })
+        .order('display_order', { ascending: true })
 
       if (error) throw error
       setScreens(data || [])
@@ -71,9 +191,9 @@ export default function AdminPanel() {
         return
       }
 
-      // Validate coordinate ranges
-      if (lat < 53 || lat > 56 || lng < 20 || lng > 27) {
-        alert('Koordinatės turi būti Lietuvos teritorijoje (platuma: 53-56, ilguma: 20-27)')
+      // Validate coordinate ranges for Lithuania
+      if (lat < 53.9 || lat > 56.4 || lng < 20.9 || lng > 26.8) {
+        alert('Koordinatės turi būti Lietuvos teritorijoje (platuma: 53.9-56.4, ilguma: 20.9-26.8)')
         return
       }
 
@@ -82,7 +202,7 @@ export default function AdminPanel() {
         city: formData.city,
         district: formData.district,
         address: formData.address,
-        coordinates: `(${lat}, ${lng})`, // POINT format
+        coordinates: `${lat},${lng}`, // Alternative format
         image_url: formData.image_url,
         description: formData.description || null,
         is_double_sided: formData.is_double_sided,
@@ -97,10 +217,16 @@ export default function AdminPanel() {
         resolution: formData.resolution || null,
         traffic: formData.traffic || null,
         price: formData.price ? parseFloat(formData.price) : null,
-        is_active: true
+        is_active: true,
+        display_order: screens.length,
+        // Temporarily commented out last minute fields
+        // is_last_minute: formData.is_last_minute || false,
+        // last_minute_date: formData.last_minute_date || null
       }
 
       console.log('Saving screen data:', screenData)
+      console.log('Screen data keys:', Object.keys(screenData))
+      console.log('Full screen data object:', JSON.stringify(screenData, null, 2))
 
       if (editingScreen) {
         // Update existing screen
@@ -112,6 +238,7 @@ export default function AdminPanel() {
 
         if (error) {
           console.error('Update error:', error)
+          console.error('Error details:', JSON.stringify(error, null, 2))
           throw error
         }
         console.log('Updated screen:', data)
@@ -124,6 +251,7 @@ export default function AdminPanel() {
 
         if (error) {
           console.error('Insert error:', error)
+          console.error('Insert error details:', JSON.stringify(error, null, 2))
           throw error
         }
         console.log('Created screen:', data)
@@ -150,22 +278,26 @@ export default function AdminPanel() {
         side_b_image_url: '',
         side_a_mobile_image_url: '',
         side_b_mobile_image_url: '',
-        size: '',
-        resolution: '',
-        traffic: '',
-        price: ''
-      })
-      setShowForm(false)
-      setEditingScreen(null)
+      size: '',
+      resolution: '',
+      traffic: '',
+      price: '',
+      is_last_minute: false,
+      last_minute_date: ''
+    })
+    setShowForm(false)
+    setEditingScreen(null)
       fetchScreens()
     } catch (error: unknown) {
       console.error('Error saving screen:', error)
+      console.error('Error details:', JSON.stringify(error, null, 2))
       alert(`Klaida išsaugant ekraną: ${error instanceof Error ? error.message : 'Nežinoma klaida'}`)
     }
   }
 
   const handleEdit = (screen: LEDScreen) => {
     console.log('Editing screen coordinates:', screen.coordinates, typeof screen.coordinates)
+    console.log('Editing screen image_url:', screen.image_url)
     
     // Handle different coordinate formats
     let latitude = '0'
@@ -194,6 +326,60 @@ export default function AdminPanel() {
       address: screen.address,
       latitude: latitude,
       longitude: longitude,
+      image_url: screen.image_url || '',
+      mobile_image_url: screen.mobile_image_url || '',
+      description: screen.description || '',
+      is_double_sided: screen.is_double_sided || false,
+      is_video: screen.is_video || false,
+      is_static: screen.is_static || false,
+      is_viaduct: screen.is_viaduct || false,
+      side_a_name: screen.side_a_name || '',
+      side_b_name: screen.side_b_name || '',
+      side_a_image_url: screen.side_a_image_url || '',
+      side_b_image_url: screen.side_b_image_url || '',
+      side_a_mobile_image_url: screen.side_a_mobile_image_url || '',
+      side_b_mobile_image_url: screen.side_b_mobile_image_url || '',
+      size: screen.size || '',
+      resolution: screen.resolution || '',
+      traffic: screen.traffic || '',
+      price: screen.price?.toString() || '',
+      is_last_minute: screen.is_last_minute || false,
+      last_minute_date: screen.last_minute_date || ''
+    })
+    setEditingScreen(screen)
+    setShowForm(true)
+  }
+
+  const handleCopy = (screen: LEDScreen) => {
+    console.log('Copying screen:', screen.name)
+    
+    // Handle different coordinate formats
+    let latitude = '0'
+    let longitude = '0'
+    
+    if (Array.isArray(screen.coordinates)) {
+      latitude = screen.coordinates[0].toString()
+      longitude = screen.coordinates[1].toString()
+    } else if (screen.coordinates && typeof screen.coordinates === 'object') {
+      // POINT object format
+      latitude = (screen.coordinates as any).x?.toString() || '0'
+      longitude = (screen.coordinates as any).y?.toString() || '0'
+    } else if (typeof screen.coordinates === 'string') {
+      // String format like "(54.6872, 25.2797)"
+      const match = (screen.coordinates as string).match(/\(([^,]+),\s*([^)]+)\)/)
+      if (match) {
+        latitude = match[1]
+        longitude = match[2]
+      }
+    }
+    
+    setFormData({
+      name: `${screen.name} (Kopija)`,
+      city: screen.city,
+      district: screen.district,
+      address: screen.address,
+      latitude: latitude,
+      longitude: longitude,
       image_url: screen.image_url,
       mobile_image_url: screen.mobile_image_url || '',
       description: screen.description || '',
@@ -210,9 +396,11 @@ export default function AdminPanel() {
       size: screen.size || '',
       resolution: screen.resolution || '',
       traffic: screen.traffic || '',
-      price: screen.price?.toString() || ''
+      price: screen.price?.toString() || '',
+      is_last_minute: screen.is_last_minute || false,
+      last_minute_date: screen.last_minute_date || ''
     })
-    setEditingScreen(screen)
+    setEditingScreen(null) // Nenustatome editingScreen, kad būtų sukurtas naujas ekranas
     setShowForm(true)
   }
 
@@ -276,6 +464,57 @@ export default function AdminPanel() {
       }))
 
       alert('Nuotrauka sėkmingai įkelta!')
+      
+      // Auto-save screen if editing existing screen
+      if (editingScreen && type === 'main') {
+        try {
+          const currentFormData = {
+            ...formData,
+            ...(type === 'main' && { image_url: publicUrl }),
+            ...(type === 'mobile' && { mobile_image_url: publicUrl }),
+            ...(type === 'side_a' && { side_a_image_url: publicUrl }),
+            ...(type === 'side_b' && { side_b_image_url: publicUrl })
+          }
+          
+          // Parse coordinates
+          const lat = parseFloat(currentFormData.latitude) || 0
+          const lng = parseFloat(currentFormData.longitude) || 0
+          
+          const screenData = {
+            name: currentFormData.name,
+            city: currentFormData.city,
+            district: currentFormData.district,
+            address: currentFormData.address,
+            coordinates: `${lat},${lng}`,
+            image_url: currentFormData.image_url,
+            description: currentFormData.description || null,
+            is_double_sided: currentFormData.is_double_sided,
+            is_video: currentFormData.is_video,
+            is_static: currentFormData.is_static,
+            is_viaduct: currentFormData.is_viaduct,
+            side_a_name: currentFormData.side_a_name || null,
+            side_b_name: currentFormData.side_b_name || null,
+            side_a_image_url: currentFormData.side_a_image_url || null,
+            side_b_image_url: currentFormData.side_b_image_url || null,
+            size: currentFormData.size || null,
+            resolution: currentFormData.resolution || null,
+            traffic: currentFormData.traffic || null,
+            price: currentFormData.price ? parseFloat(currentFormData.price) : null,
+            is_active: true,
+            display_order: screens.length
+          }
+          
+          await supabase
+            .from('led_screens')
+            .update(screenData)
+            .eq('id', editingScreen.id)
+            
+          console.log('Auto-saved screen with new image')
+          alert('Nuotrauka įkelta ir ekranas išsaugotas!')
+        } catch (error) {
+          console.error('Error auto-saving screen:', error)
+        }
+      }
     } catch (error: unknown) {
       console.error('Error uploading image:', error)
       alert(`Klaida įkeliant nuotrauką: ${error instanceof Error ? error.message : 'Nežinoma klaida'}`)
@@ -471,6 +710,27 @@ export default function AdminPanel() {
                   className="w-full border border-gray-300 rounded-lg px-3 py-2"
                 />
               </div>
+              <div className="md:col-span-1">
+                <label className="flex items-center">
+                  <input
+                    type="checkbox"
+                    checked={formData.is_last_minute}
+                    onChange={(e) => setFormData({...formData, is_last_minute: e.target.checked})}
+                    className="mr-2"
+                  />
+                  Last Minute
+                </label>
+              </div>
+              <div className="md:col-span-1">
+                <label className="block text-sm font-medium text-gray-700 mb-1">Last Minute data</label>
+                <input
+                  type="date"
+                  value={formData.last_minute_date}
+                  onChange={(e) => setFormData({...formData, last_minute_date: e.target.value})}
+                  className="w-full border border-gray-300 rounded-lg px-3 py-2"
+                  disabled={!formData.is_last_minute}
+                />
+              </div>
               <div>
                 <label className="flex items-center">
                   <input
@@ -637,11 +897,41 @@ export default function AdminPanel() {
           </div>
         )}
 
-        {/* Screens List */}
-        <div className="bg-white rounded-lg shadow-lg overflow-hidden">
-          <div className="px-6 py-4 border-b border-gray-200">
-            <h2 className="text-lg font-semibold">Ekranų sąrašas ({screens.length})</h2>
+        {/* Tab Navigation */}
+        <div className="bg-white rounded-lg shadow-lg overflow-hidden mb-6">
+          <div className="border-b border-gray-200">
+            <nav className="-mb-px flex">
+              <button
+                onClick={() => setActiveTab('screens')}
+                className={`py-4 px-6 text-sm font-medium border-b-2 ${
+                  activeTab === 'screens'
+                    ? 'border-blue-500 text-blue-600'
+                    : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'
+                }`}
+              >
+                Ekranai ({screens.length})
+              </button>
+              <button
+                onClick={() => setActiveTab('clips')}
+                className={`py-4 px-6 text-sm font-medium border-b-2 ${
+                  activeTab === 'clips'
+                    ? 'border-blue-500 text-blue-600'
+                    : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'
+                }`}
+              >
+                Klipai
+              </button>
+            </nav>
           </div>
+        </div>
+
+        {/* Screens List */}
+        {activeTab === 'screens' && (
+          <div className="bg-white rounded-lg shadow-lg overflow-hidden">
+            <div className="px-6 py-4 border-b border-gray-200">
+              <h2 className="text-lg font-semibold">Ekranų sąrašas ({screens.length})</h2>
+              <p className="text-sm text-gray-600 mt-1">Tempkite eilutes, kad keistumėte ekranų eiliškumą sidebar'e</p>
+            </div>
           <div className="overflow-x-auto">
             <table className="w-full">
               <thead className="bg-gray-50">
@@ -655,9 +945,21 @@ export default function AdminPanel() {
               </thead>
               <tbody className="divide-y divide-gray-200">
                 {screens.map((screen) => (
-                  <tr key={screen.id}>
+                  <tr 
+                    key={screen.id}
+                    draggable
+                    onDragStart={(e) => handleScreenDragStart(e, screen.id)}
+                    onDragOver={handleScreenDragOver}
+                    onDrop={(e) => handleScreenDrop(e, screen.id)}
+                    className={`cursor-move transition-colors ${
+                      draggedScreen === screen.id ? 'bg-blue-50 opacity-50' : 'hover:bg-gray-50'
+                    }`}
+                  >
                     <td className="px-6 py-4 whitespace-nowrap">
-                      <div className="text-sm font-medium text-gray-900">{screen.name}</div>
+                      <div className="flex items-center gap-2">
+                        <div className="text-gray-400 text-sm cursor-move">⋮⋮</div>
+                        <div className="text-sm font-medium text-gray-900">{screen.name}</div>
+                      </div>
                     </td>
                     <td className="px-6 py-4 whitespace-nowrap">
                       <div className="text-sm text-gray-900">{screen.city}</div>
@@ -697,6 +999,12 @@ export default function AdminPanel() {
                         Redaguoti
                       </button>
                       <button
+                        onClick={() => handleCopy(screen)}
+                        className="text-green-600 hover:text-green-900 mr-4"
+                      >
+                        Kopijuoti
+                      </button>
+                      <button
                         onClick={() => handleDelete(screen.id)}
                         className="text-red-600 hover:text-red-900"
                       >
@@ -709,6 +1017,128 @@ export default function AdminPanel() {
             </table>
           </div>
         </div>
+        )}
+
+        {/* Clips Tab */}
+        {activeTab === 'clips' && (
+          <div className="bg-white rounded-lg shadow-lg overflow-hidden">
+            <div className="px-6 py-4 border-b border-gray-200 flex justify-between items-center">
+              <div>
+                <h2 className="text-lg font-semibold">Klipų reikalavimai</h2>
+                <p className="text-sm text-gray-600 mt-1">Redaguokite tooltip tekstus ir eiliškumą. Tempkite eilutes, kad keistumėte eiliškumą.</p>
+                <p className="text-xs text-blue-600 mt-1">DEBUG: Iš viso eilučių: {clipsData.length}</p>
+              </div>
+              <button
+                onClick={addNewClip}
+                className="bg-green-600 text-white px-4 py-2 rounded-lg hover:bg-green-700 text-sm"
+              >
+                + Pridėti eilutę
+              </button>
+            </div>
+            <div className="p-6">
+              <div className="space-y-4">
+                {clipsData.map((clip, index) => (
+                  <div
+                    key={clip.id}
+                    draggable
+                    onDragStart={(e) => handleDragStart(e, clip.id)}
+                    onDragOver={handleDragOver}
+                    onDrop={(e) => handleDrop(e, clip.id)}
+                    className={`bg-gray-50 p-4 rounded-lg border-2 transition-all cursor-move ${
+                      draggedItem === clip.id ? 'border-blue-500 bg-blue-50' : 'border-transparent hover:border-gray-300'
+                    }`}
+                  >
+                    <div className="flex items-center justify-between mb-3">
+                      <div className="flex items-center gap-3">
+                        <div className="text-gray-400 text-sm">⋮⋮</div>
+                        <h3 className="font-medium text-gray-900">
+                          {clip.city || 'Nauja eilutė'} - {clip.format} ({clip.width}x{clip.height})
+                        </h3>
+                        <span className="text-xs text-gray-500">ID: {clip.id}</span>
+                      </div>
+                      <button
+                        onClick={() => removeClip(clip.id)}
+                        className="text-red-500 hover:text-red-700 text-sm"
+                      >
+                        🗑️ Ištrinti
+                      </button>
+                    </div>
+                    <div className="grid grid-cols-2 gap-4 mb-3">
+                      <div>
+                        <label className="block text-sm font-medium text-gray-700 mb-1">Miestas</label>
+                        <input
+                          type="text"
+                          value={clip.city}
+                          onChange={(e) => setClipsData(prev => prev.map(item => 
+                            item.id === clip.id ? { ...item, city: e.target.value } : item
+                          ))}
+                          className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 text-sm"
+                          placeholder="Įveskite miestą"
+                        />
+                      </div>
+                      <div>
+                        <label className="block text-sm font-medium text-gray-700 mb-1">Formatas</label>
+                        <select
+                          value={clip.format}
+                          onChange={(e) => setClipsData(prev => prev.map(item => 
+                            item.id === clip.id ? { ...item, format: e.target.value } : item
+                          ))}
+                          className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 text-sm"
+                        >
+                          <option value="Horizontalus">Horizontalus</option>
+                          <option value="Vertikalus">Vertikalus</option>
+                          <option value="Viadukai">Viadukai</option>
+                        </select>
+                      </div>
+                      <div>
+                        <label className="block text-sm font-medium text-gray-700 mb-1">Plotis</label>
+                        <input
+                          type="text"
+                          value={clip.width}
+                          onChange={(e) => setClipsData(prev => prev.map(item => 
+                            item.id === clip.id ? { ...item, width: e.target.value } : item
+                          ))}
+                          className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 text-sm"
+                          placeholder="Įveskite plotį"
+                        />
+                      </div>
+                      <div>
+                        <label className="block text-sm font-medium text-gray-700 mb-1">Aukštis</label>
+                        <input
+                          type="text"
+                          value={clip.height}
+                          onChange={(e) => setClipsData(prev => prev.map(item => 
+                            item.id === clip.id ? { ...item, height: e.target.value } : item
+                          ))}
+                          className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 text-sm"
+                          placeholder="Įveskite aukštį"
+                        />
+                      </div>
+                    </div>
+                    <div>
+                      <label className="block text-sm font-medium text-gray-700 mb-1">Tooltip tekstas</label>
+                      <input
+                        type="text"
+                        value={clip.tooltip}
+                        onChange={(e) => handleTooltipChange(clip.id, e.target.value)}
+                        className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                        placeholder="Įveskite ekranų pavadinimus, atskirtus kableliu"
+                      />
+                    </div>
+                  </div>
+                ))}
+                <div className="flex justify-end pt-4">
+                  <button 
+                    onClick={saveClipsData}
+                    className="bg-blue-600 text-white px-6 py-2 rounded-lg hover:bg-blue-700"
+                  >
+                    Išsaugoti pakeitimus
+                  </button>
+                </div>
+              </div>
+            </div>
+          </div>
+        )}
       </div>
     </div>
   )

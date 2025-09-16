@@ -34,6 +34,9 @@ export interface LEDScreen {
   traffic?: string // e.g., "300.258"
   price?: number // e.g., 70
   is_active: boolean
+  is_last_minute?: boolean
+  last_minute_date?: string
+  display_order?: number
   created_at: string
   updated_at: string
 }

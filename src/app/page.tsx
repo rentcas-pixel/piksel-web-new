@@ -237,9 +237,6 @@ export default function Home() {
             {/* Header */}
             <div className="flex items-center justify-between mb-6">
               <div className="flex items-center gap-3">
-                <div className="w-10 h-10 bg-blue-600 rounded-md flex items-center justify-center">
-                  <span className="text-white font-bold text-lg">P</span>
-                </div>
                 <div>
                   <div className="flex items-center gap-2">
                     <img 

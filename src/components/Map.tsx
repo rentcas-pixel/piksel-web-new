@@ -21,6 +21,16 @@ export default function Map({ selectedCity, selectedScreens, screenCities, selec
   const [isMobile, setIsMobile] = useState(false);
   const mapRef = useRef<HTMLDivElement>(null);
   const { screens: ledScreens, loading, error } = useLEDScreens();
+  
+  // Local state for date inputs (like in mobile)
+  const [fromDate, setFromDate] = useState(selectedDateRange?.from || '');
+  const [toDate, setToDate] = useState(selectedDateRange?.to || '');
+
+  // Sync local state with prop
+  useEffect(() => {
+    setFromDate(selectedDateRange?.from || '');
+    setToDate(selectedDateRange?.to || '');
+  }, [selectedDateRange]);
 
   useEffect(() => {
     const checkMobile = () => {
@@ -85,7 +95,9 @@ export default function Map({ selectedCity, selectedScreens, screenCities, selec
       }).addTo(map);
 
       // Filter screens by selected city
-      const filteredScreens = selectedCity === 'Regionai' 
+      const filteredScreens = selectedCity === 'Lietuva'
+        ? ledScreens // Show all screens for Lithuania
+        : selectedCity === 'Regionai' 
         ? ledScreens.filter(screen => !['Vilnius', 'Kaunas', 'Klaipėda', 'Šiauliai', 'Panevėžys'].includes(screen.city))
         : ledScreens.filter(screen => screen.city === selectedCity);
 
@@ -105,18 +117,18 @@ export default function Map({ selectedCity, selectedScreens, screenCities, selec
             <div style="
               width: ${isViaduct ? '50px' : '33px'}; 
               height: ${isViaduct ? '20px' : '33px'}; 
-              background: ${isSelected ? '#10b981' : '#2563eb'}; 
+              background: ${isSelected ? '#10b981' : (isViaduct ? '#8b5cf6' : '#2563eb')}; 
               border: 3px solid white; 
               border-radius: ${isViaduct ? '10px' : '50%'}; 
               box-shadow: 0 2px 8px rgba(0,0,0,0.3);
               position: absolute;
             "></div>
-            <!-- Inner shape - Round dot for normal, Pill for viaduct -->
+            <!-- Inner shape - White dot -->
             <div style="
-              width: ${isViaduct ? '20px' : '9px'}; 
-              height: ${isViaduct ? '8px' : '9px'}; 
+              width: ${isViaduct ? '6px' : '9px'}; 
+              height: ${isViaduct ? '6px' : '9px'}; 
               background: white; 
-              border-radius: ${isViaduct ? '4px' : '50%'}; 
+              border-radius: 50%; 
               position: absolute;
               z-index: 1;
             "></div>
@@ -183,7 +195,8 @@ export default function Map({ selectedCity, selectedScreens, screenCities, selec
       // Add markers for filtered screens
       filteredScreens.forEach((screen) => {
         const isSelected = selectedScreens && selectedScreens.includes(screen.name);
-        const hasLastMinute = false; // Removed lastMinute property
+        const hasLastMinute = screen.is_last_minute || false;
+        const lastMinuteDate = screen.last_minute_date;
         
         if (screen.is_double_sided) {
           console.log('Creating double-sided markers for:', screen.name, 'at coordinates:', screen.coordinates);
@@ -205,18 +218,18 @@ export default function Map({ selectedCity, selectedScreens, screenCities, selec
                 <div style="
                   width: ${isViaduct ? '50px' : '33px'}; 
                   height: ${isViaduct ? '20px' : '33px'}; 
-                  background: ${isSelected ? '#10b981' : '#2563eb'}; 
+                  background: ${isSelected ? '#10b981' : (isViaduct ? '#8b5cf6' : '#2563eb')}; 
                   border: 3px solid white; 
                   border-radius: ${isViaduct ? '10px' : '50%'}; 
                   box-shadow: 0 2px 8px rgba(0,0,0,0.3);
                   position: absolute;
                 "></div>
-                <!-- Inner shape - Round dot for normal, Pill for viaduct -->
+                <!-- Inner shape - White dot -->
                 <div style="
-                  width: ${isViaduct ? '20px' : '9px'}; 
-                  height: ${isViaduct ? '8px' : '9px'}; 
+                  width: ${isViaduct ? '6px' : '9px'}; 
+                  height: ${isViaduct ? '6px' : '9px'}; 
                   background: white; 
-                  border-radius: ${isViaduct ? '4px' : '50%'}; 
+                  border-radius: 50%; 
                   position: absolute;
                   z-index: 1;
                 "></div>
@@ -264,7 +277,7 @@ export default function Map({ selectedCity, selectedScreens, screenCities, selec
           
           // Left marker (North side) - offset 19px left (half marker width + half gap)
           const leftMarker = L.marker([screen.coordinates[0], screen.coordinates[1]], {
-            icon: createOffsetIcon(Boolean(isSelected), false, undefined, -19, Boolean(screen.is_viaduct))
+            icon: createOffsetIcon(Boolean(isSelected), hasLastMinute, lastMinuteDate, -19, Boolean(screen.is_viaduct))
           })
             .addTo(map)
             .bindPopup(`
@@ -338,7 +351,7 @@ export default function Map({ selectedCity, selectedScreens, screenCities, selec
 
           // Right marker (South side) - offset 19px right (half marker width + half gap)
           const rightMarker = L.marker([screen.coordinates[0], screen.coordinates[1]], {
-            icon: createOffsetIcon(Boolean(isSelected), false, undefined, 19, Boolean(screen.is_viaduct))
+            icon: createOffsetIcon(Boolean(isSelected), hasLastMinute, lastMinuteDate, 19, Boolean(screen.is_viaduct))
           })
             .addTo(map)
             .bindPopup(`
@@ -412,7 +425,7 @@ export default function Map({ selectedCity, selectedScreens, screenCities, selec
         } else {
           // Single marker for regular screens
           const marker = L.marker([screen.coordinates[0], screen.coordinates[1]], {
-            icon: createLedScreenIcon(Boolean(isSelected), false, undefined, false, Boolean(screen.is_viaduct))
+            icon: createLedScreenIcon(Boolean(isSelected), hasLastMinute, lastMinuteDate, false, Boolean(screen.is_viaduct))
           })
             .addTo(map)
             .bindPopup(`
@@ -494,7 +507,7 @@ export default function Map({ selectedCity, selectedScreens, screenCities, selec
         const markers: any[] = [];
         filteredScreens.forEach(screen => {
           const isSelected = selectedScreens && selectedScreens.includes(screen.name);
-          const hasLastMinute = false; // Removed lastMinute property
+          const hasLastMinute = screen.is_last_minute || false;
           
           // Always create single marker for fitBounds (double-sided screens use single marker with combined icon)
           markers.push(L.marker([screen.coordinates[0], screen.coordinates[1]]));
@@ -750,6 +763,24 @@ export default function Map({ selectedCity, selectedScreens, screenCities, selec
           <img src="${screen.image_url}" alt="${fullName}"
                style="width: 100%; height: 100%; object-fit: cover;"/>
           
+          ${screen.is_viaduct ? `
+          <!-- Package Badge -->
+          <div style="
+            position: absolute;
+            top: 10px;
+            left: 10px;
+            background: #f59e0b;
+            color: white;
+            font-size: 11px;
+            font-weight: bold;
+            padding: 4px 8px;
+            border-radius: 6px;
+            white-space: nowrap;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.3);
+            z-index: 100;
+          ">Parduodamas tik paketas</div>
+          ` : ''}
+          
           <!-- Copy URL Button -->
           <button onclick="navigator.clipboard.writeText(window.location.origin + '/ekranas/${screen.id}${sideName ? '-' + sideName.toLowerCase() : ''}'); this.style.background='#10b981'; setTimeout(() => this.style.background='rgba(0,0,0,0.8)', 1000);" 
                   style="position: absolute; top: 10px; right: 10px; width: 28px; height: 28px; background: rgba(0,0,0,0.8); color: white; border: none; border-radius: 6px; display: flex; align-items: center; justify-content: center; cursor: pointer; z-index: 1000; transition: all 0.2s ease;"
@@ -879,17 +910,35 @@ export default function Map({ selectedCity, selectedScreens, screenCities, selec
               <div className="text-sm font-medium text-gray-700">Reklamos periodas:</div>
           <div className="flex items-center gap-2">
                 <input
+                  key="desktop-from-date"
                   type="date"
-                  value={selectedDateRange?.from || ''}
-                  onChange={(e) => onDateRangeChange && onDateRangeChange(e.target.value, selectedDateRange?.to || '')}
-                  className="px-3 py-1 border border-gray-300 rounded text-sm focus:outline-none"
+                  value={fromDate}
+                  onChange={(e) => {
+                    const newFromDate = e.target.value;
+                    console.log('Desktop From date changed:', newFromDate);
+                    setFromDate(newFromDate);
+                    if (onDateRangeChange) {
+                      onDateRangeChange(newFromDate, toDate);
+                    }
+                  }}
+                  className="px-3 py-1 border border-gray-300 rounded text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+                  placeholder="Nuo"
                 />
                 <span className="text-gray-500 text-sm">iki</span>
                 <input
+                  key="desktop-to-date"
                   type="date"
-                  value={selectedDateRange?.to || ''}
-                  onChange={(e) => onDateRangeChange && onDateRangeChange(selectedDateRange?.from || '', e.target.value)}
-                  className="px-3 py-1 border border-gray-300 rounded text-sm focus:outline-none"
+                  value={toDate}
+                  onChange={(e) => {
+                    const newToDate = e.target.value;
+                    console.log('Desktop To date changed:', newToDate);
+                    setToDate(newToDate);
+                    if (onDateRangeChange) {
+                      onDateRangeChange(fromDate, newToDate);
+                    }
+                  }}
+                  className="px-3 py-1 border border-gray-300 rounded text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+                  placeholder="Iki"
                 />
           </div>
           </div>

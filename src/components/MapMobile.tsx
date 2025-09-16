@@ -111,6 +111,24 @@ export default function Map({ selectedCity, selectedScreens: propSelectedScreens
           <img src="${screen.image_url}" alt="${fullName}"
                style="width: 100%; height: 100%; object-fit: cover;"/>
           
+          ${screen.is_viaduct ? `
+          <!-- Package Badge -->
+          <div style="
+            position: absolute;
+            top: 10px;
+            left: 10px;
+            background: #f59e0b;
+            color: white;
+            font-size: 11px;
+            font-weight: bold;
+            padding: 4px 8px;
+            border-radius: 6px;
+            white-space: nowrap;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.3);
+            z-index: 100;
+          ">Parduodamas tik paketas</div>
+          ` : ''}
+          
           <!-- Copy URL Button -->
           <button onclick="navigator.clipboard.writeText(window.location.origin + '/ekranas/${screen.id}${sideName ? '-' + sideName.toLowerCase() : ''}'); this.style.background='#10b981'; setTimeout(() => this.style.background='rgba(0,0,0,0.8)', 1000);" 
                   style="position: absolute; top: 10px; right: 10px; width: 28px; height: 28px; background: rgba(0,0,0,0.8); color: white; border: none; border-radius: 6px; display: flex; align-items: center; justify-content: center; cursor: pointer; z-index: 1000; transition: all 0.2s ease;"
@@ -171,6 +189,24 @@ export default function Map({ selectedCity, selectedScreens: propSelectedScreens
         <div style="width: 100%; height: 250px; position: relative; background: #ddd; overflow: hidden;">
           <img src="${screen.image_url}" alt="${fullName}"
                style="width: 100%; height: 100%; object-fit: cover;"/>
+          
+          ${screen.is_viaduct ? `
+          <!-- Package Badge -->
+          <div style="
+            position: absolute;
+            top: 15px;
+            left: 15px;
+            background: #f59e0b;
+            color: white;
+            font-size: 12px;
+            font-weight: bold;
+            padding: 6px 12px;
+            border-radius: 8px;
+            white-space: nowrap;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.3);
+            z-index: 100;
+          ">Parduodamas tik paketas</div>
+          ` : ''}
           
           <!-- Copy URL Button -->
           <button onclick="navigator.clipboard.writeText(window.location.origin + '/ekranas/${screen.id}${sideName ? '-' + sideName.toLowerCase() : ''}'); this.style.background='#10b981'; setTimeout(() => this.style.background='rgba(0,0,0,0.8)', 1000);" 
@@ -323,6 +359,12 @@ export default function Map({ selectedCity, selectedScreens: propSelectedScreens
 
       // Filter screens based on selected city
       const filteredScreens = ledScreens.filter(screen => {
+        if (selectedCity === 'Lietuva') {
+          return true; // Show all screens for Lithuania
+        }
+        if (selectedCity === 'Regionai') {
+          return !['Vilnius', 'Kaunas', 'Klaipėda', 'Šiauliai', 'Panevėžys'].includes(screen.city);
+        }
         if (selectedCity && selectedCity !== 'Visi') {
           return screen.city === selectedCity;
         }
@@ -351,7 +393,7 @@ export default function Map({ selectedCity, selectedScreens: propSelectedScreens
                   <div style="
                     width: 33px; 
                     height: 33px; 
-                    background: ${isSelected ? '#10b981' : '#2563eb'}; 
+                    background: ${isSelected ? '#10b981' : (screen.is_viaduct ? '#8b5cf6' : '#2563eb')}; 
                     border: 3px solid white; 
                     border-radius: 50%; 
                     box-shadow: 0 2px 8px rgba(0,0,0,0.3);
@@ -391,7 +433,7 @@ export default function Map({ selectedCity, selectedScreens: propSelectedScreens
                   <div style="
                     width: 33px; 
                     height: 33px; 
-                    background: ${isSelected ? '#10b981' : '#2563eb'}; 
+                    background: ${isSelected ? '#10b981' : (screen.is_viaduct ? '#8b5cf6' : '#2563eb')}; 
                     border: 3px solid white; 
                     border-radius: 50%; 
                     box-shadow: 0 2px 8px rgba(0,0,0,0.3);
@@ -431,17 +473,17 @@ export default function Map({ selectedCity, selectedScreens: propSelectedScreens
                   <div style="
                     width: ${screen.is_viaduct ? '50px' : '33px'}; 
                     height: ${screen.is_viaduct ? '20px' : '33px'}; 
-                    background: ${isSelected ? '#10b981' : '#2563eb'}; 
+                    background: ${isSelected ? '#10b981' : (screen.is_viaduct ? '#8b5cf6' : '#2563eb')}; 
                     border: 3px solid white; 
                     border-radius: ${screen.is_viaduct ? '10px' : '50%'}; 
                     box-shadow: 0 2px 8px rgba(0,0,0,0.3);
                     position: absolute;
                   "></div>
                   <div style="
-                    width: ${screen.is_viaduct ? '20px' : '9px'}; 
-                    height: ${screen.is_viaduct ? '8px' : '9px'}; 
+                    width: ${screen.is_viaduct ? '6px' : '9px'}; 
+                    height: ${screen.is_viaduct ? '6px' : '9px'}; 
                     background: white; 
-                    border-radius: ${screen.is_viaduct ? '4px' : '50%'}; 
+                    border-radius: 50%; 
                     position: absolute;
                     z-index: 1;
                   "></div>
@@ -883,13 +925,15 @@ export default function Map({ selectedCity, selectedScreens: propSelectedScreens
                 <div style={{ fontSize: '14px', fontWeight: '500', color: '#374151', marginBottom: '8px' }}>Periodas:</div>
                 <div style={{ display: 'flex', alignItems: 'center', gap: '8px', flexWrap: 'wrap' }}>
                   <input
+                    key="mobile-from-date"
                     type="date"
                     value={fromDate}
                     onChange={(e) => {
-                      console.log('From date changed:', e.target.value);
-                      setFromDate(e.target.value);
+                      const newFromDate = e.target.value;
+                      console.log('Mobile From date changed:', newFromDate);
+                      setFromDate(newFromDate);
                       if (onDateRangeChange) {
-                        onDateRangeChange(e.target.value, toDate);
+                        onDateRangeChange(newFromDate, toDate);
                       }
                     }}
                     style={{
@@ -906,15 +950,17 @@ export default function Map({ selectedCity, selectedScreens: propSelectedScreens
                   />
                   <span style={{ color: '#6b7280', fontSize: '12px', flexShrink: 0 }}>iki</span>
                   <input
+                    key="mobile-to-date"
                     type="date"
                     value={toDate}
                     onChange={(e) => {
-                      console.log('To date changed:', e.target.value);
-                      setToDate(e.target.value);
+                      const newToDate = e.target.value;
+                      console.log('Mobile To date changed:', newToDate);
+                      setToDate(newToDate);
                       if (onDateRangeChange) {
-                        onDateRangeChange(fromDate, e.target.value);
+                        onDateRangeChange(fromDate, newToDate);
                       }
-                      if (e.target.value) {
+                      if (newToDate) {
                         setShowInquiryForm(true);
                       }
                     }}

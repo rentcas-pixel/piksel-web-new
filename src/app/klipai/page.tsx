@@ -2,24 +2,28 @@
 
 import { Download, Image, Video } from 'lucide-react';
 import { ledScreens } from '@/data/ledScreens';
+import { defaultClipsData, ClipRequirement } from '@/data/clipsData';
+import { useEffect, useState } from 'react';
 
 export default function Klipai() {
-  const requirementsData = [
-    { city: 'Vilnius', format: 'Viadukai', width: '3040', height: '240' },
-    { city: 'Vilnius', format: 'Horizontalus', width: '1152', height: '576' },
-    { city: 'Vilnius', format: 'Vertikalus', width: '448', height: '672' },
-    { city: 'Vilnius (Outlet)', format: 'Horizontalus', width: '640', height: '288' },
-    { city: 'Kaunas ▲', format: 'Horizontalus', width: '1080', height: '450' },
-    { city: 'Kaunas', format: 'Horizontalus', width: '960', height: '576' },
-    { city: 'Klaipėda', format: 'Horizontalus', width: '1152', height: '576' },
-    { city: 'Klaipėda (Centras)', format: 'Vertikalus', width: '720', height: '864' },
-    { city: 'Šiauliai', format: 'Horizontalus', width: '1152', height: '576' },
-    { city: 'Panevėžys (RYO/Klaipėdos)', format: 'Horizontalus', width: '1309', height: '576' },
-    { city: 'Alytus', format: 'Horizontalus', width: '480', height: '270' },
-    { city: 'Marijampolė', format: 'Horizontalus', width: '1152', height: '576' },
-    { city: 'Mažeikiai', format: 'Horizontalus', width: '640', height: '288' },
-    { city: 'Utena', format: 'Horizontalus', width: '960', height: '576' }
-  ];
+  const [requirementsData, setRequirementsData] = useState<ClipRequirement[]>(defaultClipsData);
+
+  useEffect(() => {
+    // Skaityti duomenis iš localStorage
+    const savedData = localStorage.getItem('clipsData');
+    console.log('Saved data from localStorage:', savedData);
+    if (savedData) {
+      try {
+        const parsedData = JSON.parse(savedData);
+        console.log('Parsed data:', parsedData);
+        setRequirementsData(parsedData);
+      } catch (error) {
+        console.error('Error parsing saved clips data:', error);
+      }
+    } else {
+      console.log('No saved data found in localStorage');
+    }
+  }, []);
 
   // Function to get screen names for a city and format
   const getScreenNames = (city: string, format: string) => {
@@ -61,7 +65,6 @@ export default function Klipai() {
                   </thead>
                   <tbody className="divide-y divide-gray-200">
                     {requirementsData.map((item, index) => {
-                      const screenNames = getScreenNames(item.city, item.format);
                       return (
                         <tr key={index} className="hover:bg-gray-50 group relative">
                           <td className="px-6 py-4 text-sm text-gray-900 border-r border-gray-200">
@@ -77,20 +80,20 @@ export default function Klipai() {
                             {item.height}
                           </td>
                           
-                          {/* Tooltip */}
-                          {screenNames.length > 0 && (
-                            <div className="absolute left-0 top-0 w-full h-full opacity-0 group-hover:opacity-100 transition-opacity duration-200 pointer-events-none z-10">
-                              <div className="absolute top-0 left-0 bg-white text-gray-900 px-3 py-2 rounded-lg shadow-lg border border-gray-200 text-sm whitespace-nowrap transform -translate-y-full -translate-x-2">
-                                <div className="flex flex-wrap gap-1">
-                                  {screenNames.map((name, idx) => (
-                                    <span key={idx} className="bg-blue-100 text-blue-800 px-2 py-1 rounded text-xs">
-                                      {name}
+                          {/* Custom Tooltip with badges - spans entire row */}
+                          {item.tooltip && (
+                            <td className="absolute left-0 top-0 w-full h-full opacity-0 group-hover:opacity-100 transition-opacity duration-200 pointer-events-none z-10 p-0">
+                              <div className="absolute top-0 left-1/2 transform -translate-x-1/2 -translate-y-full bg-white text-gray-900 px-4 py-3 rounded-lg shadow-lg border border-gray-200 text-sm">
+                                <div className="flex flex-wrap gap-2 justify-center">
+                                  {item.tooltip.split(', ').map((screen, idx) => (
+                                    <span key={idx} className="bg-blue-100 text-blue-800 px-3 py-1 rounded-full text-xs font-medium whitespace-nowrap">
+                                      {screen}
                                     </span>
                                   ))}
                                 </div>
-                                <div className="absolute top-full left-4 w-0 h-0 border-l-4 border-r-4 border-t-4 border-transparent border-t-white"></div>
+                                <div className="absolute top-full left-1/2 transform -translate-x-1/2 w-0 h-0 border-l-4 border-r-4 border-t-4 border-transparent border-t-white"></div>
                               </div>
-                            </div>
+                            </td>
                           )}
                         </tr>
                       );

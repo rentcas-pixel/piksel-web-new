@@ -1,18 +1,56 @@
 'use client';
 
+import { useState } from 'react';
 import { useLEDScreens } from '@/hooks/useLEDScreens';
 import Image from 'next/image';
 import Link from 'next/link';
-import { MapPin, FileText, Calendar, Mail, ChevronRight, Play, HelpCircle, Phone, Monitor, Users, Clock, MapPin as LocationIcon } from 'lucide-react';
+import { MapPin, FileText, Calendar, Mail, ChevronRight, Play, HelpCircle, Phone, Monitor, Users, Clock, MapPin as LocationIcon, Search, X } from 'lucide-react';
 
 interface SidebarProps {
   onCityFilter: (city: string) => void;
   selectedCity: string;
+  onSearchResults?: (results: any[]) => void;
 }
 
-export default function Sidebar({ onCityFilter, selectedCity }: SidebarProps) {
+export default function Sidebar({ onCityFilter, selectedCity, onSearchResults }: SidebarProps) {
   // Get LED screens from Supabase
   const { screens: ledScreens, loading, error } = useLEDScreens();
+  
+  // Search state
+  const [searchQuery, setSearchQuery] = useState('');
+  const [searchResults, setSearchResults] = useState<any[]>([]);
+  const [showSearchResults, setShowSearchResults] = useState(false);
+  
+  // Search function
+  const handleSearch = (query: string) => {
+    setSearchQuery(query);
+    
+    if (query.trim() === '') {
+      setSearchResults([]);
+      setShowSearchResults(false);
+      onSearchResults?.([]);
+      return;
+    }
+    
+    const results = ledScreens.filter(screen => 
+      screen.name.toLowerCase().includes(query.toLowerCase()) ||
+      screen.address.toLowerCase().includes(query.toLowerCase()) ||
+      screen.city.toLowerCase().includes(query.toLowerCase()) ||
+      screen.district.toLowerCase().includes(query.toLowerCase())
+    );
+    
+    setSearchResults(results);
+    setShowSearchResults(true);
+    onSearchResults?.(results);
+  };
+  
+  // Clear search
+  const clearSearch = () => {
+    setSearchQuery('');
+    setSearchResults([]);
+    setShowSearchResults(false);
+    onSearchResults?.([]);
+  };
   
   // Calculate screen counts for each city
   const getCityCounts = () => {
@@ -26,6 +64,9 @@ export default function Sidebar({ onCityFilter, selectedCity }: SidebarProps) {
       }
     });
     
+    // Calculate total count for Lithuania
+    const totalCount = Object.values(cityCounts).reduce((sum, count) => sum + count, 0);
+    
     // Calculate regional count (cities not in main list)
     const mainCities = ['Vilnius', 'Kaunas', 'Klaipėda', 'Šiauliai', 'Panevėžys'];
     const regionalCount = Object.entries(cityCounts)
@@ -33,6 +74,7 @@ export default function Sidebar({ onCityFilter, selectedCity }: SidebarProps) {
       .reduce((sum, [, count]) => sum + count, 0);
     
     return [
+      { name: 'Lietuva', count: totalCount, isSpecial: true },
       { name: 'Vilnius', count: cityCounts['Vilnius'] || 0 },
       { name: 'Kaunas', count: cityCounts['Kaunas'] || 0 },
       { name: 'Klaipėda', count: cityCounts['Klaipėda'] || 0 },
@@ -53,7 +95,10 @@ export default function Sidebar({ onCityFilter, selectedCity }: SidebarProps) {
     <div className="fixed left-0 top-0 h-screen w-80 bg-gray-50 border-r border-gray-200 flex flex-col z-30">
       {/* Header */}
       <div className="p-6 bg-white border-b border-gray-200">
-        <div className="flex items-center gap-4">
+        <button 
+          onClick={() => onCityFilter('Vilnius')}
+          className="flex items-center gap-4 w-full hover:bg-gray-50 rounded-lg p-2 -m-2 transition-colors"
+        >
           <div className="w-10 h-10 bg-blue-600 rounded-md flex items-center justify-center">
             <span className="text-white font-bold text-lg">P</span>
           </div>
@@ -67,27 +112,36 @@ export default function Sidebar({ onCityFilter, selectedCity }: SidebarProps) {
             />
             <p className="text-sm text-gray-500">ryškių ekranų tinklas</p>
           </div>
-        </div>
+        </button>
       </div>
 
-      {/* Status */}
+      {/* Search */}
       <div className="p-4 bg-white border-b border-gray-200">
-        <div className="flex items-center gap-3 p-3 bg-gray-100 rounded-lg border border-gray-200">
-          <div className="flex-shrink-0">
-            <Monitor className="w-4 h-4 text-gray-600" />
+        <div className="relative">
+          <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+            <Search className="h-4 w-4 text-gray-400" />
           </div>
-          <div className="flex-1">
-            <div className="text-sm font-medium text-gray-900 flex items-center gap-2">
-              <Users className="w-3 h-3" />
-              Rodome reklamą
-            </div>
-            <div className="text-xs text-gray-500 flex items-center gap-2">
-              <Clock className="w-3 h-3" />
-              Renkame kontaktus...
-            </div>
-          </div>
-          <div className="w-2 h-2 bg-green-500 rounded-full animate-pulse"></div>
+          <input
+            type="text"
+            placeholder="Ieškoti ekranų pagal pavadinimą, adresą, miestą..."
+            value={searchQuery}
+            onChange={(e) => handleSearch(e.target.value)}
+            className="block w-full pl-10 pr-10 py-3 border border-gray-300 rounded-lg text-sm placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+          />
+          {searchQuery && (
+            <button
+              onClick={clearSearch}
+              className="absolute inset-y-0 right-0 pr-3 flex items-center"
+            >
+              <X className="h-4 w-4 text-gray-400 hover:text-gray-600" />
+            </button>
+          )}
         </div>
+        {searchResults.length > 0 && (
+          <div className="mt-2 text-xs text-gray-500">
+            Rasta {searchResults.length} ekranų
+          </div>
+        )}
       </div>
 
       {/* Cities */}
@@ -113,11 +167,23 @@ export default function Sidebar({ onCityFilter, selectedCity }: SidebarProps) {
                   onClick={() => onCityFilter(city.name)}
                   className={`w-full flex items-center gap-3 p-3 rounded-lg text-gray-600 hover:text-gray-900 transition-colors group mb-1 ${
                     selectedCity === city.name ? 'bg-blue-100 text-blue-700' : ''
-                  }`}
+                  } ${city.isSpecial ? 'bg-gradient-to-r from-blue-50 to-indigo-50 border border-blue-200' : ''}`}
                 >
-                  <MapPin className="w-4 h-4 text-gray-400 group-hover:text-gray-600" />
-                  <span className="flex-1 text-left font-medium">{city.name}</span>
-                  <span className="bg-gray-200 text-gray-600 text-xs font-medium px-2 py-1 rounded-full">
+                  {city.isSpecial ? (
+                    <span className="text-lg">🇱🇹</span>
+                  ) : (
+                    <MapPin className={`w-4 h-4 group-hover:text-gray-600 ${
+                      city.isSpecial ? 'text-blue-500' : 'text-gray-400'
+                    }`} />
+                  )}
+                  <span className={`flex-1 text-left ${
+                    city.isSpecial ? 'font-bold text-blue-800' : 'font-medium'
+                  }`}>{city.name}</span>
+                  <span className={`text-xs font-medium px-2 py-1 rounded-full ${
+                    city.isSpecial 
+                      ? 'bg-blue-200 text-blue-800' 
+                      : 'bg-gray-200 text-gray-600'
+                  }`}>
                     {city.count}
                   </span>
                   <ChevronRight className="w-4 h-4 text-gray-400 group-hover:text-gray-600 transition-colors" />

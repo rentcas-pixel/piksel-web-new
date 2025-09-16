@@ -7,7 +7,7 @@ export async function GET() {
       .from('led_screens')
       .select('*')
       .eq('is_active', true)
-      .order('city', { ascending: true })
+      .order('display_order', { ascending: true })
 
     if (error) {
       console.error('Supabase error:', error)
