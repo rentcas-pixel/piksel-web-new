@@ -495,7 +495,7 @@ export default function Map({ selectedCity, selectedScreens, screenCities, selec
                 </div>
                 
                 <!-- Close Button -->
-                <button onclick="this.closest('.leaflet-popup').remove()" 
+                <button onclick="this.closest('.leaflet-popup').remove(); if (typeof window.selectScreen === 'function') { window.selectScreen('${screen.name}'); }" 
                         class="custom-close-button">×</button>
           </div>
         `);
