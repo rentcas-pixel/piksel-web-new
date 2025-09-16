@@ -466,7 +466,7 @@ export default function AdminPanel() {
       alert('Nuotrauka sėkmingai įkelta!')
       
       // Auto-save screen if editing existing screen
-      if (editingScreen && type === 'main') {
+      if (editingScreen) {
         try {
           const currentFormData = {
             ...formData,
