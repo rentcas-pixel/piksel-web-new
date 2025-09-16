@@ -896,11 +896,16 @@ export default function Map({ selectedCity, selectedScreens, screenCities, selec
                 ))}
               </>
             )}
+          </div>
+          
+          {/* Clear All Button */}
+          <div className="flex justify-end">
             <button 
               onClick={onClearFilter}
-              className="text-gray-400 hover:text-gray-600 text-sm"
+              className="text-gray-400 hover:text-gray-600 text-sm font-bold px-2 py-1 hover:bg-gray-100 rounded"
+              title="Išvalyti visus filtrus"
             >
-              ×
+              × Išvalyti visus filtrus
             </button>
           </div>
           
