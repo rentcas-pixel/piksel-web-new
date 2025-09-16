@@ -930,7 +930,7 @@ export default function AdminPanel() {
           <div className="bg-white rounded-lg shadow-lg overflow-hidden">
             <div className="px-6 py-4 border-b border-gray-200">
               <h2 className="text-lg font-semibold">Ekranų sąrašas ({screens.length})</h2>
-              <p className="text-sm text-gray-600 mt-1">Tempkite eilutes, kad keistumėte ekranų eiliškumą sidebar'e</p>
+              <p className="text-sm text-gray-600 mt-1">Tempkite eilutes, kad keistumėte ekranų eiliškumą sidebar&apos;e</p>
             </div>
           <div className="overflow-x-auto">
             <table className="w-full">
