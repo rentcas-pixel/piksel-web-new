@@ -425,6 +425,7 @@ export default function AdminPanel() {
     
     setFormData({
       name: `${screen.name} (Kopija)`,
+      custom_url: '', // Empty for copy - admin will set new URL
       city: screen.city,
       district: screen.district,
       address: screen.address,
