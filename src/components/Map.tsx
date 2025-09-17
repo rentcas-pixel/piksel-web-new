@@ -292,7 +292,7 @@ export default function Map({ selectedCity, selectedScreens, screenCities, selec
                   
                   
                   <!-- Copy URL Button -->
-                  <button class="copy-tooltip" onclick="navigator.clipboard.writeText(window.location.origin + '/#${screen.slug}-siaure'); this.style.background='#10b981'; setTimeout(() => this.style.background='rgba(0,0,0,0.8)', 1000);" 
+                  <button class="copy-tooltip" onclick="navigator.clipboard.writeText(window.location.origin + '/#${screen.slug}'); this.style.background='#10b981'; setTimeout(() => this.style.background='rgba(0,0,0,0.8)', 1000);" 
                           style="position: absolute; top: 20px; right: 20px; width: 32px; height: 32px; background: rgba(0,0,0,0.8); color: white; border: none; border-radius: 8px; display: flex; align-items: center; justify-content: center; cursor: pointer; z-index: 1000; transition: all 0.2s ease;"
                           title="Kopijuoti URL">
                     <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
@@ -366,7 +366,7 @@ export default function Map({ selectedCity, selectedScreens, screenCities, selec
                   
                   
                   <!-- Copy URL Button -->
-                  <button class="copy-tooltip" onclick="navigator.clipboard.writeText(window.location.origin + '/#${screen.slug}-pietus'); this.style.background='#10b981'; setTimeout(() => this.style.background='rgba(0,0,0,0.8)', 1000);" 
+                  <button class="copy-tooltip" onclick="navigator.clipboard.writeText(window.location.origin + '/#${screen.slug}'); this.style.background='#10b981'; setTimeout(() => this.style.background='rgba(0,0,0,0.8)', 1000);" 
                           style="position: absolute; top: 20px; right: 20px; width: 32px; height: 32px; background: rgba(0,0,0,0.8); color: white; border: none; border-radius: 8px; display: flex; align-items: center; justify-content: center; cursor: pointer; z-index: 1000; transition: all 0.2s ease;"
                           title="Kopijuoti URL">
                     <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
