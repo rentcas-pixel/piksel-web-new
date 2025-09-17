@@ -37,6 +37,63 @@ export default function Home() {
     initEmailJS();
   }, []);
 
+  // Hash routing - handle URLs like #vilnius/compensa
+  useEffect(() => {
+    console.log('Hash routing useEffect triggered, ledScreens length:', ledScreens.length);
+    console.log('Current hash:', window.location.hash);
+    
+    const handleHashChange = () => {
+      const hash = window.location.hash.slice(1); // Remove #
+      console.log('handleHashChange called, hash:', hash);
+      if (hash && hash.includes('/')) {
+        const [city, screenName] = hash.split('/');
+        
+        // Find the screen by custom_url
+        console.log('Hash routing - Looking for hash:', hash);
+        const screen = ledScreens.find(s => {
+          console.log('Checking screen:', s.name, 'custom_url:', s.custom_url);
+          return s.custom_url === hash;
+        });
+        console.log('Hash routing - Found screen:', screen);
+        
+        if (screen) {
+          // Set the city filter
+          setSelectedCity(screen.city);
+          
+          // Wait for map to load and then show popup
+          setTimeout(() => {
+            if ((window as any).mapInstance) {
+              const map = (window as any).mapInstance;
+              map.eachLayer((layer: any) => {
+                if (layer.options && layer.options.screenId === screen.id) {
+                  layer.openPopup();
+                  return;
+                }
+                if (layer.getPopup && layer.getPopup()) {
+                  const popupContent = layer.getPopup().getContent();
+                  if (popupContent && popupContent.includes(screen.name)) {
+                    layer.openPopup();
+                    return;
+                  }
+                }
+              });
+            }
+          }, 1000);
+        }
+      }
+    };
+
+    // Handle initial hash on page load
+    handleHashChange();
+
+    // Listen for hash changes
+    window.addEventListener('hashchange', handleHashChange);
+    
+    return () => {
+      window.removeEventListener('hashchange', handleHashChange);
+    };
+  }, [ledScreens]);
+
 
 
   const handleCityFilter = (city: string) => {
@@ -84,24 +141,43 @@ export default function Home() {
   const handleShowPopup = (screenId: string) => {
     // Find the screen by ID
     const screen = ledScreens.find(s => s.id === screenId);
+    console.log('handleShowPopup - Looking for screenId:', screenId);
+    console.log('handleShowPopup - Found screen:', screen?.name);
     if (screen) {
       // Store the screen to show popup and let Map component handle it
       if ((window as any).mapInstance) {
         // Find all layers (markers) on the map
         const map = (window as any).mapInstance;
+        let foundMarker = false;
         map.eachLayer((layer: any) => {
+          if (foundMarker) return; // Stop if already found
+          
           // Check if this layer is a marker with our screen data
           if (layer.options && layer.options.screenId === screenId) {
-            // Open the popup
+            console.log('Found marker by screenId:', screenId);
             layer.openPopup();
+            foundMarker = true;
             return;
           }
-          // Also check if the popup content contains our screen name
-          if (layer.getPopup && layer.getPopup()) {
-            const popupContent = layer.getPopup().getContent();
-            if (popupContent && popupContent.includes(screen.name)) {
-              layer.openPopup();
-              return;
+          
+          // Check by coordinates as backup (more reliable)
+          if (layer.getLatLng && screen.coordinates) {
+            const markerLatLng = layer.getLatLng();
+            const screenLat = Array.isArray(screen.coordinates) ? screen.coordinates[0] : 0;
+            const screenLng = Array.isArray(screen.coordinates) ? screen.coordinates[1] : 0;
+            
+            if (Math.abs(markerLatLng.lat - screenLat) < 0.0001 && 
+                Math.abs(markerLatLng.lng - screenLng) < 0.0001) {
+              // Additional check: popup content should contain screen name
+              if (layer.getPopup && layer.getPopup()) {
+                const popupContent = layer.getPopup().getContent();
+                if (popupContent && popupContent.includes(screen.name)) {
+                  console.log('Found marker by coordinates and name:', screen.name);
+                  layer.openPopup();
+                  foundMarker = true;
+                  return;
+                }
+              }
             }
           }
         });

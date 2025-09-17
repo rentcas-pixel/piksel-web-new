@@ -134,6 +134,7 @@ export default function AdminPanel() {
   // Form state
   const [formData, setFormData] = useState({
     name: '',
+    custom_url: '',
     city: '',
     district: '',
     address: '',
@@ -221,6 +222,7 @@ export default function AdminPanel() {
 
       const screenData = {
         name: formData.name,
+        custom_url: formData.custom_url || null,
         city: formData.city,
         district: formData.district,
         address: formData.address,
@@ -318,6 +320,30 @@ export default function AdminPanel() {
   }
 
   const handleEdit = (screen: LEDScreen) => {
+    // Open popup on map instead of edit form
+    if ((window as any).mapInstance) {
+      // Find all layers (markers) on the map
+      const map = (window as any).mapInstance;
+      map.eachLayer((layer: any) => {
+        // Check if this layer is a marker with our screen data
+        if (layer.options && layer.options.screenId === screen.id) {
+          // Open the popup
+          layer.openPopup();
+          return;
+        }
+        // Also check if the popup content contains our screen name
+        if (layer.getPopup && layer.getPopup()) {
+          const popupContent = layer.getPopup().getContent();
+          if (popupContent && popupContent.includes(screen.name)) {
+            layer.openPopup();
+            return;
+          }
+        }
+      });
+    }
+  }
+
+  const handleEditForm = (screen: LEDScreen) => {
     console.log('Editing screen coordinates:', screen.coordinates, typeof screen.coordinates)
     console.log('Editing screen image_url:', screen.image_url)
     
@@ -343,6 +369,7 @@ export default function AdminPanel() {
     
     setFormData({
       name: screen.name,
+      custom_url: screen.custom_url || '',
       city: screen.city,
       district: screen.district,
       address: screen.address,
@@ -504,6 +531,7 @@ export default function AdminPanel() {
           
           const screenData = {
             name: currentFormData.name,
+            custom_url: currentFormData.custom_url || null,
             city: currentFormData.city,
             district: currentFormData.district,
             address: currentFormData.address,
@@ -598,6 +626,17 @@ export default function AdminPanel() {
                   className="w-full border border-gray-300 rounded-lg px-3 py-2"
                   required
                 />
+              </div>
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-1">URL</label>
+                <input
+                  type="text"
+                  value={formData.custom_url || ''}
+                  onChange={(e) => setFormData({...formData, custom_url: e.target.value})}
+                  className="w-full border border-gray-300 rounded-lg px-3 py-2"
+                  placeholder="vilnius/compensa"
+                />
+                <p className="text-xs text-gray-500 mt-1">Formatas: miestas/ekranas (be lietuviškų raidžių)</p>
               </div>
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-1">Miestas</label>
@@ -1029,24 +1068,36 @@ export default function AdminPanel() {
                       </div>
                     </td>
                     <td className="px-6 py-4 whitespace-nowrap text-sm font-medium">
-                      <button
-                        onClick={() => handleEdit(screen)}
-                        className="text-blue-600 hover:text-blue-900 mr-4"
-                      >
-                        Redaguoti
-                      </button>
-                      <button
-                        onClick={() => handleCopy(screen)}
-                        className="text-green-600 hover:text-green-900 mr-4"
-                      >
-                        Kopijuoti
-                      </button>
-                      <button
-                        onClick={() => handleDelete(screen.id)}
-                        className="text-red-600 hover:text-red-900"
-                      >
-                        Ištrinti
-                      </button>
+                      <div className="flex gap-2">
+                        <button
+                          onClick={() => handleEdit(screen)}
+                          className="text-blue-600 hover:text-blue-900"
+                          title="Rodyti popup žemėlapyje"
+                        >
+                          👁️ Rodyti
+                        </button>
+                        <button
+                          onClick={() => handleEditForm(screen)}
+                          className="text-green-600 hover:text-green-900"
+                          title="Redaguoti formoje"
+                        >
+                          ✏️ Redaguoti
+                        </button>
+                        <button
+                          onClick={() => handleCopy(screen)}
+                          className="text-purple-600 hover:text-purple-900"
+                          title="Kopijuoti ekraną"
+                        >
+                          📋 Kopijuoti
+                        </button>
+                        <button
+                          onClick={() => handleDelete(screen.id)}
+                          className="text-red-600 hover:text-red-900"
+                          title="Ištrinti ekraną"
+                        >
+                          🗑️ Ištrinti
+                        </button>
+                      </div>
                     </td>
                   </tr>
                 ))}

@@ -12,6 +12,7 @@ export const supabase = createClient(supabaseUrl, supabaseAnonKey)
 export interface LEDScreen {
   id: string
   slug: string // SEO-friendly URL identifier (e.g., compensa, senukai-vilnius)
+  custom_url?: string // Custom URL path like "vilnius/compensa"
   name: string
   coordinates: [number, number] // [latitude, longitude]
   city: string

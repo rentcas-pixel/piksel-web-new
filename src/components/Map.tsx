@@ -272,6 +272,17 @@ export default function Map({ selectedCity, selectedScreens, screenCities, selec
                        style="width: 468px; height: 468px; object-fit: cover;"/>
                   
                   
+                  <!-- Copy URL Button -->
+                  ${screen.custom_url ? `
+                  <button class="copy-url-tooltip" onclick="navigator.clipboard.writeText('${window.location.origin}/#${screen.custom_url}'); this.style.background='#10b981'; setTimeout(() => this.style.background='rgba(0,0,0,0.8)', 1000);" 
+                          style="position: absolute; top: 20px; right: 20px; width: 32px; height: 32px; background: rgba(0,0,0,0.8); color: white; border: none; border-radius: 8px; display: flex; align-items: center; justify-content: center; cursor: pointer; z-index: 1000; transition: all 0.2s ease;"
+                          title="Kopijuoti URL">
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                      <rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect>
+                      <path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path>
+                    </svg>
+                  </button>
+                  ` : ''}
                   
                   <!-- Copy Coordinates Button -->
                   <button class="copy-coordinates-tooltip" onclick="navigator.clipboard.writeText('${screen.coordinates[0]}, ${screen.coordinates[1]}'); this.style.background='#10b981'; setTimeout(() => this.style.background='rgba(0,0,0,0.8)', 1000);" 
@@ -338,6 +349,17 @@ export default function Map({ selectedCity, selectedScreens, screenCities, selec
                        style="width: 468px; height: 468px; object-fit: cover;"/>
                   
                   
+                  <!-- Copy URL Button -->
+                  ${screen.custom_url ? `
+                  <button class="copy-url-tooltip" onclick="navigator.clipboard.writeText('${window.location.origin}/#${screen.custom_url}'); this.style.background='#10b981'; setTimeout(() => this.style.background='rgba(0,0,0,0.8)', 1000);" 
+                          style="position: absolute; top: 20px; right: 20px; width: 32px; height: 32px; background: rgba(0,0,0,0.8); color: white; border: none; border-radius: 8px; display: flex; align-items: center; justify-content: center; cursor: pointer; z-index: 1000; transition: all 0.2s ease;"
+                          title="Kopijuoti URL">
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                      <rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect>
+                      <path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path>
+                    </svg>
+                  </button>
+                  ` : ''}
                   
                   <!-- Copy Coordinates Button -->
                   <button class="copy-coordinates-tooltip" onclick="navigator.clipboard.writeText('${screen.coordinates[0]}, ${screen.coordinates[1]}'); this.style.background='#10b981'; setTimeout(() => this.style.background='rgba(0,0,0,0.8)', 1000);" 
@@ -404,6 +426,17 @@ export default function Map({ selectedCity, selectedScreens, screenCities, selec
                        style="width: 468px; height: 468px; object-fit: cover;"/>
                   
                   
+                  <!-- Copy URL Button -->
+                  ${screen.custom_url ? `
+                  <button class="copy-url-tooltip" onclick="navigator.clipboard.writeText('${window.location.origin}/#${screen.custom_url}'); this.style.background='#10b981'; setTimeout(() => this.style.background='rgba(0,0,0,0.8)', 1000);" 
+                          style="position: absolute; top: 20px; right: 20px; width: 32px; height: 32px; background: rgba(0,0,0,0.8); color: white; border: none; border-radius: 8px; display: flex; align-items: center; justify-content: center; cursor: pointer; z-index: 1000; transition: all 0.2s ease;"
+                          title="Kopijuoti URL">
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                      <rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect>
+                      <path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path>
+                    </svg>
+                  </button>
+                  ` : ''}
                   
                   <!-- Copy Coordinates Button -->
                   <button class="copy-coordinates-tooltip" onclick="navigator.clipboard.writeText('${screen.coordinates[0]}, ${screen.coordinates[1]}'); this.style.background='#10b981'; setTimeout(() => this.style.background='rgba(0,0,0,0.8)', 1000);" 
@@ -655,6 +688,26 @@ export default function Map({ selectedCity, selectedScreens, screenCities, selec
             pointer-events: none;
             border: 1px solid rgba(255,255,255,0.2);
           }
+
+          .copy-url-tooltip::after {
+            content: 'Kopijuoti URL';
+            position: absolute;
+            top: 50%;
+            right: 50px;
+            transform: translateY(-50%);
+            background: rgba(0,0,0,0.9);
+            color: white;
+            padding: 6px 11px;
+            border-radius: 12px;
+            font-size: 15px;
+            white-space: nowrap;
+            opacity: 0;
+            visibility: hidden;
+            transition: all 0.2s ease;
+            z-index: 1001;
+            pointer-events: none;
+            border: 1px solid rgba(255,255,255,0.2);
+          }
           
           /* Allow tooltip to overflow popup */
           .leaflet-popup-content-wrapper {
@@ -671,6 +724,11 @@ export default function Map({ selectedCity, selectedScreens, screenCities, selec
           }
           
           .copy-coordinates-tooltip:hover::after {
+            opacity: 1;
+            visibility: visible;
+          }
+
+          .copy-url-tooltip:hover::after {
             opacity: 1;
             visibility: visible;
           }
