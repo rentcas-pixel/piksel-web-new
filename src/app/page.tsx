@@ -116,7 +116,7 @@ export default function Home() {
     return () => {
       window.removeEventListener('hashchange', handleHashChange);
     };
-  }, []); // Remove selectedScreens dependency
+  }, [ledScreens]);
 
   const handleCityFilter = (city: string) => {
     setSelectedCity(city);
