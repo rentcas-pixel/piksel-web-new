@@ -89,7 +89,9 @@ export default function ScreenList({ selectedCity, selectedScreens, onSelectScre
                       alt={screen.name}
                       width={300}
                       height={150}
-                      className="w-full h-32 object-cover rounded-md"
+                      className="w-full h-32 object-cover rounded-md cursor-pointer hover:opacity-90 transition-opacity"
+                      onClick={() => onShowPopup ? onShowPopup(screen.id) : null}
+                      title="Paspausti, kad pamatytumėte žemėlapyje"
                     />
                     {false && (
                       <div className="absolute top-2 left-2 bg-red-500 text-white text-xs font-bold px-2 py-1 rounded">

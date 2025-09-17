@@ -271,6 +271,14 @@ export default function Map({ selectedCity, selectedScreens, screenCities, selec
                   <img src="${screen.image_url}" alt="${screen.name} - Šiaurė"
                        style="width: 468px; height: 468px; object-fit: cover;"/>
                   
+                  <!-- Expand Photo Button -->
+                  <button onclick="window.openPhotoModal('${screen.image_url}', '${screen.name} - Šiaurė')" 
+                          style="position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); width: 60px; height: 60px; background: rgba(0,0,0,0.7); color: white; border: none; border-radius: 50%; display: flex; align-items: center; justify-content: center; cursor: pointer; z-index: 999; font-size: 28px; font-weight: bold; transition: all 0.3s ease; opacity: 0.8;"
+                          onmouseover="this.style.opacity='1'; this.style.background='rgba(0,0,0,0.9)'; this.style.transform='translate(-50%, -50%) scale(1.1)';"
+                          onmouseout="this.style.opacity='0.8'; this.style.background='rgba(0,0,0,0.7)'; this.style.transform='translate(-50%, -50%) scale(1)';"
+                          title="Išdidinti nuotrauką">
+                    +
+                  </button>
                   
                   <!-- Copy URL Button -->
                   ${screen.custom_url ? `
@@ -348,6 +356,14 @@ export default function Map({ selectedCity, selectedScreens, screenCities, selec
                   <img src="${screen.image_url}" alt="${screen.name} - Pietūs"
                        style="width: 468px; height: 468px; object-fit: cover;"/>
                   
+                  <!-- Expand Photo Button -->
+                  <button onclick="window.openPhotoModal('${screen.image_url}', '${screen.name} - Pietūs')" 
+                          style="position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); width: 60px; height: 60px; background: rgba(0,0,0,0.7); color: white; border: none; border-radius: 50%; display: flex; align-items: center; justify-content: center; cursor: pointer; z-index: 999; font-size: 28px; font-weight: bold; transition: all 0.3s ease; opacity: 0.8;"
+                          onmouseover="this.style.opacity='1'; this.style.background='rgba(0,0,0,0.9)'; this.style.transform='translate(-50%, -50%) scale(1.1)';"
+                          onmouseout="this.style.opacity='0.8'; this.style.background='rgba(0,0,0,0.7)'; this.style.transform='translate(-50%, -50%) scale(1)';"
+                          title="Išdidinti nuotrauką">
+                    +
+                  </button>
                   
                   <!-- Copy URL Button -->
                   ${screen.custom_url ? `
@@ -417,14 +433,53 @@ export default function Map({ selectedCity, selectedScreens, screenCities, selec
             icon: createLedScreenIcon(Boolean(isSelected), hasLastMinute, lastMinuteDate, false, Boolean(screen.is_viaduct)),
             screenId: screen.id
           })
-            .addTo(map)
-            .bindPopup(`
+            .addTo(map);
+
+          // Add Last Minute badge if applicable
+          if (hasLastMinute && lastMinuteDate) {
+            L.marker([screen.coordinates[0], screen.coordinates[1]], {
+              icon: L.divIcon({
+                className: 'last-minute-badge',
+                html: `
+                  <div style="
+                    position: absolute;
+                    top: -15px;
+                    left: 40px;
+                    background: #dc2626;
+                    color: white;
+                    padding: 3px 6px;
+                    border-radius: 3px;
+                    font-size: 9px;
+                    font-weight: 700;
+                    text-transform: uppercase;
+                    white-space: nowrap;
+                    box-shadow: 0 2px 4px rgba(0,0,0,0.3);
+                    z-index: 1000;
+                  ">
+                    LAST MINUTE
+                  </div>
+                `,
+                iconSize: [70, 15],
+                iconAnchor: [0, 0]
+              })
+            }).addTo(map);
+          }
+
+          marker.bindPopup(`
               <div style="font-family: ui-sans-serif, system-ui, -apple-system, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, 'Noto Sans', sans-serif; width: 780px; height: 468px; border-radius: 0; overflow: visible; background: transparent; display: flex; gap: -8px; position: relative;">
                 <!-- Photo -->
                 <div style="width: 468px; height: 468px; position: relative; background: #ddd; border-radius: 9px 0 0 9px !important; overflow: hidden;">
                   <img src="${screen.image_url}" alt="${screen.name}"
                        style="width: 468px; height: 468px; object-fit: cover;"/>
                   
+                  <!-- Expand Photo Button -->
+                  <button onclick="window.openPhotoModal('${screen.image_url}', '${screen.name}')" 
+                          style="position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); width: 60px; height: 60px; background: rgba(0,0,0,0.7); color: white; border: none; border-radius: 50%; display: flex; align-items: center; justify-content: center; cursor: pointer; z-index: 999; font-size: 28px; font-weight: bold; transition: all 0.3s ease; opacity: 0.8;"
+                          onmouseover="this.style.opacity='1'; this.style.background='rgba(0,0,0,0.9)'; this.style.transform='translate(-50%, -50%) scale(1.1)';"
+                          onmouseout="this.style.opacity='0.8'; this.style.background='rgba(0,0,0,0.7)'; this.style.transform='translate(-50%, -50%) scale(1)';"
+                          title="Išdidinti nuotrauką">
+                    +
+                  </button>
                   
                   <!-- Copy URL Button -->
                   ${screen.custom_url ? `
@@ -511,7 +566,7 @@ export default function Map({ selectedCity, selectedScreens, screenCities, selec
       
     };
 
-      // Add window function for screen selection
+      // Add window functions for screen selection and photo modal
       if (typeof window !== 'undefined') {
         (window as any).selectScreen = (screenName: string) => {
           if (onSelectScreen) {
@@ -519,6 +574,60 @@ export default function Map({ selectedCity, selectedScreens, screenCities, selec
           }
         };
         
+        // Photo modal functions
+        (window as any).openPhotoModal = (imageUrl: string, title: string) => {
+          // Create modal if it doesn't exist
+          let modal = document.getElementById('photo-modal');
+          if (!modal) {
+            modal = document.createElement('div');
+            modal.id = 'photo-modal';
+            modal.className = 'photo-modal';
+            modal.innerHTML = `
+              <div class="photo-modal-content">
+                <div class="photo-modal-badge" id="photo-modal-badge"></div>
+                <img class="photo-modal-image" id="photo-modal-image" src="" alt="" />
+                <button class="photo-modal-close" onclick="window.closePhotoModal()">×</button>
+              </div>
+            `;
+            document.body.appendChild(modal);
+            
+            // Close modal when clicking outside
+            modal.addEventListener('click', (e) => {
+              if (e.target === modal) {
+                (window as any).closePhotoModal();
+              }
+            });
+            
+            // Close modal with Escape key
+            document.addEventListener('keydown', (e) => {
+              if (e.key === 'Escape') {
+                (window as any).closePhotoModal();
+              }
+            });
+          }
+          
+          // Set image and title
+          const img = document.getElementById('photo-modal-image') as HTMLImageElement;
+          const badgeEl = document.getElementById('photo-modal-badge') as HTMLDivElement;
+          
+          if (img && badgeEl) {
+            img.src = imageUrl;
+            img.alt = title;
+            badgeEl.textContent = title;
+            
+            // Show modal
+            modal.classList.add('show');
+            document.body.style.overflow = 'hidden'; // Prevent background scrolling
+          }
+        };
+        
+        (window as any).closePhotoModal = () => {
+          const modal = document.getElementById('photo-modal');
+          if (modal) {
+            modal.classList.remove('show');
+            document.body.style.overflow = ''; // Restore scrolling
+          }
+        };
       }
 
     // Load Leaflet CSS and JS
@@ -731,6 +840,103 @@ export default function Map({ selectedCity, selectedScreens, screenCities, selec
           .copy-url-tooltip:hover::after {
             opacity: 1;
             visibility: visible;
+          }
+          
+          /* Photo Modal Styles */
+          .photo-modal {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100vw;
+            height: 100vh;
+            background: rgba(0, 0, 0, 0.9);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 10000;
+            opacity: 0;
+            visibility: hidden;
+            transition: all 0.3s ease;
+            backdrop-filter: blur(5px);
+          }
+          
+          .photo-modal.show {
+            opacity: 1;
+            visibility: visible;
+          }
+          
+          .photo-modal-content {
+            position: relative;
+            max-width: 90vw;
+            max-height: 90vh;
+            background: white;
+            border-radius: 12px;
+            overflow: hidden;
+            box-shadow: 0 25px 50px rgba(0, 0, 0, 0.5);
+            transform: scale(0.8);
+            transition: transform 0.3s ease;
+          }
+          
+          .photo-modal.show .photo-modal-content {
+            transform: scale(1);
+          }
+          
+          .photo-modal-image {
+            width: 100%;
+            height: auto;
+            max-width: 90vw;
+            max-height: 80vh;
+            object-fit: contain;
+            display: block;
+          }
+          
+          .photo-modal-badge {
+            position: absolute;
+            top: 20px;
+            left: 20px;
+            background: rgba(0, 0, 0, 0.9);
+            color: white;
+            padding: 12px 20px;
+            border-radius: 25px;
+            font-size: 16px;
+            font-weight: 600;
+            z-index: 10001;
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+            max-width: calc(100% - 120px);
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+          }
+          
+          .photo-modal-close {
+            position: absolute;
+            top: 20px;
+            right: 20px;
+            width: 40px;
+            height: 40px;
+            background: rgba(0, 0, 0, 0.8);
+            color: white;
+            border: none;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            font-size: 20px;
+            font-weight: bold;
+            z-index: 10002;
+            transition: all 0.2s ease;
+          }
+          
+          .photo-modal-close:hover {
+            background: rgba(0, 0, 0, 1);
+            transform: scale(1.1);
+          }
+          
+          .photo-modal-close:active {
+            transform: scale(0.95);
           }
         `;
         document.head.appendChild(style);
