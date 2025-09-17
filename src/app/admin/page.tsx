@@ -940,6 +940,7 @@ export default function AdminPanel() {
                     setEditingScreen(null)
                     setFormData({
                       name: '',
+                      custom_url: '',
                       city: '',
                       district: '',
                       address: '',
