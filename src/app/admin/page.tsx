@@ -284,6 +284,7 @@ export default function AdminPanel() {
       // Reset form
       setFormData({
         name: '',
+        custom_url: '',
         city: '',
         district: '',
         address: '',
