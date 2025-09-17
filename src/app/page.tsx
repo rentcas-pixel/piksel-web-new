@@ -5,7 +5,7 @@ import Sidebar from '@/components/Sidebar';
 import Map from '@/components/Map';
 import ScreenList from '@/components/ScreenList';
 import { useLEDScreens } from '@/hooks/useLEDScreens';
-import { Building2, User, Mail, MessageSquare, Send, Calendar, MapPin, X } from 'lucide-react';
+import { Building2, User, Mail, MessageSquare, Send, Calendar, MapPin, X, CheckCircle } from 'lucide-react';
 import { sendInquiryEmail, initEmailJS } from '@/lib/emailjs';
 
 
@@ -27,6 +27,7 @@ export default function Home() {
     message: ''
   });
   const [submittingInquiry, setSubmittingInquiry] = useState(false);
+  const [showSuccessMessage, setShowSuccessMessage] = useState(false);
   
   // Get LED screens from Supabase
   const { screens: ledScreens, loading, error } = useLEDScreens();
@@ -183,8 +184,13 @@ export default function Home() {
         // Still show success since data was saved to Supabase
       }
       
-      // Success
-      alert('Užklausa sėkmingai išsiųsta! Susisieksime su jumis artimiausiu metu.');
+      // Success - show custom notification
+      setShowSuccessMessage(true);
+      
+      // Hide notification after 5 seconds
+      setTimeout(() => {
+        setShowSuccessMessage(false);
+      }, 5000);
       
       // Reset form
       setInquiryForm({
@@ -235,6 +241,22 @@ export default function Home() {
 
   return (
     <div className="min-h-screen bg-gray-50">
+      {/* Success Notification */}
+      {showSuccessMessage && (
+        <div className="fixed top-4 right-4 z-[9999] bg-green-500 text-white p-4 rounded-lg shadow-lg flex items-center gap-3 transform transition-all duration-300 ease-out">
+          <CheckCircle className="w-6 h-6" />
+          <div>
+            <div className="font-semibold">Užklausa sėkmingai išsiųsta!</div>
+            <div className="text-sm opacity-90">Susisieksime su jumis artimiausiu metu.</div>
+          </div>
+          <button 
+            onClick={() => setShowSuccessMessage(false)}
+            className="ml-2 text-white hover:text-gray-200"
+          >
+            <X className="w-4 h-4" />
+          </button>
+        </div>
+      )}
       {/* Sidebar */}
       <Sidebar 
         onCityFilter={handleCityFilter}
