@@ -4,8 +4,11 @@ import { useState, useEffect } from 'react'
 import { supabase } from '@/lib/supabase'
 import { LEDScreen } from '@/lib/supabase'
 import { ClipRequirement, defaultClipsData } from '@/data/clipsData'
+import { useAuth } from '@/hooks/useAuth'
+import LoginForm from '@/components/LoginForm'
 
 export default function AdminPanel() {
+  const { isAuthenticated, isLoading: authLoading, login, logout } = useAuth();
   const [activeTab, setActiveTab] = useState('screens')
   const [screens, setScreens] = useState<LEDScreen[]>([])
   const [loading, setLoading] = useState(true)
@@ -158,10 +161,6 @@ export default function AdminPanel() {
   })
   const [uploading, setUploading] = useState(false)
 
-  useEffect(() => {
-    fetchScreens()
-  }, [])
-
   const fetchScreens = async () => {
     try {
       const { data, error } = await supabase
@@ -176,6 +175,29 @@ export default function AdminPanel() {
     } finally {
       setLoading(false)
     }
+  }
+
+  useEffect(() => {
+    if (isAuthenticated) {
+      fetchScreens()
+    }
+  }, [isAuthenticated])
+
+  // Show loading while checking authentication
+  if (authLoading) {
+    return (
+      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
+        <div className="text-center">
+          <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-500 mx-auto mb-2"></div>
+          <p className="text-gray-600">Tikrinama autentifikacija...</p>
+        </div>
+      </div>
+    );
+  }
+
+  // Show login form if not authenticated
+  if (!isAuthenticated) {
+    return <LoginForm onLogin={login} />;
   }
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -536,6 +558,19 @@ export default function AdminPanel() {
 
   return (
     <div className="min-h-screen bg-gray-50 p-8">
+      {/* Admin Header with Logout */}
+      <div className="flex justify-between items-center mb-6">
+        <h1 className="text-2xl font-bold text-gray-900">Admin Panel</h1>
+        <button
+          onClick={logout}
+          className="bg-red-500 hover:bg-red-600 text-white px-4 py-2 rounded-lg transition-colors flex items-center gap-2"
+        >
+          <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013 3v1" />
+          </svg>
+          Atsijungti
+        </button>
+      </div>
       <div className="max-w-7xl mx-auto">
         <div className="flex justify-between items-center mb-8">
           <h1 className="text-3xl font-bold text-gray-900">LED Ekranų Valdymas</h1>
