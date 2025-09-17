@@ -26,6 +26,7 @@ export default function Home() {
   // Get LED screens from Supabase
   const { screens: ledScreens, loading, error } = useLEDScreens();
 
+
   // Hash routing functionality
   useEffect(() => {
     const handleHashChange = () => {

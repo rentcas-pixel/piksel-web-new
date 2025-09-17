@@ -1,3 +1,4 @@
+
 'use client';
 
 import { useState, useEffect } from 'react';
@@ -14,13 +15,11 @@ export default function ScreenPage() {
 
   useEffect(() => {
     if (params.id) {
-      const foundScreen = ledScreens.find(s => s.id === params.id);
-      if (foundScreen) {
-        setScreen(foundScreen);
-      }
-      setLoading(false);
+      // Redirect to main page with screen popup
+      const screenSlug = params.id;
+      router.replace(`/?screen=${screenSlug}`);
     }
-  }, [params.id]);
+  }, [params.id, router]);
 
   if (loading) {
     return (

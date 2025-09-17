@@ -11,6 +11,7 @@ export const supabase = createClient(supabaseUrl, supabaseAnonKey)
 // Types for our database
 export interface LEDScreen {
   id: string
+  slug: string // SEO-friendly URL identifier (e.g., compensa, senukai-vilnius)
   name: string
   coordinates: [number, number] // [latitude, longitude]
   city: string

@@ -130,7 +130,7 @@ export default function Map({ selectedCity, selectedScreens: propSelectedScreens
           ` : ''}
           
           <!-- Copy URL Button -->
-          <button onclick="navigator.clipboard.writeText(window.location.origin + '/ekranas/${screen.id}${sideName ? '-' + sideName.toLowerCase() : ''}'); this.style.background='#10b981'; setTimeout(() => this.style.background='rgba(0,0,0,0.8)', 1000);" 
+          <button onclick="navigator.clipboard.writeText(window.location.origin + '/#${screen.slug}${sideName ? '-' + sideName.toLowerCase() : ''}'); this.style.background='#10b981'; setTimeout(() => this.style.background='rgba(0,0,0,0.8)', 1000);" 
                   style="position: absolute; top: 10px; right: 10px; width: 28px; height: 28px; background: rgba(0,0,0,0.8); color: white; border: none; border-radius: 6px; display: flex; align-items: center; justify-content: center; cursor: pointer; z-index: 1000; transition: all 0.2s ease;"
                   title="Kopijuoti URL">
             <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
@@ -209,7 +209,7 @@ export default function Map({ selectedCity, selectedScreens: propSelectedScreens
           ` : ''}
           
           <!-- Copy URL Button -->
-          <button onclick="navigator.clipboard.writeText(window.location.origin + '/ekranas/${screen.id}${sideName ? '-' + sideName.toLowerCase() : ''}'); this.style.background='#10b981'; setTimeout(() => this.style.background='rgba(0,0,0,0.8)', 1000);" 
+          <button onclick="navigator.clipboard.writeText(window.location.origin + '/#${screen.slug}${sideName ? '-' + sideName.toLowerCase() : ''}'); this.style.background='#10b981'; setTimeout(() => this.style.background='rgba(0,0,0,0.8)', 1000);" 
                   style="position: absolute; top: 15px; right: 15px; width: 32px; height: 32px; background: rgba(0,0,0,0.8); color: white; border: none; border-radius: 8px; display: flex; align-items: center; justify-content: center; cursor: pointer; z-index: 1000; transition: all 0.2s ease;"
                   title="Kopijuoti URL">
             <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
@@ -1072,7 +1072,7 @@ export default function Map({ selectedCity, selectedScreens: propSelectedScreens
             {ledScreens && ledScreens
               .filter(screen => screen.city === selectedCity)
               .map(screen => (
-                <div key={screen.id} style={{ 
+                <div key={screen.slug} style={{ 
                   backgroundColor: 'white',
                   borderRadius: '8px',
                   border: '1px solid #e5e7eb',
