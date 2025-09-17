@@ -154,7 +154,7 @@ export default function AdminPanel() {
     traffic: '',
     price: '',
     is_last_minute: false,
-    last_minute_date: ''
+      last_minute_date: ''
   })
   const [uploading, setUploading] = useState(false)
 
@@ -278,13 +278,13 @@ export default function AdminPanel() {
         side_b_image_url: '',
         side_a_mobile_image_url: '',
         side_b_mobile_image_url: '',
-      size: '',
-      resolution: '',
-      traffic: '',
-      price: '',
-      is_last_minute: false,
+        size: '',
+        resolution: '',
+        traffic: '',
+        price: '',
+        is_last_minute: false,
       last_minute_date: ''
-    })
+      })
     setShowForm(false)
     setEditingScreen(null)
       fetchScreens()
@@ -344,7 +344,7 @@ export default function AdminPanel() {
       traffic: screen.traffic || '',
       price: screen.price?.toString() || '',
       is_last_minute: screen.is_last_minute || false,
-      last_minute_date: screen.last_minute_date || ''
+      last_minute_date: screen.last_minute_date || '',
     })
     setEditingScreen(screen)
     setShowForm(true)

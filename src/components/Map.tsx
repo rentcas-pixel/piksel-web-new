@@ -22,6 +22,7 @@ export default function Map({ selectedCity, selectedScreens, screenCities, selec
   const mapRef = useRef<HTMLDivElement>(null);
   const { screens: ledScreens, loading, error } = useLEDScreens();
   
+  
   // Detect Chrome browser
   const isChrome = typeof window !== 'undefined' && /Chrome/.test(navigator.userAgent) && /Google Inc/.test(navigator.vendor);
   
@@ -69,27 +70,6 @@ export default function Map({ selectedCity, selectedScreens, screenCities, selec
       const map = L.map(mapRef.current).setView([55.1694, 23.8813], 7);
       (window as unknown as { mapInstance: any }).mapInstance = map;
       
-      // Global function to show popup by screen ID
-      (window as any).showMapPopup = (screenId: string) => {
-        const screen = ledScreens.find(s => s.id === screenId);
-        if (screen) {
-          // Center the map on the screen location first
-          map.setView([screen.coordinates[0], screen.coordinates[1]], 15);
-          
-          // Wait a bit for the map to center, then find and open popup
-          setTimeout(() => {
-            map.eachLayer((layer: any) => {
-              if (layer instanceof (window as any).L.Marker) {
-                const latLng = layer.getLatLng();
-                if (Math.abs(latLng.lat - screen.coordinates[0]) < 0.0001 && 
-                    Math.abs(latLng.lng - screen.coordinates[1]) < 0.0001) {
-                  layer.openPopup();
-                }
-              }
-            });
-          }, 300);
-        }
-      };
 
 
       // Add OpenStreetMap tile layer
@@ -201,8 +181,8 @@ export default function Map({ selectedCity, selectedScreens, screenCities, selec
         const hasLastMinute = screen.is_last_minute || false;
         const lastMinuteDate = screen.last_minute_date;
         
+        
         if (screen.is_double_sided) {
-          console.log('Creating double-sided markers for:', screen.name, 'at coordinates:', screen.coordinates);
           
           // Create custom icons with pixel offset for fixed positioning
           const createOffsetIcon = (isSelected: boolean, hasLastMinute: boolean, lastMinuteDate?: string, offsetX: number = 0, isViaduct?: boolean) => L.divIcon({
@@ -280,7 +260,8 @@ export default function Map({ selectedCity, selectedScreens, screenCities, selec
           
           // Left marker (North side) - offset 19px left (half marker width + half gap)
           const leftMarker = L.marker([screen.coordinates[0], screen.coordinates[1]], {
-            icon: createOffsetIcon(Boolean(isSelected), hasLastMinute, lastMinuteDate, -19, Boolean(screen.is_viaduct))
+            icon: createOffsetIcon(Boolean(isSelected), hasLastMinute, lastMinuteDate, -19, Boolean(screen.is_viaduct)),
+            screenId: screen.id
           })
             .addTo(map)
             .bindPopup(`
@@ -291,15 +272,6 @@ export default function Map({ selectedCity, selectedScreens, screenCities, selec
                        style="width: 468px; height: 468px; object-fit: cover;"/>
                   
                   
-                  <!-- Copy URL Button -->
-                  <button class="copy-tooltip" onclick="navigator.clipboard.writeText(window.location.origin + '/#${screen.slug}'); this.style.background='#10b981'; setTimeout(() => this.style.background='rgba(0,0,0,0.8)', 1000);" 
-                          style="position: absolute; top: 20px; right: 20px; width: 32px; height: 32px; background: rgba(0,0,0,0.8); color: white; border: none; border-radius: 8px; display: flex; align-items: center; justify-content: center; cursor: pointer; z-index: 1000; transition: all 0.2s ease;"
-                          title="Kopijuoti URL">
-                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                      <rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect>
-                      <path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path>
-                    </svg>
-                  </button>
                   
                   <!-- Copy Coordinates Button -->
                   <button class="copy-coordinates-tooltip" onclick="navigator.clipboard.writeText('${screen.coordinates[0]}, ${screen.coordinates[1]}'); this.style.background='#10b981'; setTimeout(() => this.style.background='rgba(0,0,0,0.8)', 1000);" 
@@ -354,7 +326,8 @@ export default function Map({ selectedCity, selectedScreens, screenCities, selec
 
           // Right marker (South side) - offset 19px right (half marker width + half gap)
           const rightMarker = L.marker([screen.coordinates[0], screen.coordinates[1]], {
-            icon: createOffsetIcon(Boolean(isSelected), hasLastMinute, lastMinuteDate, 19, Boolean(screen.is_viaduct))
+            icon: createOffsetIcon(Boolean(isSelected), hasLastMinute, lastMinuteDate, 19, Boolean(screen.is_viaduct)),
+            screenId: screen.id
           })
             .addTo(map)
             .bindPopup(`
@@ -365,15 +338,6 @@ export default function Map({ selectedCity, selectedScreens, screenCities, selec
                        style="width: 468px; height: 468px; object-fit: cover;"/>
                   
                   
-                  <!-- Copy URL Button -->
-                  <button class="copy-tooltip" onclick="navigator.clipboard.writeText(window.location.origin + '/#${screen.slug}'); this.style.background='#10b981'; setTimeout(() => this.style.background='rgba(0,0,0,0.8)', 1000);" 
-                          style="position: absolute; top: 20px; right: 20px; width: 32px; height: 32px; background: rgba(0,0,0,0.8); color: white; border: none; border-radius: 8px; display: flex; align-items: center; justify-content: center; cursor: pointer; z-index: 1000; transition: all 0.2s ease;"
-                          title="Kopijuoti URL">
-                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                      <rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect>
-                      <path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path>
-                    </svg>
-                  </button>
                   
                   <!-- Copy Coordinates Button -->
                   <button class="copy-coordinates-tooltip" onclick="navigator.clipboard.writeText('${screen.coordinates[0]}, ${screen.coordinates[1]}'); this.style.background='#10b981'; setTimeout(() => this.style.background='rgba(0,0,0,0.8)', 1000);" 
@@ -428,7 +392,8 @@ export default function Map({ selectedCity, selectedScreens, screenCities, selec
         } else {
           // Single marker for regular screens
           const marker = L.marker([screen.coordinates[0], screen.coordinates[1]], {
-            icon: createLedScreenIcon(Boolean(isSelected), hasLastMinute, lastMinuteDate, false, Boolean(screen.is_viaduct))
+            icon: createLedScreenIcon(Boolean(isSelected), hasLastMinute, lastMinuteDate, false, Boolean(screen.is_viaduct)),
+            screenId: screen.id
           })
             .addTo(map)
             .bindPopup(`
@@ -439,15 +404,6 @@ export default function Map({ selectedCity, selectedScreens, screenCities, selec
                        style="width: 468px; height: 468px; object-fit: cover;"/>
                   
                   
-                  <!-- Copy URL Button -->
-                  <button class="copy-tooltip" onclick="navigator.clipboard.writeText(window.location.origin + '/#${screen.slug}'); this.style.background='#10b981'; setTimeout(() => this.style.background='rgba(0,0,0,0.8)', 1000);" 
-                          style="position: absolute; top: 20px; right: 20px; width: 32px; height: 32px; background: rgba(0,0,0,0.8); color: white; border: none; border-radius: 8px; display: flex; align-items: center; justify-content: center; cursor: pointer; z-index: 1000; transition: all 0.2s ease;"
-                          title="Kopijuoti URL">
-                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                      <rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect>
-                      <path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path>
-                    </svg>
-                  </button>
                   
                   <!-- Copy Coordinates Button -->
                   <button class="copy-coordinates-tooltip" onclick="navigator.clipboard.writeText('${screen.coordinates[0]}, ${screen.coordinates[1]}'); this.style.background='#10b981'; setTimeout(() => this.style.background='rgba(0,0,0,0.8)', 1000);" 
@@ -498,7 +454,7 @@ export default function Map({ selectedCity, selectedScreens, screenCities, selec
                 </div>
                 
                 <!-- Close Button -->
-                <button onclick="this.closest('.leaflet-popup').remove(); if (typeof window.selectScreen === 'function') { window.selectScreen('${screen.name}'); }" 
+                <button onclick="this.closest('.leaflet-popup').remove();" 
                         class="custom-close-button">×</button>
           </div>
         `);
@@ -519,6 +475,7 @@ export default function Map({ selectedCity, selectedScreens, screenCities, selec
         const group = new L.featureGroup(markers);
         map.fitBounds(group.getBounds().pad(0.1));
       }
+      
     };
 
       // Add window function for screen selection
@@ -738,7 +695,7 @@ export default function Map({ selectedCity, selectedScreens, screenCities, selec
         (window as any).mapInstance = undefined;
       }
     };
-  }, [loading, error, ledScreens, selectedCity, selectedScreens, isMobile]);
+  }, [loading, error, ledScreens, selectedCity, isMobile]); // Restore selectedCity for showMapPopup function
 
   // Use mobile component for mobile devices
   if (isMobile) {
@@ -784,15 +741,6 @@ export default function Map({ selectedCity, selectedScreens, screenCities, selec
           ">Parduodamas tik paketas</div>
           ` : ''}
           
-          <!-- Copy URL Button -->
-          <button onclick="navigator.clipboard.writeText(window.location.origin + '/ekranas/${screen.slug}${sideName ? '-' + sideName.toLowerCase() : ''}'); this.style.background='#10b981'; setTimeout(() => this.style.background='rgba(0,0,0,0.8)', 1000);" 
-                  style="position: absolute; top: 10px; right: 10px; width: 28px; height: 28px; background: rgba(0,0,0,0.8); color: white; border: none; border-radius: 6px; display: flex; align-items: center; justify-content: center; cursor: pointer; z-index: 1000; transition: all 0.2s ease;"
-                  title="Kopijuoti URL">
-            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-              <rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect>
-              <path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path>
-            </svg>
-          </button>
         </div>
         
         <!-- Card -->

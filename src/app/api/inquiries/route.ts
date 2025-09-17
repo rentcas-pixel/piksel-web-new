@@ -4,18 +4,21 @@ import { supabase } from '@/lib/supabase'
 export async function POST(request: NextRequest) {
   try {
     const body = await request.json()
+    console.log('Received inquiry data:', body)
     
     const { data, error } = await supabase
       .from('inquiries')
       .insert([
         {
-          screen_id: body.screenId,
+          screen_id: body.screenId || null, // Legacy field (optional)
+          selected_screens: body.selectedScreens || [], // New: Array of screen names
+          screen_cities: body.screenCities || {}, // New: Screen to city mapping
           company_name: body.companyName,
           contact_person: body.contactPerson,
           email: body.email,
           phone: body.phone,
           message: body.message,
-          selected_dates: body.dateRange,
+          selected_dates: body.dateRange, // Store as text instead of DATERANGE
           status: 'pending'
         }
       ])

@@ -6,13 +6,8 @@ import Map from '@/components/Map';
 import ScreenList from '@/components/ScreenList';
 import { useLEDScreens } from '@/hooks/useLEDScreens';
 import { Building2, User, Mail, MessageSquare, Send, Calendar, MapPin, X } from 'lucide-react';
+import { sendInquiryEmail, initEmailJS } from '@/lib/emailjs';
 
-// Global declarations
-declare global {
-  interface Window {
-    showMapPopup: (screenId: string) => void;
-  }
-}
 
 export default function Home() {
   const [selectedCity, setSelectedCity] = useState<string>('Vilnius');
@@ -23,83 +18,25 @@ export default function Home() {
   const [isLoading, setIsLoading] = useState(false);
   const [searchResults, setSearchResults] = useState<any[]>([]);
   
+  // Inquiry form state
+  const [inquiryForm, setInquiryForm] = useState({
+    companyName: '',
+    contactPerson: '',
+    email: '',
+    phone: '',
+    message: ''
+  });
+  const [submittingInquiry, setSubmittingInquiry] = useState(false);
+  
   // Get LED screens from Supabase
   const { screens: ledScreens, loading, error } = useLEDScreens();
 
-
-  // Hash routing functionality
+  // Initialize EmailJS on component mount
   useEffect(() => {
-    const handleHashChange = () => {
-      const hash = window.location.hash.substring(1); // Remove #
-      console.log('Hash changed to:', hash);
-      
-      if (hash) {
-        // Parse hash: city-screen or just city
-        const parts = hash.split('-');
-        console.log('Hash parts:', parts);
-        
-        if (parts.length >= 2) {
-          const city = parts[0];
-          const screenName = parts.slice(1).join('-'); // Handle multi-word screen names
-          console.log('Looking for city:', city, 'screen:', screenName);
-          
-          // Set city filter - capitalize first letter
-          const capitalizedCity = city.charAt(0).toUpperCase() + city.slice(1);
-          setSelectedCity(capitalizedCity);
-          
-          // Find screen in data
-          const screen = ledScreens.find(s => 
-            s.city.toLowerCase() === city.toLowerCase() && 
-            s.name.toLowerCase().replace(/\s+/g, '-') === screenName.toLowerCase()
-          );
-          
-          console.log('Found screen:', screen);
-          
-          if (screen) {
-            // Add screen to selected
-            setSelectedScreens(prev => {
-              if (!prev.includes(screen.name)) {
-                return [...prev, screen.name];
-              }
-              return prev;
-            });
-            
-            // Open popup after a delay to ensure map is ready
-            setTimeout(() => {
-              const mapInstance = (window as unknown as { mapInstance: any }).mapInstance;
-              if (mapInstance) {
-                // Find the marker and open its popup
-                mapInstance.eachLayer((layer: unknown) => {
-                  if (layer instanceof (window as unknown as { L: { Marker: any } }).L.Marker) {
-                    const latLng = (layer as any).getLatLng();
-                    if (Math.abs(latLng.lat - screen.coordinates[0]) < 0.0001 && 
-                        Math.abs(latLng.lng - screen.coordinates[1]) < 0.0001) {
-                      (layer as any).openPopup();
-                    }
-                  }
-                });
-              }
-            }, 2000);
-          }
-        } else if (parts.length === 1) {
-          // Just city
-          console.log('Setting city to:', parts[0]);
-          const capitalizedCity = parts[0].charAt(0).toUpperCase() + parts[0].slice(1);
-          setSelectedCity(capitalizedCity);
-        }
-      }
-    };
+    initEmailJS();
+  }, []);
 
-    // Handle initial hash immediately
-    handleHashChange();
-    
-    // Listen for hash changes
-    window.addEventListener('hashchange', handleHashChange);
-    
-    return () => {
-      window.removeEventListener('hashchange', handleHashChange);
-    };
-  }, []); // Remove selectedScreens dependency
+
 
   const handleCityFilter = (city: string) => {
     setSelectedCity(city);
@@ -111,8 +48,6 @@ export default function Home() {
     setSearchResults(results);
   };
 
-  // Get the selected city for map display
-  const mapCity = selectedCity;
 
   const handleClearFilter = () => {
     setSelectedCity('Vilnius');
@@ -139,10 +74,6 @@ export default function Home() {
             ...prevCities,
             [screenName]: screen.city
           }));
-          // Update URL hash when selecting screen
-          const citySlug = screen.city.toLowerCase();
-          const screenSlug = screenName.toLowerCase().replace(/\s+/g, '-');
-          window.location.hash = `${citySlug}-${screenSlug}`;
         }
         return [...prev, screenName];
       }
@@ -150,10 +81,30 @@ export default function Home() {
   };
 
   const handleShowPopup = (screenId: string) => {
-    // Find the screen by ID and trigger popup
+    // Find the screen by ID
     const screen = ledScreens.find(s => s.id === screenId);
-    if (screen && window.showMapPopup) {
-      window.showMapPopup(screenId);
+    if (screen) {
+      // Store the screen to show popup and let Map component handle it
+      if ((window as any).mapInstance) {
+        // Find all layers (markers) on the map
+        const map = (window as any).mapInstance;
+        map.eachLayer((layer: any) => {
+          // Check if this layer is a marker with our screen data
+          if (layer.options && layer.options.screenId === screenId) {
+            // Open the popup
+            layer.openPopup();
+            return;
+          }
+          // Also check if the popup content contains our screen name
+          if (layer.getPopup && layer.getPopup()) {
+            const popupContent = layer.getPopup().getContent();
+            if (popupContent && popupContent.includes(screen.name)) {
+              layer.openPopup();
+              return;
+            }
+          }
+        });
+      }
     }
   };
 
@@ -167,6 +118,90 @@ export default function Home() {
 
   const handleCloseInquiryForm = () => {
     setShowInquiryForm(false);
+  };
+
+  // Handle inquiry form submission
+  const handleSubmitInquiry = async (e: React.FormEvent) => {
+    e.preventDefault();
+    
+    if (!inquiryForm.companyName || !inquiryForm.contactPerson || !inquiryForm.email) {
+      alert('Prašome užpildyti visus privalomus laukus');
+      return;
+    }
+    
+    if (selectedScreens.length === 0) {
+      alert('Prašome pasirinkti bent vieną ekraną');
+      return;
+    }
+    
+    if (!dateRange) {
+      alert('Prašome pasirinkti reklamos periodą');
+      return;
+    }
+    
+    setSubmittingInquiry(true);
+    
+    try {
+      // 1. Save to Supabase
+      const response = await fetch('/api/inquiries', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          selectedScreens: selectedScreens,
+          screenCities: screenCities,
+          companyName: inquiryForm.companyName,
+          contactPerson: inquiryForm.contactPerson,
+          email: inquiryForm.email,
+          phone: inquiryForm.phone,
+          message: inquiryForm.message,
+          dateRange: `${dateRange.from} - ${dateRange.to}`,
+        }),
+      });
+      
+      if (!response.ok) {
+        const errorData = await response.json();
+        console.error('API Error:', errorData);
+        throw new Error(`Nepavyko išsiųsti užklausos: ${errorData.error || 'Unknown error'}`);
+      }
+      
+      // 2. Send email notification
+      const emailResult = await sendInquiryEmail({
+        selectedScreens: selectedScreens,
+        screenCities: screenCities,
+        companyName: inquiryForm.companyName,
+        contactPerson: inquiryForm.contactPerson,
+        email: inquiryForm.email,
+        phone: inquiryForm.phone,
+        message: inquiryForm.message,
+        dateRange: `${dateRange.from} - ${dateRange.to}`,
+      });
+      
+      if (!emailResult.success) {
+        console.warn('Email failed to send:', emailResult.error);
+        // Still show success since data was saved to Supabase
+      }
+      
+      // Success
+      alert('Užklausa sėkmingai išsiųsta! Susisieksime su jumis artimiausiu metu.');
+      
+      // Reset form
+      setInquiryForm({
+        companyName: '',
+        contactPerson: '',
+        email: '',
+        phone: '',
+        message: ''
+      });
+      setShowInquiryForm(false);
+      
+    } catch (error) {
+      console.error('Error submitting inquiry:', error);
+      alert('Klaida siunčiant užklausą. Bandykite dar kartą.');
+    } finally {
+      setSubmittingInquiry(false);
+    }
   };
 
   // Show loading state
@@ -220,7 +255,7 @@ export default function Home() {
       {/* Map - Full Width with margin for sidebar */}
       <div className={`ml-[640px] ${showInquiryForm ? 'mr-96' : 'mr-0'}`}>
         <Map 
-          selectedCity={mapCity} 
+          selectedCity={selectedCity} 
           selectedScreens={selectedScreens} 
           screenCities={screenCities}
           selectedDateRange={dateRange}
@@ -297,64 +332,89 @@ export default function Home() {
                 </div>
               )}
 
-              {/* Company */}
+            {/* Company */}
             <div className="mb-4">
-              <h3 className="text-sm font-semibold text-gray-700 mb-2">Įmonė</h3>
-                    <input
-                      type="text"
+              <h3 className="text-sm font-semibold text-gray-700 mb-2">Įmonė *</h3>
+              <input
+                type="text"
+                value={inquiryForm.companyName}
+                onChange={(e) => setInquiryForm({...inquiryForm, companyName: e.target.value})}
                 placeholder="Įmonės pavadinimas"
-                      className="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
-                    />
-              </div>
+                className="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+                required
+              />
+            </div>
 
-              {/* Name */}
+            {/* Name */}
             <div className="mb-4">
-              <h3 className="text-sm font-semibold text-gray-700 mb-2">Vardas</h3>
-                    <input
-                      type="text"
+              <h3 className="text-sm font-semibold text-gray-700 mb-2">Vardas *</h3>
+              <input
+                type="text"
+                value={inquiryForm.contactPerson}
+                onChange={(e) => setInquiryForm({...inquiryForm, contactPerson: e.target.value})}
                 placeholder="Jūsų vardas"
-                      className="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
-                    />
-              </div>
+                className="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+                required
+              />
+            </div>
 
-              {/* Email */}
+            {/* Email */}
             <div className="mb-4">
-              <h3 className="text-sm font-semibold text-gray-700 mb-2">El. paštas</h3>
-                    <input
-                      type="email"
+              <h3 className="text-sm font-semibold text-gray-700 mb-2">El. paštas *</h3>
+              <input
+                type="email"
+                value={inquiryForm.email}
+                onChange={(e) => setInquiryForm({...inquiryForm, email: e.target.value})}
                 placeholder="el@paštas.lt"
-                      className="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
-                    />
-              </div>
+                className="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+                required
+              />
+            </div>
 
-              {/* Comment */}
+            {/* Phone */}
+            <div className="mb-4">
+              <h3 className="text-sm font-semibold text-gray-700 mb-2">Telefonas</h3>
+              <input
+                type="tel"
+                value={inquiryForm.phone}
+                onChange={(e) => setInquiryForm({...inquiryForm, phone: e.target.value})}
+                placeholder="+370 600 12345"
+                className="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+              />
+            </div>
+
+            {/* Comment */}
             <div className="mb-6">
               <h3 className="text-sm font-semibold text-gray-700 mb-2">Komentaras</h3>
-                    <textarea
+              <textarea
+                value={inquiryForm.message}
+                onChange={(e) => setInquiryForm({...inquiryForm, message: e.target.value})}
                 placeholder="Jūsų komentaras ar papildoma informacija..."
-                      rows={4}
-                      className="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 resize-none"
-                    />
+                rows={4}
+                className="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 resize-none"
+              />
             </div>
 
             {/* Send Button */}
+            <form onSubmit={handleSubmitInquiry}>
               <button
-              onClick={() => {
-                setIsLoading(true);
-                setTimeout(() => setIsLoading(false), 3000);
-              }}
-              disabled={isLoading}
-              className="w-full bg-blue-600 hover:bg-blue-700 disabled:bg-blue-400 text-white font-semibold py-3 px-4 rounded-lg transition-colors flex items-center justify-center gap-2"
-            >
-              {isLoading ? (
-                <>
-                  <div className="animate-spin rounded-full h-5 w-5 border-b-2 border-white"></div>
-                  <span>Siunčiama...</span>
-                </>
-              ) : (
-                'Siųsti'
-              )}
+                type="submit"
+                disabled={submittingInquiry}
+                className="w-full bg-blue-600 hover:bg-blue-700 disabled:bg-blue-400 text-white font-semibold py-3 px-4 rounded-lg transition-colors flex items-center justify-center gap-2"
+              >
+                {submittingInquiry ? (
+                  <>
+                    <div className="animate-spin rounded-full h-5 w-5 border-b-2 border-white"></div>
+                    <span>Siunčiama...</span>
+                  </>
+                ) : (
+                  <>
+                    <Send className="w-4 h-4" />
+                    <span>Siųsti užklausą</span>
+                  </>
+                )}
               </button>
+            </form>
           </div>
         </div>
       )}

@@ -54,7 +54,9 @@ export interface Pricing {
 
 export interface Inquiry {
   id: string
-  screen_id: string
+  screen_id: string // Legacy field (keep for compatibility)
+  selected_screens: string[] // New: Array of selected screen names
+  screen_cities: { [screenName: string]: string } // New: Screen name to city mapping
   company_name: string
   contact_person: string
   email: string
