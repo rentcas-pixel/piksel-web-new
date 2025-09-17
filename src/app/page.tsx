@@ -39,12 +39,18 @@ export default function Home() {
 
   // Hash routing - handle URLs like #vilnius/compensa
   useEffect(() => {
+    if (ledScreens.length === 0) {
+      console.log('Hash routing - Screens not loaded yet, skipping');
+      return;
+    }
+    
     console.log('Hash routing useEffect triggered, ledScreens length:', ledScreens.length);
     console.log('Current hash:', window.location.hash);
     
     const handleHashChange = () => {
       const hash = window.location.hash.slice(1); // Remove #
       console.log('handleHashChange called, hash:', hash);
+      
       if (hash && hash.includes('/')) {
         const [city, screenName] = hash.split('/');
         
@@ -57,28 +63,61 @@ export default function Home() {
         console.log('Hash routing - Found screen:', screen);
         
         if (screen) {
-          // Set the city filter
+          console.log('Setting city to:', screen.city);
+          // Set the city filter first
           setSelectedCity(screen.city);
           
-          // Wait for map to load and then show popup
+          // Store screen ID for popup opening after map reload
+          (window as any).pendingPopupScreenId = screen.id;
+          
+          // Wait longer for map to fully reload
           setTimeout(() => {
-            if ((window as any).mapInstance) {
+            console.log('Attempting to open popup for screen:', screen.name);
+            if ((window as any).mapInstance && (window as any).pendingPopupScreenId) {
               const map = (window as any).mapInstance;
+              let popupOpened = false;
+              
               map.eachLayer((layer: any) => {
-                if (layer.options && layer.options.screenId === screen.id) {
+                if (popupOpened) return;
+                
+                // Check by screenId first
+                if (layer.options && layer.options.screenId === (window as any).pendingPopupScreenId) {
+                  console.log('Opening popup by screenId');
                   layer.openPopup();
+                  popupOpened = true;
+                  (window as any).pendingPopupScreenId = null;
                   return;
                 }
-                if (layer.getPopup && layer.getPopup()) {
-                  const popupContent = layer.getPopup().getContent();
-                  if (popupContent && popupContent.includes(screen.name)) {
-                    layer.openPopup();
-                    return;
+                
+                // Check by coordinates as backup
+                if (layer.getLatLng && screen.coordinates) {
+                  const markerLatLng = layer.getLatLng();
+                  const screenLat = Array.isArray(screen.coordinates) ? screen.coordinates[0] : 0;
+                  const screenLng = Array.isArray(screen.coordinates) ? screen.coordinates[1] : 0;
+                  
+                  if (Math.abs(markerLatLng.lat - screenLat) < 0.0001 && 
+                      Math.abs(markerLatLng.lng - screenLng) < 0.0001) {
+                    if (layer.getPopup && layer.getPopup()) {
+                      const popupContent = layer.getPopup().getContent();
+                      if (popupContent && popupContent.includes(screen.name)) {
+                        console.log('Opening popup by coordinates and name');
+                        layer.openPopup();
+                        popupOpened = true;
+                        (window as any).pendingPopupScreenId = null;
+                        return;
+                      }
+                    }
                   }
                 }
               });
+              
+              if (!popupOpened) {
+                console.log('Could not find marker for screen:', screen.name);
+              }
             }
-          }, 1000);
+          }, 2000); // Increased delay to 2 seconds
+        } else {
+          console.log('Screen not found for hash:', hash);
         }
       }
     };
