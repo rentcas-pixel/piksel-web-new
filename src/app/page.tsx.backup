@@ -34,24 +34,41 @@ export default function Home() {
       console.log('Hash changed to:', hash);
       
       if (hash) {
-        // Parse hash: city-screen or just city
-        const parts = hash.split('-');
-        console.log('Hash parts:', parts);
+        // First try to find screen by slug directly
+        const screenBySlug = ledScreens.find(s => s.slug === hash);
         
-        if (parts.length >= 2) {
-          const city = parts[0];
-          const screenName = parts.slice(1).join('-'); // Handle multi-word screen names
-          console.log('Looking for city:', city, 'screen:', screenName);
+        if (screenBySlug) {
+          console.log('Found screen by slug:', screenBySlug);
           
-          // Set city filter - capitalize first letter
-          const capitalizedCity = city.charAt(0).toUpperCase() + city.slice(1);
-          setSelectedCity(capitalizedCity);
+          // Set city filter to screen's city
+          setSelectedCity(screenBySlug.city);
           
-          // Find screen in data
-          const screen = ledScreens.find(s => 
-            s.city.toLowerCase() === city.toLowerCase() && 
-            s.name.toLowerCase().replace(/\s+/g, '-') === screenName.toLowerCase()
-          );
+          // Wait for map to be ready, then show popup
+          setTimeout(() => {
+            if (typeof window !== 'undefined' && window.showMapPopup) {
+              window.showMapPopup(screenBySlug.id);
+            }
+          }, 1000);
+        } else {
+          // Parse hash: city-screen or just city
+          const parts = hash.split('-');
+          console.log('Hash parts:', parts);
+          
+          if (parts.length >= 2) {
+            const city = parts[0];
+            const screenName = parts.slice(1).join('-'); // Handle multi-word screen names
+            console.log('Looking for city:', city, 'screen:', screenName);
+            
+            // Set city filter - capitalize first letter
+            const capitalizedCity = city.charAt(0).toUpperCase() + city.slice(1);
+            setSelectedCity(capitalizedCity);
+            
+            // Find screen by slug or name
+            const screen = ledScreens.find(s => 
+              s.slug === screenName.toLowerCase() ||
+              (s.city.toLowerCase() === city.toLowerCase() && 
+               s.name.toLowerCase().replace(/\s+/g, '-') === screenName.toLowerCase())
+            );
           
           console.log('Found screen:', screen);
           
@@ -99,7 +116,7 @@ export default function Home() {
     return () => {
       window.removeEventListener('hashchange', handleHashChange);
     };
-  }, []); // Remove selectedScreens dependency
+  }, [ledScreens]);
 
   const handleCityFilter = (city: string) => {
     setSelectedCity(city);
