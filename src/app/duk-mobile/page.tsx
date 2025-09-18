@@ -7,6 +7,7 @@ import Link from 'next/link';
 export default function DUKMobile() {
   const [openItems, setOpenItems] = useState<number[]>([0]); // First item open by default
   const [showContactPopup, setShowContactPopup] = useState(false);
+  const [showHamburgerMenu, setShowHamburgerMenu] = useState(false);
 
   const faqData = [
     {
@@ -88,6 +89,26 @@ export default function DUKMobile() {
           </div>
           <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
             <button 
+              onClick={() => setShowHamburgerMenu(true)}
+              style={{ 
+                padding: '8px', 
+                backgroundColor: '#3b82f6', 
+                color: 'white', 
+                borderRadius: '11px', 
+                fontSize: '16px',
+                fontWeight: 'bold',
+                border: 'none',
+                cursor: 'pointer',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                width: '32px',
+                height: '32px'
+              }}
+            >
+              ☰
+            </button>
+            <button 
               onClick={() => setShowContactPopup(true)}
               style={{ 
                 padding: '8px', 
@@ -111,6 +132,47 @@ export default function DUKMobile() {
         </div>
       </div>
 
+      {/* Cities Navigation */}
+      <div style={{ 
+        backgroundColor: '#f9fafb', 
+        borderBottom: '1px solid #e5e7eb', 
+        padding: '8px 16px',
+        flexShrink: 0
+      }}>
+        <div style={{ 
+          display: 'flex', 
+          alignItems: 'center', 
+          gap: '6px', 
+          overflowX: 'auto',
+          paddingBottom: '4px',
+          scrollbarWidth: 'none',
+          msOverflowStyle: 'none',
+          WebkitOverflowScrolling: 'touch'
+        }}>
+          {['Vilnius', 'Kaunas', 'Klaipėda', 'Šiauliai', 'Panevėžys', 'Regionai', 'Reikalavimai klipams', 'DUK'].map(city => (
+            <Link
+              key={city}
+              href={city === 'DUK' ? '/duk-mobile' : city === 'Reikalavimai klipams' ? '/klipai-mobile' : '/'}
+              style={{
+                padding: '6px 12px',
+                borderRadius: '9999px',
+                fontSize: '13px',
+                fontWeight: '500',
+                backgroundColor: city === 'DUK' ? '#3b82f6' : 'white',
+                color: city === 'DUK' ? 'white' : '#374151',
+                border: city === 'DUK' ? 'none' : '1px solid #d1d5db',
+                cursor: 'pointer',
+                whiteSpace: 'nowrap',
+                flexShrink: 0,
+                textDecoration: 'none'
+              }}
+            >
+              {city}
+            </Link>
+          ))}
+        </div>
+      </div>
+
       {/* Main Content */}
       <div style={{ 
         flex: 1,
@@ -121,7 +183,7 @@ export default function DUKMobile() {
       }}>
         {/* Header */}
         <div style={{ textAlign: 'center', marginBottom: '32px' }}>
-          <h1 style={{ fontSize: '24px', fontWeight: 'bold', color: '#111827', margin: 0 }}>Dažniausiai užduodami klausimai</h1>
+          <h1 style={{ fontSize: '24px', fontWeight: 'bold', color: '#111827', margin: 0 }}>DUK</h1>
         </div>
 
         {/* FAQ Accordion */}
@@ -220,7 +282,7 @@ export default function DUKMobile() {
             fontFamily: "'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif"
           }}>
             {/* Header */}
-            <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '20px' }}>
+            <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '24px' }}>
               <img 
                 src="/Piksel-logo-black-2023.png" 
                 alt="Piksel Logo" 
@@ -249,74 +311,187 @@ export default function DUKMobile() {
             </div>
 
             {/* Contact Information */}
-            <div style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
+            <div style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
               {/* Phone */}
-              <div style={{ 
-                display: 'flex', 
-                alignItems: 'center', 
-                gap: '12px',
-                padding: '12px',
-                backgroundColor: '#3b82f6',
-                borderRadius: '8px'
-              }}>
-                <div style={{
-                  width: '48px',
-                  height: '48px',
+              <a 
+                href="tel:+37069066633"
+                style={{
+                  display: 'flex',
+                  alignItems: 'center',
+                  gap: '12px',
+                  padding: '12px',
                   backgroundColor: '#3b82f6',
-                  borderRadius: '50%',
+                  borderRadius: '10px',
+                  textDecoration: 'none',
+                  color: 'white',
+                  transition: 'all 0.2s ease'
+                }}
+                onMouseOver={(e) => {
+                  e.currentTarget.style.backgroundColor = '#2563eb';
+                }}
+                onMouseOut={(e) => {
+                  e.currentTarget.style.backgroundColor = '#3b82f6';
+                }}
+              >
+                <div style={{
+                  width: '36px',
+                  height: '36px',
+                  backgroundColor: 'rgba(255, 255, 255, 0.2)',
+                  borderRadius: '8px',
                   display: 'flex',
                   alignItems: 'center',
                   justifyContent: 'center',
-                  fontSize: '22px'
+                  fontSize: '18px'
                 }}>
-                  <span style={{ filter: 'brightness(0) invert(1)' }}>📞</span>
+                  📞
                 </div>
-                <a 
-                  href="tel:+37069066633"
-                  style={{ 
-                    color: '#000000', 
-                    textDecoration: 'none', 
-                    fontSize: '16px',
-                    fontWeight: '400'
-                  }}
-                >
-                  +370 690 666 33
-                </a>
-              </div>
-
+                <div>
+                  <div style={{ fontSize: '14px', fontWeight: '600', marginBottom: '2px' }}>Telefonas</div>
+                  <div style={{ fontSize: '16px', fontWeight: '500' }}>+370 690 666 33</div>
+                </div>
+              </a>
+              
               {/* Email */}
-              <div style={{ 
-                display: 'flex', 
-                alignItems: 'center', 
-                gap: '12px',
-                padding: '12px',
-                backgroundColor: '#3b82f6',
-                borderRadius: '8px'
-              }}>
+              <a 
+                href="mailto:info@piksel.lt"
+                style={{
+                  display: 'flex',
+                  alignItems: 'center',
+                  gap: '12px',
+                  padding: '12px',
+                  backgroundColor: '#10b981',
+                  borderRadius: '10px',
+                  textDecoration: 'none',
+                  color: 'white',
+                  transition: 'all 0.2s ease'
+                }}
+                onMouseOver={(e) => {
+                  e.currentTarget.style.backgroundColor = '#059669';
+                }}
+                onMouseOut={(e) => {
+                  e.currentTarget.style.backgroundColor = '#10b981';
+                }}
+              >
                 <div style={{
-                  width: '48px',
-                  height: '48px',
-                  backgroundColor: '#3b82f6',
-                  borderRadius: '50%',
+                  width: '36px',
+                  height: '36px',
+                  backgroundColor: 'rgba(255, 255, 255, 0.2)',
+                  borderRadius: '8px',
                   display: 'flex',
                   alignItems: 'center',
                   justifyContent: 'center',
-                  fontSize: '22px'
+                  fontSize: '18px'
                 }}>
-                  <span style={{ filter: 'brightness(0) invert(1)' }}>✉️</span>
+                  ✉️
                 </div>
-                <a 
-                  href="mailto:info@piksel.lt"
-                  style={{ 
-                    color: '#000000', 
-                    textDecoration: 'none', 
-                    fontSize: '16px',
-                    fontWeight: '400'
-                  }}
-                >
-                  info@piksel.lt
-                </a>
-              </div>
+                <div>
+                  <div style={{ fontSize: '14px', fontWeight: '600', marginBottom: '2px' }}>El. paštas</div>
+                  <div style={{ fontSize: '16px', fontWeight: '500' }}>info@piksel.lt</div>
+                </div>
+              </a>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Hamburger Menu */}
+      {showHamburgerMenu && (
+        <div style={{
+          position: 'fixed',
+          top: 0,
+          left: 0,
+          right: 0,
+          bottom: 0,
+          backgroundColor: 'rgba(0, 0, 0, 0.5)',
+          zIndex: 2000,
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'center'
+        }}>
+          <div style={{
+            backgroundColor: 'white',
+            borderRadius: '16px',
+            padding: '24px',
+            maxWidth: '320px',
+            width: '90%',
+            maxHeight: '80vh',
+            overflowY: 'auto',
+            boxShadow: '0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04)',
+            backdropFilter: 'blur(10px)',
+            fontFamily: "'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif"
+          }}>
+            {/* Header */}
+            <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '20px' }}>
+              <img 
+                src="/Piksel-logo-black-2023.png" 
+                alt="Piksel Logo" 
+                style={{ height: '22px', width: 'auto' }}
+              />
+              <button
+                onClick={() => setShowHamburgerMenu(false)}
+                style={{
+                  background: 'rgba(107, 114, 128, 0.1)',
+                  border: 'none',
+                  fontSize: '20px',
+                  color: '#6b7280',
+                  cursor: 'pointer',
+                  padding: '8px',
+                  borderRadius: '50%',
+                  width: '36px',
+                  height: '36px',
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  transition: 'all 0.2s ease'
+                }}
+              >
+                ×
+              </button>
+            </div>
+
+            {/* Menu Items */}
+            <div style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
+              <Link 
+                href="/klipai-mobile"
+                style={{
+                  display: 'flex',
+                  alignItems: 'center',
+                  gap: '12px',
+                  padding: '12px',
+                  borderRadius: '8px',
+                  textDecoration: 'none',
+                  color: '#374151',
+                  backgroundColor: '#f9fafb',
+                  border: '1px solid #e5e7eb',
+                  fontSize: '14px',
+                  fontWeight: '500'
+                }}
+                onClick={() => setShowHamburgerMenu(false)}
+              >
+                <span>📋</span>
+                <span>Reikalavimai klipams</span>
+              </Link>
+              <Link 
+                href="/duk-mobile"
+                style={{
+                  display: 'flex',
+                  alignItems: 'center',
+                  gap: '12px',
+                  padding: '12px',
+                  borderRadius: '8px',
+                  textDecoration: 'none',
+                  color: '#374151',
+                  backgroundColor: '#3b82f6',
+                  border: '1px solid #3b82f6',
+                  fontSize: '14px',
+                  fontWeight: '500',
+                  color: 'white'
+                }}
+                onClick={() => setShowHamburgerMenu(false)}
+              >
+                <span>❓</span>
+                <span>DUK</span>
+              </Link>
             </div>
           </div>
         </div>

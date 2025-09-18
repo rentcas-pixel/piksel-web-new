@@ -1,6 +1,7 @@
 'use client';
 
 import { useEffect, useRef, useState } from 'react';
+import Link from 'next/link';
 import { LEDScreen } from '@/lib/supabase';
 import { useLEDScreens } from '@/hooks/useLEDScreens';
 import ResponsiveImage from './ResponsiveImage';
@@ -664,16 +665,15 @@ export default function Map({ selectedCity, selectedScreens: propSelectedScreens
         }}>
           <div style={{
             backgroundColor: 'white',
-            borderRadius: '20px',
-            padding: '32px',
-            maxWidth: '420px',
-            width: '100%',
-            boxShadow: '0 25px 50px -12px rgba(0, 0, 0, 0.25)',
-            border: '1px solid rgba(255, 255, 255, 0.2)',
-            backdropFilter: 'blur(10px)',
+            borderRadius: '16px',
+            padding: '20px',
+            maxWidth: '280px',
+            width: '90%',
+            boxShadow: '0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04)',
+            border: '1px solid #e5e7eb',
             fontFamily: "'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif"
           }}>
-            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '28px' }}>
+            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '24px' }}>
               <img 
                 src="/Piksel-logo-black-2023.png" 
                 alt="Piksel Logo" 
@@ -682,26 +682,26 @@ export default function Map({ selectedCity, selectedScreens: propSelectedScreens
               <button
                 onClick={() => setShowContactPopup(false)}
                 style={{
-                  background: 'rgba(107, 114, 128, 0.1)',
+                  background: '#f3f4f6',
                   border: 'none',
-                  fontSize: '20px',
+                  fontSize: '18px',
                   color: '#6b7280',
                   cursor: 'pointer',
-                  padding: '8px',
-                  borderRadius: '50%',
-                  width: '36px',
-                  height: '36px',
+                  padding: '0',
+                  borderRadius: '8px',
+                  width: '28px',
+                  height: '28px',
                   display: 'flex',
                   alignItems: 'center',
                   justifyContent: 'center',
                   transition: 'all 0.2s ease'
                 }}
                 onMouseOver={(e) => {
-                  e.currentTarget.style.background = 'rgba(107, 114, 128, 0.2)';
+                  e.currentTarget.style.background = '#e5e7eb';
                   e.currentTarget.style.color = '#374151';
                 }}
                 onMouseOut={(e) => {
-                  e.currentTarget.style.background = 'rgba(107, 114, 128, 0.1)';
+                  e.currentTarget.style.background = '#f3f4f6';
                   e.currentTarget.style.color = '#6b7280';
                 }}
               >
@@ -709,80 +709,84 @@ export default function Map({ selectedCity, selectedScreens: propSelectedScreens
               </button>
             </div>
             
-            <div style={{ display: 'flex', flexDirection: 'column', gap: '20px' }}>
-              <div style={{
-                backgroundColor: '#f8fafc',
-                borderRadius: '12px',
-                padding: '20px',
-                border: '1px solid #e2e8f0'
-              }}>
-                <div style={{ display: 'flex', alignItems: 'center', gap: '12px', marginBottom: '8px' }}>
-                  <div style={{
-                    width: '48px',
-                    height: '48px',
-                    backgroundColor: '#2563eb',
-                    borderRadius: '10px',
-                    display: 'flex',
-                    alignItems: 'center',
-                    justifyContent: 'center',
-                    color: 'white',
-                    fontSize: '22px'
-                  }}>
-                    <span style={{ filter: 'brightness(0) invert(1)' }}>📞</span>
-                  </div>
-                  <h3 style={{ fontSize: '16px', fontWeight: '600', color: '#1e293b', margin: 0 }}>Telefonas</h3>
+            <div style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
+              {/* Phone */}
+              <a 
+                href="tel:+37069066633"
+                style={{
+                  display: 'flex',
+                  alignItems: 'center',
+                  gap: '12px',
+                  padding: '12px',
+                  backgroundColor: '#3b82f6',
+                  borderRadius: '10px',
+                  textDecoration: 'none',
+                  color: 'white',
+                  transition: 'all 0.2s ease'
+                }}
+                onMouseOver={(e) => {
+                  e.currentTarget.style.backgroundColor = '#2563eb';
+                }}
+                onMouseOut={(e) => {
+                  e.currentTarget.style.backgroundColor = '#3b82f6';
+                }}
+              >
+                <div style={{
+                  width: '36px',
+                  height: '36px',
+                  backgroundColor: 'rgba(255, 255, 255, 0.2)',
+                  borderRadius: '8px',
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  fontSize: '18px'
+                }}>
+                  📞
                 </div>
-                <a 
-                  href="tel:+37069066633" 
-                  style={{ 
-                    fontSize: '18px', 
-                    color: '#000000', 
-                    textDecoration: 'none',
-                    fontWeight: '400',
-                    display: 'block',
-                    padding: '8px 0'
-                  }}
-                >
-                  +370 690 666 33
-                </a>
-              </div>
+                <div>
+                  <div style={{ fontSize: '14px', fontWeight: '600', marginBottom: '2px' }}>Telefonas</div>
+                  <div style={{ fontSize: '16px', fontWeight: '500' }}>+370 690 666 33</div>
+                </div>
+              </a>
               
-              <div style={{
-                backgroundColor: '#f8fafc',
-                borderRadius: '12px',
-                padding: '20px',
-                border: '1px solid #e2e8f0'
-              }}>
-                <div style={{ display: 'flex', alignItems: 'center', gap: '12px', marginBottom: '8px' }}>
-                  <div style={{
-                    width: '48px',
-                    height: '48px',
-                    backgroundColor: '#2563eb',
-                    borderRadius: '10px',
-                    display: 'flex',
-                    alignItems: 'center',
-                    justifyContent: 'center',
-                    color: 'white',
-                    fontSize: '22px'
-                  }}>
-                    <span style={{ filter: 'brightness(0) invert(1)' }}>✉️</span>
-                  </div>
-                  <h3 style={{ fontSize: '16px', fontWeight: '600', color: '#1e293b', margin: 0 }}>El. paštas</h3>
+              {/* Email */}
+              <a 
+                href="mailto:info@piksel.lt"
+                style={{
+                  display: 'flex',
+                  alignItems: 'center',
+                  gap: '12px',
+                  padding: '12px',
+                  backgroundColor: '#10b981',
+                  borderRadius: '10px',
+                  textDecoration: 'none',
+                  color: 'white',
+                  transition: 'all 0.2s ease'
+                }}
+                onMouseOver={(e) => {
+                  e.currentTarget.style.backgroundColor = '#059669';
+                }}
+                onMouseOut={(e) => {
+                  e.currentTarget.style.backgroundColor = '#10b981';
+                }}
+              >
+                <div style={{
+                  width: '36px',
+                  height: '36px',
+                  backgroundColor: 'rgba(255, 255, 255, 0.2)',
+                  borderRadius: '8px',
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  fontSize: '18px'
+                }}>
+                  ✉️
                 </div>
-                <a 
-                  href="mailto:info@piksel.lt" 
-                  style={{ 
-                    fontSize: '18px', 
-                    color: '#000000', 
-                    textDecoration: 'none',
-                    fontWeight: '400',
-                    display: 'block',
-                    padding: '8px 0'
-                  }}
-                >
-                  info@piksel.lt
-                </a>
-              </div>
+                <div>
+                  <div style={{ fontSize: '14px', fontWeight: '600', marginBottom: '2px' }}>El. paštas</div>
+                  <div style={{ fontSize: '16px', fontWeight: '500' }}>info@piksel.lt</div>
+                </div>
+              </a>
             </div>
           </div>
         </div>
@@ -805,10 +809,18 @@ export default function Map({ selectedCity, selectedScreens: propSelectedScreens
           msOverflowStyle: 'none',
           WebkitOverflowScrolling: 'touch'
         }}>
-          {['Vilnius', 'Kaunas', 'Klaipėda', 'Šiauliai', 'Panevėžys', 'Regionai'].map(city => (
+          {['Vilnius', 'Kaunas', 'Klaipėda', 'Šiauliai', 'Panevėžys', 'Regionai', 'Reikalavimai klipams', 'DUK'].map(city => (
             <button
               key={city}
-              onClick={() => onCityChange && onCityChange(city)}
+              onClick={() => {
+                if (city === 'Reikalavimai klipams') {
+                  window.location.href = '/klipai-mobile';
+                } else if (city === 'DUK') {
+                  window.location.href = '/duk-mobile';
+                } else {
+                  onCityChange && onCityChange(city);
+                }
+              }}
               style={{
                 padding: '6px 12px',
                 borderRadius: '9999px',
@@ -838,8 +850,8 @@ export default function Map({ selectedCity, selectedScreens: propSelectedScreens
             position: 'relative',
             zIndex: 1
           }}>
-            <div style={{ display: 'flex', alignItems: 'center', gap: '12px', flexWrap: 'wrap', marginBottom: '8px' }}>
-              <div style={{ fontSize: '14px', fontWeight: '500', color: '#374151' }}>Pasirinkta:</div>
+            <div style={{ display: 'flex', alignItems: 'center', gap: '12px', overflowX: 'auto', paddingBottom: '4px', marginBottom: '8px' }}>
+              <div style={{ fontSize: '14px', fontWeight: '500', color: '#374151', flexShrink: 0 }}>Pasirinkta:</div>
               {screenCities && Object.keys(screenCities).length > 0 && (
                 <>
                   {Object.entries(screenCities).reduce((acc, [screenName, city]) => {
@@ -848,14 +860,16 @@ export default function Map({ selectedCity, selectedScreens: propSelectedScreens
                     }
                     return acc;
                   }, [] as [string, string][]).map(([city, _]) => (
-                    <div key={city} style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                    <div key={city} style={{ display: 'flex', alignItems: 'center', gap: '8px', flexShrink: 0 }}>
                       <div style={{
                         backgroundColor: '#bfdbfe',
                         color: '#1e3a8a',
                         padding: '4px 12px',
                         borderRadius: '20px',
                         fontSize: '12px',
-                        fontWeight: '500'
+                        fontWeight: '500',
+                        whiteSpace: 'nowrap',
+                        flexShrink: 0
                       }}>
                         {city}
                       </div>
@@ -871,7 +885,9 @@ export default function Map({ selectedCity, selectedScreens: propSelectedScreens
                             fontWeight: '500',
                             display: 'flex',
                             alignItems: 'center',
-                            gap: '4px'
+                            gap: '4px',
+                            whiteSpace: 'nowrap',
+                            flexShrink: 0
                           }}>
                             {screen}
                             <button
@@ -900,19 +916,20 @@ export default function Map({ selectedCity, selectedScreens: propSelectedScreens
                 onClick={handleClearFilter}
                 style={{
                   color: 'white',
-                  fontSize: '12px',
+                  fontSize: '14px',
                   fontWeight: 'bold',
                   background: 'black',
                   border: 'none',
                   borderRadius: '50%',
                   cursor: 'pointer',
-                  padding: '4px',
+                  padding: '0',
                   marginLeft: 'auto',
-                  width: '21px',
-                  height: '21px',
+                  width: '28px',
+                  height: '28px',
                   display: 'flex',
                   alignItems: 'center',
-                  justifyContent: 'center'
+                  justifyContent: 'center',
+                  flexShrink: 0
                 }}
               >
                 ×
@@ -1157,10 +1174,8 @@ export default function Map({ selectedCity, selectedScreens: propSelectedScreens
             padding: '24px',
             maxWidth: '320px',
             width: '90%',
-            maxHeight: '80vh',
-            overflowY: 'auto',
             boxShadow: '0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04)',
-            backdropFilter: 'blur(10px)'
+            fontFamily: "'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif"
           }}>
             {/* Header */}
             <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '20px' }}>
@@ -1193,59 +1208,46 @@ export default function Map({ selectedCity, selectedScreens: propSelectedScreens
 
             {/* Menu Items */}
             <div style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
-              <a 
+              <Link 
                 href="/klipai-mobile"
                 style={{
                   display: 'flex',
                   alignItems: 'center',
-                  padding: '16px',
-                  backgroundColor: '#f8fafc',
-                  borderRadius: '12px',
+                  gap: '12px',
+                  padding: '12px',
+                  borderRadius: '8px',
                   textDecoration: 'none',
                   color: '#374151',
-                  fontSize: '16px',
-                  fontWeight: '500',
-                  transition: 'all 0.2s ease',
-                  border: '1px solid #e5e7eb'
+                  backgroundColor: '#f9fafb',
+                  border: '1px solid #e5e7eb',
+                  fontSize: '14px',
+                  fontWeight: '500'
                 }}
-                onMouseEnter={(e) => {
-                  e.currentTarget.style.backgroundColor = '#3b82f6';
-                  e.currentTarget.style.color = 'white';
-                }}
-                onMouseLeave={(e) => {
-                  e.currentTarget.style.backgroundColor = '#f8fafc';
-                  e.currentTarget.style.color = '#374151';
-                }}
+                onClick={() => setShowHamburgerMenu(false)}
               >
-                📹 Klipai
-              </a>
-              
-              <a 
+                <span>📋</span>
+                <span>Reikalavimai klipams</span>
+              </Link>
+              <Link 
                 href="/duk-mobile"
                 style={{
                   display: 'flex',
                   alignItems: 'center',
-                  padding: '16px',
-                  backgroundColor: '#f8fafc',
-                  borderRadius: '12px',
+                  gap: '12px',
+                  padding: '12px',
+                  borderRadius: '8px',
                   textDecoration: 'none',
                   color: '#374151',
-                  fontSize: '16px',
-                  fontWeight: '500',
-                  transition: 'all 0.2s ease',
-                  border: '1px solid #e5e7eb'
+                  backgroundColor: '#f9fafb',
+                  border: '1px solid #e5e7eb',
+                  fontSize: '14px',
+                  fontWeight: '500'
                 }}
-                onMouseEnter={(e) => {
-                  e.currentTarget.style.backgroundColor = '#3b82f6';
-                  e.currentTarget.style.color = 'white';
-                }}
-                onMouseLeave={(e) => {
-                  e.currentTarget.style.backgroundColor = '#f8fafc';
-                  e.currentTarget.style.color = '#374151';
-                }}
+                onClick={() => setShowHamburgerMenu(false)}
               >
-                ❓ DUK
-              </a>
+                <span>❓</span>
+                <span>DUK</span>
+              </Link>
             </div>
           </div>
         </div>
