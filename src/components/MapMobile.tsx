@@ -852,7 +852,17 @@ export default function Map({ selectedCity, selectedScreens: propSelectedScreens
             position: 'relative',
             zIndex: 1
           }}>
-            <div style={{ display: 'flex', alignItems: 'center', gap: '12px', overflowX: 'auto', paddingBottom: '4px', marginBottom: '8px' }}>
+            <div style={{ 
+              display: 'flex', 
+              alignItems: 'center', 
+              gap: '12px', 
+              overflowX: 'auto', 
+              paddingBottom: '4px', 
+              marginBottom: '8px',
+              width: '100%',
+              maxWidth: '100%',
+              minHeight: '40px'
+            }}>
               <div style={{ fontSize: '14px', fontWeight: '500', color: '#374151', flexShrink: 0 }}>Pasirinkta:</div>
               {screenCities && Object.keys(screenCities).length > 0 && (
                 <>
@@ -877,6 +887,7 @@ export default function Map({ selectedCity, selectedScreens: propSelectedScreens
                       </div>
                       {selectedScreens && selectedScreens
                         .filter(screen => screenCities[screen] === city)
+                        .slice(0, 4)
                         .map((screen, index) => (
                           <div key={index} style={{
                             backgroundColor: '#dcfce7',
@@ -910,6 +921,20 @@ export default function Map({ selectedCity, selectedScreens: propSelectedScreens
                             </button>
                           </div>
                         ))}
+                      {selectedScreens && selectedScreens.filter(screen => screenCities[screen] === city).length > 4 && (
+                        <div style={{
+                          backgroundColor: '#f3f4f6',
+                          color: '#6b7280',
+                          padding: '4px 12px',
+                          borderRadius: '20px',
+                          fontSize: '12px',
+                          fontWeight: '500',
+                          whiteSpace: 'nowrap',
+                          flexShrink: 0
+                        }}>
+                          +{selectedScreens.filter(screen => screenCities[screen] === city).length - 4}
+                        </div>
+                      )}
                     </div>
                   ))}
                 </>
