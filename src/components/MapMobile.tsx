@@ -851,24 +851,28 @@ export default function Map({ selectedCity, selectedScreens: propSelectedScreens
             flexShrink: 0,
             position: 'relative',
             zIndex: 1,
-            overflow: 'hidden'
+            width: '100%',
+            maxWidth: '100vw'
           }}>
             <div style={{ 
               display: 'flex', 
               alignItems: 'center', 
               gap: '12px', 
               overflowX: 'auto', 
+              overflowY: 'hidden',
               paddingBottom: '4px', 
               marginBottom: '8px',
               width: '100%',
               maxWidth: '100%',
               minHeight: '40px',
-              maxHeight: '40px'
+              maxHeight: '40px',
+              flexWrap: 'nowrap'
             }}>
               <div style={{ fontSize: '14px', fontWeight: '500', color: '#374151', flexShrink: 0 }}>Pasirinkta:</div>
               {screenCities && Object.keys(screenCities).length > 0 && (
                 <>
                   {(() => {
+                    const allBadges: JSX.Element[] = [];
                     const cityGroups = Object.entries(screenCities).reduce((acc, [screenName, city]) => {
                       if (!acc.find(([_, c]) => c === city)) {
                         acc.push([city, city]);
@@ -876,24 +880,17 @@ export default function Map({ selectedCity, selectedScreens: propSelectedScreens
                       return acc;
                     }, [] as [string, string][]);
                     
-                    let totalBadges = 0;
-                    const maxBadges = 5;
+                    const maxBadges = 3; // Max 3 badge'ai
                     
-                    return cityGroups.map(([city, _]) => {
+                    for (const [city, _] of cityGroups) {
+                      if (allBadges.length >= maxBadges) break;
+                      
                       const cityScreens = selectedScreens?.filter(screen => screenCities[screen] === city) || [];
-                      const cityBadge = 1; // Miesto badge'as
-                      const remainingSlots = maxBadges - totalBadges;
                       
-                      if (remainingSlots <= 0) return null; // Neberodo, jei jau pasiekė limitą
-                      
-                      const screensToShow = Math.min(cityScreens.length, remainingSlots - cityBadge);
-                      const hasMoreScreens = cityScreens.length > screensToShow;
-                      
-                      totalBadges += cityBadge + screensToShow + (hasMoreScreens ? 1 : 0);
-                      
-                      return (
-                        <div key={city} style={{ display: 'flex', alignItems: 'center', gap: '8px', flexShrink: 0 }}>
-                          <div style={{
+                      // Miesto badge'as
+                      if (allBadges.length < maxBadges) {
+                        allBadges.push(
+                          <div key={`city-${city}`} style={{
                             backgroundColor: '#bfdbfe',
                             color: '#1e3a8a',
                             padding: '4px 12px',
@@ -905,56 +902,68 @@ export default function Map({ selectedCity, selectedScreens: propSelectedScreens
                           }}>
                             {city}
                           </div>
-                          {cityScreens.slice(0, screensToShow).map((screen, index) => (
-                            <div key={index} style={{
-                              backgroundColor: '#dcfce7',
-                              color: '#166534',
-                              padding: '4px 12px',
-                              borderRadius: '20px',
-                              fontSize: '12px',
-                              fontWeight: '500',
-                              display: 'flex',
-                              alignItems: 'center',
-                              gap: '4px',
-                              whiteSpace: 'nowrap',
-                              flexShrink: 0
-                            }}>
-                              {screen}
-                              <button
-                                onClick={() => handleSelectScreen(screen)}
-                                style={{
-                                  color: '#16a34a',
-                                  fontWeight: 'bold',
-                                  fontSize: '14px',
-                                  background: 'none',
-                                  border: 'none',
-                                  cursor: 'pointer',
-                                  padding: '0',
-                                  marginLeft: '4px'
-                                }}
-                                title="Išimti ekraną"
-                              >
-                                ×
-                              </button>
-                            </div>
-                          ))}
-                          {hasMoreScreens && (
-                            <div style={{
-                              backgroundColor: '#f3f4f6',
-                              color: '#6b7280',
-                              padding: '4px 12px',
-                              borderRadius: '20px',
-                              fontSize: '12px',
-                              fontWeight: '500',
-                              whiteSpace: 'nowrap',
-                              flexShrink: 0
-                            }}>
-                              +{cityScreens.length - screensToShow}
-                            </div>
-                          )}
+                        );
+                      }
+                      
+                      // Ekranų badge'ai
+                      for (let i = 0; i < cityScreens.length && allBadges.length < maxBadges; i++) {
+                        const screen = cityScreens[i];
+                        allBadges.push(
+                          <div key={`screen-${screen}`} style={{
+                            backgroundColor: '#dcfce7',
+                            color: '#166534',
+                            padding: '4px 12px',
+                            borderRadius: '20px',
+                            fontSize: '12px',
+                            fontWeight: '500',
+                            display: 'flex',
+                            alignItems: 'center',
+                            gap: '4px',
+                            whiteSpace: 'nowrap',
+                            flexShrink: 0
+                          }}>
+                            {screen}
+                            <button
+                              onClick={() => handleSelectScreen(screen)}
+                              style={{
+                                color: '#16a34a',
+                                fontWeight: 'bold',
+                                fontSize: '14px',
+                                background: 'none',
+                                border: 'none',
+                                cursor: 'pointer',
+                                padding: '0',
+                                marginLeft: '4px'
+                              }}
+                              title="Išimti ekraną"
+                            >
+                              ×
+                            </button>
+                          </div>
+                        );
+                      }
+                    }
+                    
+                    // Pridėti "+X" badge'ą, jei yra daugiau ekranų
+                    const totalScreens = selectedScreens?.length || 0;
+                    if (totalScreens > maxBadges) {
+                      allBadges.push(
+                        <div key="more-badge" style={{
+                          backgroundColor: '#f3f4f6',
+                          color: '#6b7280',
+                          padding: '4px 12px',
+                          borderRadius: '20px',
+                          fontSize: '12px',
+                          fontWeight: '500',
+                          whiteSpace: 'nowrap',
+                          flexShrink: 0
+                        }}>
+                          +{totalScreens - maxBadges}
                         </div>
                       );
-                    }).filter(Boolean);
+                    }
+                    
+                    return allBadges;
                   })()}
                 </>
               )}
