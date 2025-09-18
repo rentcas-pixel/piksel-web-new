@@ -818,7 +818,9 @@ export default function Map({ selectedCity, selectedScreens: propSelectedScreens
                 } else if (city === 'DUK') {
                   window.location.href = '/duk-mobile';
                 } else {
-                  onCityChange && onCityChange(city);
+                  if (onCityChange) {
+                    onCityChange(city);
+                  }
                 }
               }}
               style={{
