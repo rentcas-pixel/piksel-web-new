@@ -1128,25 +1128,41 @@ export default function Map({ selectedCity, selectedScreens, screenCities, selec
     <div className="w-full h-screen relative">
       {/* Filter Bar */}
       {(selectedCity || (selectedScreens && selectedScreens.length > 0)) && (
-        <div className="absolute top-4 left-[66px] z-[1000] bg-white rounded-lg shadow-lg border border-gray-200 px-4 py-3 flex flex-col gap-3">
-          <div className="flex items-center gap-3 flex-wrap">
+        <div className="absolute top-4 left-[66px] z-[1000] bg-white rounded-lg shadow-lg border border-gray-200 px-4 py-3 flex flex-col gap-3 max-w-md">
+          <div className="flex items-center gap-3 overflow-x-auto overflow-y-hidden max-h-12">
             <div className="text-sm font-medium text-gray-700">Pasirinkite:</div>
             {screenCities && Object.keys(screenCities).length > 0 && (
               <>
-                {Object.entries(screenCities).reduce((acc, [screenName, city]) => {
-                  if (!acc.find(([_, c]) => c === city)) {
-                    acc.push([city, city]);
-                  }
-                  return acc;
-                }, [] as [string, string][]).map(([city, _]) => (
-                  <div key={city} className="flex items-center gap-2">
-                    <div className="bg-blue-100 text-blue-800 px-3 py-1 rounded-full text-sm font-medium">
-                      {city}
-                    </div>
-                    {selectedScreens && selectedScreens
-                      .filter(screen => screenCities[screen] === city)
-                      .map((screen, index) => (
-                        <div key={index} className="bg-green-100 text-green-800 px-3 py-1 rounded-full text-sm font-medium flex items-center gap-2">
+                {(() => {
+                  const allBadges: JSX.Element[] = [];
+                  const cityGroups = Object.entries(screenCities).reduce((acc, [screenName, city]) => {
+                    if (!acc.find(([_, c]) => c === city)) {
+                      acc.push([city, city]);
+                    }
+                    return acc;
+                  }, [] as [string, string][]);
+                  
+                  const maxBadges = 4; // Max 4 badge'ai
+                  
+                  for (const [city, _] of cityGroups) {
+                    if (allBadges.length >= maxBadges) break;
+                    
+                    const cityScreens = selectedScreens?.filter(screen => screenCities[screen] === city) || [];
+                    
+                    // Miesto badge'as
+                    if (allBadges.length < maxBadges) {
+                      allBadges.push(
+                        <div key={`city-${city}`} className="bg-blue-100 text-blue-800 px-3 py-1 rounded-full text-sm font-medium whitespace-nowrap">
+                          {city}
+                        </div>
+                      );
+                    }
+                    
+                    // Ekranų badge'ai
+                    for (let i = 0; i < cityScreens.length && allBadges.length < maxBadges; i++) {
+                      const screen = cityScreens[i];
+                      allBadges.push(
+                        <div key={`screen-${screen}`} className="bg-green-100 text-green-800 px-3 py-1 rounded-full text-sm font-medium flex items-center gap-2 whitespace-nowrap">
                           {screen}
                           <button 
                             onClick={() => onSelectScreen && onSelectScreen(screen)}
@@ -1156,9 +1172,22 @@ export default function Map({ selectedCity, selectedScreens, screenCities, selec
                             ×
                           </button>
                         </div>
-                      ))}
-                  </div>
-                ))}
+                      );
+                    }
+                  }
+                  
+                  // Pridėti "+X" badge'ą, jei yra daugiau ekranų
+                  const totalScreens = selectedScreens?.length || 0;
+                  if (totalScreens > maxBadges) {
+                    allBadges.push(
+                      <div key="more-badge" className="bg-gray-100 text-gray-600 px-3 py-1 rounded-full text-sm font-medium whitespace-nowrap">
+                        +{totalScreens - maxBadges}
+                      </div>
+                    );
+                  }
+                  
+                  return allBadges;
+                })()}
               </>
             )}
           </div>
