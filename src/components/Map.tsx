@@ -585,6 +585,7 @@ export default function Map({ selectedCity, selectedScreens, screenCities, selec
             modal.innerHTML = `
               <div class="photo-modal-content">
                 <div class="photo-modal-badge" id="photo-modal-badge"></div>
+                <div class="photo-modal-add-badge" id="photo-modal-add-badge" onclick="window.toggleScreenFromModal()"></div>
                 <img class="photo-modal-image" id="photo-modal-image" src="" alt="" />
                 <button class="photo-modal-close" onclick="window.closePhotoModal()">×</button>
               </div>
@@ -609,11 +610,20 @@ export default function Map({ selectedCity, selectedScreens, screenCities, selec
           // Set image and title
           const img = document.getElementById('photo-modal-image') as HTMLImageElement;
           const badgeEl = document.getElementById('photo-modal-badge') as HTMLDivElement;
+          const addBadgeEl = document.getElementById('photo-modal-add-badge') as HTMLDivElement;
           
-          if (img && badgeEl) {
+          if (img && badgeEl && addBadgeEl) {
             img.src = imageUrl;
             img.alt = title;
             badgeEl.textContent = title;
+            
+            // Store current screen name for toggle function
+            (window as any).currentModalScreen = title;
+            
+            // Update add badge text based on selection status
+            const isSelected = selectedScreens && selectedScreens.includes(title);
+            addBadgeEl.textContent = isSelected ? '✓ Pridėtas' : '+ Pridėti';
+            addBadgeEl.style.background = isSelected ? 'rgba(34, 197, 94, 0.95)' : 'rgba(59, 130, 246, 0.95)';
             
             // Show modal
             modal.classList.add('show');
@@ -626,6 +636,15 @@ export default function Map({ selectedCity, selectedScreens, screenCities, selec
           if (modal) {
             modal.classList.remove('show');
             document.body.style.overflow = ''; // Restore scrolling
+          }
+        };
+        
+        (window as any).toggleScreenFromModal = () => {
+          const screenName = (window as any).currentModalScreen;
+          if (screenName && onSelectScreen) {
+            onSelectScreen(screenName);
+            // Close modal after adding/removing screen
+            (window as any).closePhotoModal();
           }
         };
       }
@@ -904,10 +923,41 @@ export default function Map({ selectedCity, selectedScreens, screenCities, selec
             backdrop-filter: blur(10px);
             border: 1px solid rgba(255, 255, 255, 0.1);
             box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
-            max-width: calc(100% - 120px);
+            width: 200px;
+            text-align: center;
             white-space: nowrap;
-            overflow: hidden;
-            text-overflow: ellipsis;
+          }
+          
+          .photo-modal-add-badge {
+            position: absolute;
+            top: 83px;
+            left: 20px;
+            background: rgba(59, 130, 246, 0.95);
+            color: white;
+            padding: 12px 20px;
+            border-radius: 25px;
+            font-size: 16px;
+            font-weight: 600;
+            z-index: 10001;
+            backdrop-filter: blur(10px);
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+            cursor: pointer;
+            transition: all 0.2s ease;
+            user-select: none;
+            width: 200px;
+            text-align: center;
+            white-space: nowrap;
+          }
+          
+          .photo-modal-add-badge:hover {
+            background: rgba(37, 99, 235, 0.95);
+            transform: translateY(-2px);
+            box-shadow: 0 12px 40px rgba(0, 0, 0, 0.4);
+          }
+          
+          .photo-modal-add-badge:active {
+            transform: translateY(0);
+            transition: all 0.1s ease;
           }
           
           .photo-modal-close {
@@ -959,7 +1009,7 @@ export default function Map({ selectedCity, selectedScreens, screenCities, selec
         (window as any).mapInstance = undefined;
       }
     };
-  }, [loading, error, ledScreens, selectedCity, isMobile]); // Restore selectedCity for showMapPopup function
+  }, [loading, error, ledScreens, selectedCity, selectedScreens, isMobile]); // Restore selectedCity for showMapPopup function
 
   // Use mobile component for mobile devices
   if (isMobile) {
