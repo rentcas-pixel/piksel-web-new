@@ -480,7 +480,6 @@ export default function DUKMobile() {
                   padding: '12px',
                   borderRadius: '8px',
                   textDecoration: 'none',
-                  color: '#374151',
                   backgroundColor: '#3b82f6',
                   border: '1px solid #3b82f6',
                   fontSize: '14px',
