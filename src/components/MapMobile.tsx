@@ -850,7 +850,8 @@ export default function Map({ selectedCity, selectedScreens: propSelectedScreens
             padding: '16px 16px',
             flexShrink: 0,
             position: 'relative',
-            zIndex: 1
+            zIndex: 1,
+            overflow: 'hidden'
           }}>
             <div style={{ 
               display: 'flex', 
@@ -861,82 +862,100 @@ export default function Map({ selectedCity, selectedScreens: propSelectedScreens
               marginBottom: '8px',
               width: '100%',
               maxWidth: '100%',
-              minHeight: '40px'
+              minHeight: '40px',
+              maxHeight: '40px'
             }}>
               <div style={{ fontSize: '14px', fontWeight: '500', color: '#374151', flexShrink: 0 }}>Pasirinkta:</div>
               {screenCities && Object.keys(screenCities).length > 0 && (
                 <>
-                  {Object.entries(screenCities).reduce((acc, [screenName, city]) => {
-                    if (!acc.find(([_, c]) => c === city)) {
-                      acc.push([city, city]);
-                    }
-                    return acc;
-                  }, [] as [string, string][]).map(([city, _]) => (
-                    <div key={city} style={{ display: 'flex', alignItems: 'center', gap: '8px', flexShrink: 0 }}>
-                      <div style={{
-                        backgroundColor: '#bfdbfe',
-                        color: '#1e3a8a',
-                        padding: '4px 12px',
-                        borderRadius: '20px',
-                        fontSize: '12px',
-                        fontWeight: '500',
-                        whiteSpace: 'nowrap',
-                        flexShrink: 0
-                      }}>
-                        {city}
-                      </div>
-                      {selectedScreens && selectedScreens
-                        .filter(screen => screenCities[screen] === city)
-                        .slice(0, 4)
-                        .map((screen, index) => (
-                          <div key={index} style={{
-                            backgroundColor: '#dcfce7',
-                            color: '#166534',
+                  {(() => {
+                    const cityGroups = Object.entries(screenCities).reduce((acc, [screenName, city]) => {
+                      if (!acc.find(([_, c]) => c === city)) {
+                        acc.push([city, city]);
+                      }
+                      return acc;
+                    }, [] as [string, string][]);
+                    
+                    let totalBadges = 0;
+                    const maxBadges = 5;
+                    
+                    return cityGroups.map(([city, _]) => {
+                      const cityScreens = selectedScreens?.filter(screen => screenCities[screen] === city) || [];
+                      const cityBadge = 1; // Miesto badge'as
+                      const remainingSlots = maxBadges - totalBadges;
+                      
+                      if (remainingSlots <= 0) return null; // Neberodo, jei jau pasiekė limitą
+                      
+                      const screensToShow = Math.min(cityScreens.length, remainingSlots - cityBadge);
+                      const hasMoreScreens = cityScreens.length > screensToShow;
+                      
+                      totalBadges += cityBadge + screensToShow + (hasMoreScreens ? 1 : 0);
+                      
+                      return (
+                        <div key={city} style={{ display: 'flex', alignItems: 'center', gap: '8px', flexShrink: 0 }}>
+                          <div style={{
+                            backgroundColor: '#bfdbfe',
+                            color: '#1e3a8a',
                             padding: '4px 12px',
                             borderRadius: '20px',
                             fontSize: '12px',
                             fontWeight: '500',
-                            display: 'flex',
-                            alignItems: 'center',
-                            gap: '4px',
                             whiteSpace: 'nowrap',
                             flexShrink: 0
                           }}>
-                            {screen}
-                            <button
-                              onClick={() => handleSelectScreen(screen)}
-                              style={{
-                                color: '#16a34a',
-                                fontWeight: 'bold',
-                                fontSize: '14px',
-                                background: 'none',
-                                border: 'none',
-                                cursor: 'pointer',
-                                padding: '0',
-                                marginLeft: '4px'
-                              }}
-                              title="Išimti ekraną"
-                            >
-                              ×
-                            </button>
+                            {city}
                           </div>
-                        ))}
-                      {selectedScreens && selectedScreens.filter(screen => screenCities[screen] === city).length > 4 && (
-                        <div style={{
-                          backgroundColor: '#f3f4f6',
-                          color: '#6b7280',
-                          padding: '4px 12px',
-                          borderRadius: '20px',
-                          fontSize: '12px',
-                          fontWeight: '500',
-                          whiteSpace: 'nowrap',
-                          flexShrink: 0
-                        }}>
-                          +{selectedScreens.filter(screen => screenCities[screen] === city).length - 4}
+                          {cityScreens.slice(0, screensToShow).map((screen, index) => (
+                            <div key={index} style={{
+                              backgroundColor: '#dcfce7',
+                              color: '#166534',
+                              padding: '4px 12px',
+                              borderRadius: '20px',
+                              fontSize: '12px',
+                              fontWeight: '500',
+                              display: 'flex',
+                              alignItems: 'center',
+                              gap: '4px',
+                              whiteSpace: 'nowrap',
+                              flexShrink: 0
+                            }}>
+                              {screen}
+                              <button
+                                onClick={() => handleSelectScreen(screen)}
+                                style={{
+                                  color: '#16a34a',
+                                  fontWeight: 'bold',
+                                  fontSize: '14px',
+                                  background: 'none',
+                                  border: 'none',
+                                  cursor: 'pointer',
+                                  padding: '0',
+                                  marginLeft: '4px'
+                                }}
+                                title="Išimti ekraną"
+                              >
+                                ×
+                              </button>
+                            </div>
+                          ))}
+                          {hasMoreScreens && (
+                            <div style={{
+                              backgroundColor: '#f3f4f6',
+                              color: '#6b7280',
+                              padding: '4px 12px',
+                              borderRadius: '20px',
+                              fontSize: '12px',
+                              fontWeight: '500',
+                              whiteSpace: 'nowrap',
+                              flexShrink: 0
+                            }}>
+                              +{cityScreens.length - screensToShow}
+                            </div>
+                          )}
                         </div>
-                      )}
-                    </div>
-                  ))}
+                      );
+                    }).filter(Boolean);
+                  })()}
                 </>
               )}
               <button
