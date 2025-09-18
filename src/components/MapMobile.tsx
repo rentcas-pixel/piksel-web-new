@@ -577,6 +577,7 @@ export default function Map({ selectedCity, selectedScreens: propSelectedScreens
   return (
     <div style={{ 
       width: '100vw', 
+      maxWidth: '100vw',
       height: '100vh', 
       display: 'flex', 
       flexDirection: 'column',
@@ -584,8 +585,8 @@ export default function Map({ selectedCity, selectedScreens: propSelectedScreens
       position: 'fixed',
       top: 0,
       left: 0,
-      zIndex: 1000,
-      overflow: 'auto'
+      overflow: 'hidden',
+      zIndex: 1000
     }}>
       
       {/* Main Sidebar - Horizontal */}
