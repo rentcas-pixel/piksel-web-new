@@ -709,7 +709,7 @@ export default function AdminPanel() {
                 {uploading && <p className="text-sm text-blue-600 mt-1">Įkeliama...</p>}
                 {formData.image_url && (
                   <div className="mt-2">
-                    <img src={formData.image_url} alt="Desktop Preview" className="w-32 h-32 object-cover rounded-lg border" />
+                    <img src={formData.image_url} alt="LED reklamos ekrano desktop peržiūra - reklama ekranuose" className="w-32 h-32 object-cover rounded-lg border" />
                     <p className="text-sm text-green-600 mt-1">Desktop nuotrauka paruošta!</p>
                   </div>
                 )}
@@ -731,7 +731,7 @@ export default function AdminPanel() {
                 {uploading && <p className="text-sm text-blue-600 mt-1">Įkeliama...</p>}
                 {formData.mobile_image_url && (
                   <div className="mt-2">
-                    <img src={formData.mobile_image_url} alt="Mobile Preview" className="w-32 h-32 object-cover rounded-lg border" />
+                    <img src={formData.mobile_image_url} alt="LED reklamos ekrano mobile peržiūra - reklama ekranuose" className="w-32 h-32 object-cover rounded-lg border" />
                     <p className="text-sm text-green-600 mt-1">Mobile nuotrauka paruošta!</p>
                   </div>
                 )}
@@ -899,7 +899,7 @@ export default function AdminPanel() {
                       />
                       {formData.side_a_image_url && (
                         <div className="mt-2">
-                          <img src={formData.side_a_image_url} alt="Side A Preview" className="w-32 h-32 object-cover rounded-lg border" />
+                          <img src={formData.side_a_image_url} alt="LED reklamos ekrano A pusės peržiūra - reklama ekranuose" className="w-32 h-32 object-cover rounded-lg border" />
                         </div>
                       )}
                     </div>
@@ -919,7 +919,7 @@ export default function AdminPanel() {
                       />
                       {formData.side_b_image_url && (
                         <div className="mt-2">
-                          <img src={formData.side_b_image_url} alt="Side B Preview" className="w-32 h-32 object-cover rounded-lg border" />
+                          <img src={formData.side_b_image_url} alt="LED reklamos ekrano B pusės peržiūra - reklama ekranuose" className="w-32 h-32 object-cover rounded-lg border" />
                         </div>
                       )}
                     </div>

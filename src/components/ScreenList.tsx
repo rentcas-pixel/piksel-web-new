@@ -86,7 +86,7 @@ export default function ScreenList({ selectedCity, selectedScreens, onSelectScre
                   <div className="relative mb-3">
                     <Image
                       src={screen.image_url}
-                      alt={screen.name}
+                      alt={`LED reklamos ekranas ${screen.name} - ${screen.city} mieste, reklama ekranuose, lauko reklama, led reklama`}
                       width={300}
                       height={150}
                       className="w-full h-32 object-cover rounded-md cursor-pointer hover:opacity-90 transition-opacity"

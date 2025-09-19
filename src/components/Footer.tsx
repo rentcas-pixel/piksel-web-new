@@ -11,7 +11,7 @@ export default function Footer() {
             <div className="flex items-center mb-4">
               <Image
                 src="/Piksel-logo-black-2023.png"
-                alt="PIKSEL Logo"
+                alt="Piksel - LED reklamos ekranai Lietuvoje, reklama ekranuose, lauko reklama, led reklama"
                 width={120}
                 height={40}
                 className="h-8 w-auto brightness-0 invert"

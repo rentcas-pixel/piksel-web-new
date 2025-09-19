@@ -10,17 +10,17 @@ export default function Slideshow() {
     {
       id: 1,
       image: "/sliede-1.jpeg",
-      alt: "LED ekranas Vilniaus centre"
+      alt: "LED ekranas Vilniaus centre - modernus didžiulis reklamos ekranas su aukšta spalvų tikslumu ir ryškumu"
     },
     {
       id: 2,
       image: "/sliede-2.jpeg",
-      alt: "LED ekranas su reklama"
+      alt: "LED reklamos ekranas su dinamiška reklama - profesionalus sprendimas prekės ženklų ir kampanijų demonstravimui"
     },
     {
       id: 3,
       image: "/sliede-3.jpeg",
-      alt: "LED ekranų valdymo sistema"
+      alt: "LED ekranų valdymo sistema - profesionalus sprendimas reklamos turinio valdymui ir platinimui visoje Lietuvoje"
     }
   ];
 

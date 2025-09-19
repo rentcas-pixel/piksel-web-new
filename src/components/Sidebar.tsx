@@ -105,7 +105,7 @@ export default function Sidebar({ onCityFilter, selectedCity, onSearchResults }:
           <div>
             <Image
               src="/Piksel-logo-black-2023.png"
-              alt="Piksel Logo"
+              alt="Piksel - LED reklamos ekranai Lietuvoje, reklama ekranuose, lauko reklama, led reklama"
               width={120}
               height={40}
               className="h-[22px] w-auto"

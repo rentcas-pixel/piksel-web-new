@@ -1,0 +1,3 @@
+User-agent: *
+Allow: /
+Sitemap: https://nextjs-table-app-stable.vercel.app/sitemap.xml

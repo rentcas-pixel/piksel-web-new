@@ -61,7 +61,7 @@ export default function KlipaiMobile() {
             <Link href="/" style={{ textDecoration: 'none' }}>
               <img 
                 src="/Piksel-logo-black-2023.png" 
-                alt="Piksel Logo" 
+                alt="Piksel - LED reklamos ekranai Lietuvoje, reklama ekranuose, lauko reklama, led reklama" 
                 style={{ height: '22px', width: 'auto' }}
               />
             </Link>
@@ -318,7 +318,7 @@ export default function KlipaiMobile() {
             <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '24px' }}>
               <img 
                 src="/Piksel-logo-black-2023.png" 
-                alt="Piksel Logo" 
+                alt="Piksel - LED reklamos ekranai Lietuvoje, reklama ekranuose, lauko reklama, led reklama" 
                 style={{ height: '22px', width: 'auto' }}
               />
               <button
@@ -457,7 +457,7 @@ export default function KlipaiMobile() {
             <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '20px' }}>
               <img 
                 src="/Piksel-logo-black-2023.png" 
-                alt="Piksel Logo" 
+                alt="Piksel - LED reklamos ekranai Lietuvoje, reklama ekranuose, lauko reklama, led reklama" 
                 style={{ height: '22px', width: 'auto' }}
               />
               <button

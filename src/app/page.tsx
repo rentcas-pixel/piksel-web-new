@@ -414,7 +414,7 @@ export default function Home() {
                   <div className="flex items-center gap-2">
                     <img 
                       src="/Piksel-logo-black-2023.png" 
-                      alt="Piksel" 
+                      alt="Piksel - LED reklamos ekranai Lietuvoje, reklama ekranuose, lauko reklama, led reklama" 
                       className="h-6"
                     />
                   </div>

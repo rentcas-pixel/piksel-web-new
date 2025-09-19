@@ -84,7 +84,7 @@ export default function ScreenPage() {
           <div className="relative overflow-hidden">
             <Image
               src={screen.image}
-              alt={screen.name}
+              alt={`LED reklamos ekranas ${screen.name} - ${screen.city} mieste, reklama ekranuose, lauko reklama, led reklama`}
               width={1920}
               height={1080}
               className="w-full h-[70vh] object-contain bg-gray-100 aspect-video"

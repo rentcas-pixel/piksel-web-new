@@ -268,7 +268,7 @@ export default function Map({ selectedCity, selectedScreens, screenCities, selec
               <div style="font-family: ui-sans-serif, system-ui, -apple-system, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, 'Noto Sans', sans-serif; width: 780px; height: 468px; border-radius: 0; overflow: visible; background: transparent; display: flex; gap: -8px; position: relative;">
                 <!-- Photo -->
                 <div style="width: 468px; height: 468px; position: relative; background: #ddd; border-radius: 9px 0 0 9px !important; overflow: hidden;">
-                  <img src="${screen.image_url}" alt="${screen.name} - Šiaurė"
+                  <img src="${screen.image_url}" alt="LED reklamos ekranas ${screen.name} šiaurės pusė - ${screen.city} mieste, ${screen.address}, reklama ekranuose, lauko reklama, led reklama"
                        style="width: 468px; height: 468px; object-fit: cover;"/>
                   
                   <!-- Expand Photo Button -->
@@ -353,7 +353,7 @@ export default function Map({ selectedCity, selectedScreens, screenCities, selec
               <div style="font-family: ui-sans-serif, system-ui, -apple-system, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, 'Noto Sans', sans-serif; width: 780px; height: 468px; border-radius: 0; overflow: visible; background: transparent; display: flex; gap: -8px; position: relative;">
                 <!-- Photo -->
                 <div style="width: 468px; height: 468px; position: relative; background: #ddd; border-radius: 9px 0 0 9px !important; overflow: hidden;">
-                  <img src="${screen.image_url}" alt="${screen.name} - Pietūs"
+                  <img src="${screen.image_url}" alt="LED reklamos ekranas ${screen.name} pietų pusė - ${screen.city} mieste, ${screen.address}, reklama ekranuose, lauko reklama, led reklama"
                        style="width: 468px; height: 468px; object-fit: cover;"/>
                   
                   <!-- Expand Photo Button -->
@@ -469,7 +469,7 @@ export default function Map({ selectedCity, selectedScreens, screenCities, selec
               <div style="font-family: ui-sans-serif, system-ui, -apple-system, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, 'Noto Sans', sans-serif; width: 780px; height: 468px; border-radius: 0; overflow: visible; background: transparent; display: flex; gap: -8px; position: relative;">
                 <!-- Photo -->
                 <div style="width: 468px; height: 468px; position: relative; background: #ddd; border-radius: 9px 0 0 9px !important; overflow: hidden;">
-                  <img src="${screen.image_url}" alt="${screen.name}"
+                  <img src="${screen.image_url}" alt="LED reklamos ekranas ${screen.name} - ${screen.city} mieste, ${screen.address}, reklama ekranuose, lauko reklama, led reklama"
                        style="width: 468px; height: 468px; object-fit: cover;"/>
                   
                   <!-- Expand Photo Button -->
@@ -1034,7 +1034,7 @@ export default function Map({ selectedCity, selectedScreens, screenCities, selec
       <div style="font-family: ui-sans-serif, system-ui, -apple-system, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, 'Noto Sans', sans-serif; width: 320px; max-width: 90vw; background: white; border-radius: 12px; overflow: hidden; box-shadow: 0 10px 25px rgba(0,0,0,0.15);">
         <!-- Photo -->
         <div style="width: 100%; height: 200px; position: relative; background: #ddd; overflow: hidden;">
-          <img src="${screen.image_url}" alt="${fullName}"
+          <img src="${screen.image_url}" alt="LED reklamos ekranas ${screen.name} - ${screen.city} mieste, reklama ekranuose, lauko reklama, led reklama"
                style="width: 100%; height: 100%; object-fit: cover;"/>
           
           ${screen.is_viaduct ? `
