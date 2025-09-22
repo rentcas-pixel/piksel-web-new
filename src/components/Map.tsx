@@ -327,7 +327,7 @@ export default function Map({ selectedCity, selectedScreens, screenCities, selec
                     </div>
                     <div style="display: flex; justify-content: space-between; align-items: center; padding: 14px 0; font-size: 16px;">
                       <span style="color: #6b7280;">Kaina</span>
-                      <span style="font-weight: 500; color: #111827;">${screen.price ? `${screen.price} EUR` : '70 EUR'}</span>
+                      <span style="font-weight: 500; color: #111827;">-</span>
                     </div>
                   </div>
                   
@@ -412,7 +412,7 @@ export default function Map({ selectedCity, selectedScreens, screenCities, selec
                     </div>
                     <div style="display: flex; justify-content: space-between; align-items: center; padding: 14px 0; font-size: 16px;">
                       <span style="color: #6b7280;">Kaina</span>
-                      <span style="font-weight: 500; color: #111827;">${screen.price ? `${screen.price} EUR` : '70 EUR'}</span>
+                      <span style="font-weight: 500; color: #111827;">-</span>
                     </div>
                   </div>
                   
@@ -528,7 +528,7 @@ export default function Map({ selectedCity, selectedScreens, screenCities, selec
                     </div>
                     <div style="display: flex; justify-content: space-between; align-items: center; padding: 14px 0; font-size: 16px;">
                       <span style="color: #6b7280;">Kaina</span>
-                      <span style="font-weight: 500; color: #111827;">${screen.price ? `${screen.price} EUR` : '70 EUR'}</span>
+                      <span style="font-weight: 500; color: #111827;">-</span>
                     </div>
                   </div>
                   
@@ -1128,9 +1128,9 @@ export default function Map({ selectedCity, selectedScreens, screenCities, selec
     <div className="w-full h-screen relative">
       {/* Filter Bar */}
       {(selectedCity || (selectedScreens && selectedScreens.length > 0)) && (
-        <div className="absolute top-4 left-[66px] z-[1000] bg-white rounded-lg shadow-lg border border-gray-200 px-4 py-3 flex flex-col gap-3 max-w-md">
+        <div className="absolute top-4 left-[66px] z-[1000] bg-white rounded-lg shadow-lg border border-gray-200 px-4 py-3 flex flex-col gap-3" style={{ maxWidth: '560px' }}>
           <div className="flex items-center gap-3 overflow-x-auto overflow-y-hidden max-h-12">
-            <div className="text-sm font-medium text-gray-700">Pasirinkite:</div>
+            <div className="text-sm font-medium text-gray-700">Filtruoti:</div>
             {screenCities && Object.keys(screenCities).length > 0 && (
               <>
                 {(() => {
@@ -1142,25 +1142,18 @@ export default function Map({ selectedCity, selectedScreens, screenCities, selec
                     return acc;
                   }, [] as [string, string][]);
                   
-                  const maxBadges = 4; // Max 4 badge'ai
-                  
                   for (const [city, _] of cityGroups) {
-                    if (allBadges.length >= maxBadges) break;
-                    
                     const cityScreens = selectedScreens?.filter(screen => screenCities[screen] === city) || [];
                     
                     // Miesto badge'as
-                    if (allBadges.length < maxBadges) {
-                      allBadges.push(
-                        <div key={`city-${city}`} className="bg-blue-100 text-blue-800 px-3 py-1 rounded-full text-sm font-medium whitespace-nowrap">
-                          {city}
-                        </div>
-                      );
-                    }
+                    allBadges.push(
+                      <div key={`city-${city}`} className="bg-blue-100 text-blue-800 px-3 py-1 rounded-full text-sm font-medium whitespace-nowrap">
+                        {city}
+                      </div>
+                    );
                     
-                    // Ekranų badge'ai
-                    for (let i = 0; i < cityScreens.length && allBadges.length < maxBadges; i++) {
-                      const screen = cityScreens[i];
+                    // Visi ekranų badge'ai
+                    for (const screen of cityScreens) {
                       allBadges.push(
                         <div key={`screen-${screen}`} className="bg-green-100 text-green-800 px-3 py-1 rounded-full text-sm font-medium flex items-center gap-2 whitespace-nowrap">
                           {screen}
@@ -1174,16 +1167,6 @@ export default function Map({ selectedCity, selectedScreens, screenCities, selec
                         </div>
                       );
                     }
-                  }
-                  
-                  // Pridėti "+X" badge'ą, jei yra daugiau ekranų
-                  const totalScreens = selectedScreens?.length || 0;
-                  if (totalScreens > maxBadges) {
-                    allBadges.push(
-                      <div key="more-badge" className="bg-gray-100 text-gray-600 px-3 py-1 rounded-full text-sm font-medium whitespace-nowrap">
-                        +{totalScreens - maxBadges}
-                      </div>
-                    );
                   }
                   
                   return allBadges;

@@ -165,7 +165,7 @@ export default function Map({ selectedCity, selectedScreens: propSelectedScreens
             </div>
             <div style="display: flex; justify-content: space-between; align-items: center; padding: 8px 0; font-size: 14px;">
               <span style="color: #6b7280;">Kaina</span>
-              <span style="font-weight: 500; color: #111827;">${screen.price ? `${screen.price} EUR` : '70 EUR'}</span>
+              <span style="font-weight: 500; color: #111827;">-</span>
             </div>
           </div>
           
@@ -244,7 +244,7 @@ export default function Map({ selectedCity, selectedScreens: propSelectedScreens
             </div>
             <div style="display: flex; justify-content: space-between; align-items: center; padding: 12px 0; font-size: 16px;">
               <span style="color: #6b7280;">Kaina</span>
-              <span style="font-weight: 500; color: #111827;">${screen.price ? `${screen.price} EUR` : '70 EUR'}</span>
+              <span style="font-weight: 500; color: #111827;">-</span>
             </div>
           </div>
           
