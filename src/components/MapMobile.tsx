@@ -56,14 +56,42 @@ export default function Map({ selectedCity, selectedScreens: propSelectedScreens
       setTimeout(() => {
         const submitButton = document.getElementById('submit-inquiry-button');
         if (submitButton) {
+          // Scroll to bottom to ensure submit button is visible above keyboard
           submitButton.scrollIntoView({ 
             behavior: 'smooth', 
-            block: 'center' 
+            block: 'end' 
           });
         }
       }, 300); // Small delay to ensure form is rendered
     }
   }, [showInquiryForm, toDate]);
+
+  // Auto-scroll to submit button when any input is focused (keyboard opens)
+  useEffect(() => {
+    const handleInputFocus = () => {
+      setTimeout(() => {
+        const submitButton = document.getElementById('submit-inquiry-button');
+        if (submitButton && showInquiryForm) {
+          submitButton.scrollIntoView({ 
+            behavior: 'smooth', 
+            block: 'end' 
+          });
+        }
+      }, 500); // Delay to account for keyboard animation
+    };
+
+    // Add event listeners to all input fields
+    const inputs = document.querySelectorAll('input, textarea');
+    inputs.forEach(input => {
+      input.addEventListener('focus', handleInputFocus);
+    });
+
+    return () => {
+      inputs.forEach(input => {
+        input.removeEventListener('focus', handleInputFocus);
+      });
+    };
+  }, [showInquiryForm]);
   
   // Handle inquiry submission
   const handleSubmitInquiry = async () => {
@@ -1290,13 +1318,15 @@ export default function Map({ selectedCity, selectedScreens: propSelectedScreens
                 style={{
                   backgroundColor: submittingInquiry ? '#9ca3af' : '#2563eb',
                   color: 'white',
-                  padding: '10px 16px',
+                  padding: '12px 16px',
                   borderRadius: '6px',
                   fontSize: '14px',
                   fontWeight: '500',
                   border: 'none',
                   cursor: submittingInquiry ? 'not-allowed' : 'pointer',
-                  marginTop: '8px'
+                  marginTop: '12px',
+                  marginBottom: '20px',
+                  minHeight: '44px' // Minimum touch target size for mobile
                 }}
               >
                 {submittingInquiry ? 'Siunčiama...' : 'Siųsti užklausą'}
