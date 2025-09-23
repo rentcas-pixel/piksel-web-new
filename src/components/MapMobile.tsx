@@ -5,6 +5,7 @@ import Link from 'next/link';
 import { LEDScreen } from '@/lib/supabase';
 import { useLEDScreens } from '@/hooks/useLEDScreens';
 import ResponsiveImage from './ResponsiveImage';
+import { sendInquiryEmail, initEmailJS } from '@/lib/emailjs';
 
 interface MapProps {
   selectedCity: string;
@@ -44,6 +45,11 @@ export default function Map({ selectedCity, selectedScreens: propSelectedScreens
   // Check if mobile
   const [isMobile, setIsMobile] = useState(false);
   
+  // Initialize EmailJS
+  useEffect(() => {
+    initEmailJS();
+  }, []);
+  
   // Handle inquiry submission
   const handleSubmitInquiry = async () => {
     if (!inquiryForm.companyName || !inquiryForm.contactPerson || !inquiryForm.email || !inquiryForm.phone) {
@@ -79,27 +85,21 @@ export default function Map({ selectedCity, selectedScreens: propSelectedScreens
       });
 
       if (response.ok) {
-        // Send email notification
-        await fetch('/api/send-email', {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json',
-          },
-          body: JSON.stringify({
-            to: 'info@piksel.lt', // Your email
-            subject: 'Nauja užklausa iš svetainės',
-            html: `
-              <h2>Nauja užklausa</h2>
-              <p><strong>Įmonė:</strong> ${inquiryForm.companyName}</p>
-              <p><strong>Kontaktinis asmuo:</strong> ${inquiryForm.contactPerson}</p>
-              <p><strong>El. paštas:</strong> ${inquiryForm.email}</p>
-              <p><strong>Telefonas:</strong> ${inquiryForm.phone}</p>
-              <p><strong>Pasirinkti ekranai:</strong> ${selectedScreens.join(', ')}</p>
-              <p><strong>Datos:</strong> ${fromDate} - ${toDate}</p>
-              <p><strong>Žinutė:</strong> ${inquiryForm.message}</p>
-            `
-          }),
+        // Send email notification using EmailJS (same as desktop)
+        const emailResult = await sendInquiryEmail({
+          selectedScreens: selectedScreens,
+          screenCities: screenCities,
+          companyName: inquiryForm.companyName,
+          contactPerson: inquiryForm.contactPerson,
+          email: inquiryForm.email,
+          phone: inquiryForm.phone,
+          message: inquiryForm.message,
+          dateRange: `${fromDate} - ${toDate}`
         });
+        
+        if (!emailResult.success) {
+          console.error('Email send failed:', emailResult.error);
+        }
 
         // Show success message
         setShowSuccessMessage(true);
