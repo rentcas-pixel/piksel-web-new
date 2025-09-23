@@ -204,16 +204,19 @@ export default function Home() {
     console.log('handleShowPopup - Looking for screenId:', screenId);
     console.log('handleShowPopup - Found screen:', screen?.name);
     console.log('handleShowPopup - Screen city:', screen?.city, 'Selected city:', selectedCity);
+    console.log('handleShowPopup - City comparison:', screen?.city, '!==', selectedCity, '=', screen?.city !== selectedCity);
     
     if (screen) {
+      console.log('✅ Screen found, checking city...');
       // If screen is in a different city, change to that city first
       if (screen.city !== selectedCity) {
-        console.log('Screen is in different city, changing from', selectedCity, 'to', screen.city);
+        console.log('🔄 Screen is in different city, changing from', selectedCity, 'to', screen.city);
         setSelectedCity(screen.city);
         setPendingPopupScreen(screenId); // Set pending popup to open after city change
+        console.log('✅ City changed and pending popup set');
       } else {
         // Screen is in current city, open popup immediately
-        console.log('Screen is in current city, opening popup immediately');
+        console.log('📍 Screen is in current city, opening popup immediately');
         openPopupForScreen(screenId, screen);
       }
     } else {
