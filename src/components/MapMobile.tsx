@@ -1090,67 +1090,62 @@ export default function Map({ selectedCity, selectedScreens: propSelectedScreens
               <div style={{ paddingTop: '8px', borderTop: '1px solid #f3f4f6' }}>
                 <div style={{ fontSize: '14px', fontWeight: '500', color: '#374151', marginBottom: '8px' }}>Periodas:</div>
                 <div style={{ display: 'flex', alignItems: 'center', gap: '8px', flexWrap: 'wrap' }}>
-                  <input
-                    key="mobile-from-date"
-                    type="date"
-                    value={fromDate}
-                    placeholder="Nuo"
-                    onChange={(e) => {
-                      const newFromDate = e.target.value;
-                      console.log('Mobile From date changed:', newFromDate);
-                      setFromDate(newFromDate);
-                      if (onDateRangeChange) {
-                        onDateRangeChange(newFromDate, toDate);
-                      }
-                    }}
-                    style={{
-                      flex: 1,
-                      minWidth: '120px',
-                      padding: '8px 12px',
-                      border: '1px solid #d1d5db',
-                      borderRadius: '6px',
-                      fontSize: '14px',
-                      outline: 'none',
-                      color: '#111827 !important',
-                      backgroundColor: '#f7f4f0',
-                      '::placeholder': {
-                        color: '#6b7280 !important'
-                      }
-                    }}
-                  />
-                  <span style={{ color: '#6b7280', fontSize: '12px', flexShrink: 0 }}>iki</span>
-                  <input
-                    key="mobile-to-date"
-                    type="date"
-                    value={toDate}
-                    placeholder="Iki"
-                    onChange={(e) => {
-                      const newToDate = e.target.value;
-                      console.log('Mobile To date changed:', newToDate);
-                      setToDate(newToDate);
-                      if (onDateRangeChange) {
-                        onDateRangeChange(fromDate, newToDate);
-                      }
-                      if (newToDate) {
-                        setShowInquiryForm(true);
-                      }
-                    }}
-                    min={fromDate || undefined}
-                    style={{
-                      flex: 1,
-                      minWidth: '120px',
-                      padding: '8px 12px',
-                      border: '1px solid #d1d5db',
-                      borderRadius: '6px',
-                      fontSize: '14px',
-                      outline: 'none',
-                      color: '#111827 !important',
-                      backgroundColor: '#f7f4f0',
-                      '::placeholder': {
-                        color: '#6b7280 !important'
-                      }
-                    }}
-                  />
+                  <div style={{ flex: 1, minWidth: '120px' }}>
+                    <div style={{ fontSize: '12px', color: '#6b7280', marginBottom: '4px' }}>Nuo:</div>
+                    <input
+                      key="mobile-from-date"
+                      type="date"
+                      value={fromDate}
+                      onChange={(e) => {
+                        const newFromDate = e.target.value;
+                        console.log('Mobile From date changed:', newFromDate);
+                        setFromDate(newFromDate);
+                        if (onDateRangeChange) {
+                          onDateRangeChange(newFromDate, toDate);
+                        }
+                      }}
+                      style={{
+                        width: '100%',
+                        padding: '8px 12px',
+                        border: '1px solid #d1d5db',
+                        borderRadius: '6px',
+                        fontSize: '14px',
+                        outline: 'none',
+                        color: '#111827 !important',
+                        backgroundColor: '#f7f4f0'
+                      }}
+                    />
+                  </div>
+                  <div style={{ flex: 1, minWidth: '120px' }}>
+                    <div style={{ fontSize: '12px', color: '#6b7280', marginBottom: '4px' }}>Iki:</div>
+                    <input
+                      key="mobile-to-date"
+                      type="date"
+                      value={toDate}
+                      onChange={(e) => {
+                        const newToDate = e.target.value;
+                        console.log('Mobile To date changed:', newToDate);
+                        setToDate(newToDate);
+                        if (onDateRangeChange) {
+                          onDateRangeChange(fromDate, newToDate);
+                        }
+                        if (newToDate) {
+                          setShowInquiryForm(true);
+                        }
+                      }}
+                      min={fromDate || undefined}
+                      style={{
+                        width: '100%',
+                        padding: '8px 12px',
+                        border: '1px solid #d1d5db',
+                        borderRadius: '6px',
+                        fontSize: '14px',
+                        outline: 'none',
+                        color: '#111827 !important',
+                        backgroundColor: '#f7f4f0'
+                      }}
+                    />
+                  </div>
                 </div>
               </div>
             )}
