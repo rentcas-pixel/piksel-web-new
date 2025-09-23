@@ -1110,7 +1110,7 @@ export default function Map({ selectedCity, selectedScreens: propSelectedScreens
                       borderRadius: '6px',
                       fontSize: '14px',
                       outline: 'none',
-                      color: '#111827',
+                      color: '#111827 !important',
                       backgroundColor: '#f7f4f0'
                     }}
                   />
@@ -1139,7 +1139,7 @@ export default function Map({ selectedCity, selectedScreens: propSelectedScreens
                       borderRadius: '6px',
                       fontSize: '14px',
                       outline: 'none',
-                      color: '#111827',
+                      color: '#111827 !important',
                       backgroundColor: '#f7f4f0'
                     }}
                   />
