@@ -30,8 +30,101 @@ export default function Map({ selectedCity, selectedScreens: propSelectedScreens
   const [showContactPopup, setShowContactPopup] = useState(false);
   const [showHamburgerMenu, setShowHamburgerMenu] = useState(false);
   
+  // Inquiry form state
+  const [inquiryForm, setInquiryForm] = useState({
+    companyName: '',
+    contactPerson: '',
+    email: '',
+    phone: '',
+    message: ''
+  });
+  const [submittingInquiry, setSubmittingInquiry] = useState(false);
+  const [showSuccessMessage, setShowSuccessMessage] = useState(false);
+  
   // Check if mobile
   const [isMobile, setIsMobile] = useState(false);
+  
+  // Handle inquiry submission
+  const handleSubmitInquiry = async () => {
+    if (!inquiryForm.companyName || !inquiryForm.contactPerson || !inquiryForm.email || !inquiryForm.phone) {
+      alert('Prašome užpildyti visus privalomus laukus');
+      return;
+    }
+
+    // Email validation
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    if (!emailRegex.test(inquiryForm.email)) {
+      alert('Prašome įvesti teisingą el. pašto adresą');
+      return;
+    }
+
+    setSubmittingInquiry(true);
+    
+    try {
+      const response = await fetch('/api/inquiries', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          selectedScreens,
+          screenCities,
+          companyName: inquiryForm.companyName,
+          contactPerson: inquiryForm.contactPerson,
+          email: inquiryForm.email,
+          phone: inquiryForm.phone,
+          message: inquiryForm.message,
+          dateRange: `${fromDate} - ${toDate}`
+        }),
+      });
+
+      if (response.ok) {
+        // Send email notification
+        await fetch('/api/send-email', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({
+            to: 'info@piksel.lt', // Your email
+            subject: 'Nauja užklausa iš svetainės',
+            html: `
+              <h2>Nauja užklausa</h2>
+              <p><strong>Įmonė:</strong> ${inquiryForm.companyName}</p>
+              <p><strong>Kontaktinis asmuo:</strong> ${inquiryForm.contactPerson}</p>
+              <p><strong>El. paštas:</strong> ${inquiryForm.email}</p>
+              <p><strong>Telefonas:</strong> ${inquiryForm.phone}</p>
+              <p><strong>Pasirinkti ekranai:</strong> ${selectedScreens.join(', ')}</p>
+              <p><strong>Datos:</strong> ${fromDate} - ${toDate}</p>
+              <p><strong>Žinutė:</strong> ${inquiryForm.message}</p>
+            `
+          }),
+        });
+
+        // Show success message
+        setShowSuccessMessage(true);
+        setTimeout(() => {
+          setShowSuccessMessage(false);
+        }, 5000);
+        
+        // Reset form
+        setInquiryForm({
+          companyName: '',
+          contactPerson: '',
+          email: '',
+          phone: '',
+          message: ''
+        });
+      } else {
+        alert('Klaida siunčiant užklausą. Bandykite dar kartą.');
+      }
+    } catch (error) {
+      console.error('Error submitting inquiry:', error);
+      alert('Klaida siunčiant užklausą. Bandykite dar kartą.');
+    } finally {
+      setSubmittingInquiry(false);
+    }
+  };
   
   // Handle screen selection
   const handleSelectScreen = (screenName: string) => {
@@ -1067,65 +1160,106 @@ export default function Map({ selectedCity, selectedScreens: propSelectedScreens
             <h3 style={{ fontSize: '16px', fontWeight: '600', color: '#111827', marginBottom: '12px' }}>
               Užklausos forma
             </h3>
+            {showSuccessMessage && (
+              <div style={{
+                backgroundColor: '#d1fae5',
+                color: '#065f46',
+                padding: '12px',
+                borderRadius: '6px',
+                fontSize: '14px',
+                marginBottom: '12px'
+              }}>
+                ✓ Užklausa sėkmingai išsiųsta! Susisieksime su jumis artimiausiu metu.
+              </div>
+            )}
+            
             <div style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
               <input
                 type="text"
-                placeholder="Jūsų vardas"
-                style={{
-                  padding: '8px 12px',
-                  border: '1px solid #d1d5db',
-                  borderRadius: '6px',
-                  fontSize: '14px',
-                  outline: 'none'
-                }}
-              />
-              <input
-                type="email"
-                placeholder="El. paštas"
-                style={{
-                  padding: '8px 12px',
-                  border: '1px solid #d1d5db',
-                  borderRadius: '6px',
-                  fontSize: '14px',
-                  outline: 'none'
-                }}
-              />
-              <input
-                type="tel"
-                placeholder="Telefono numeris"
-                style={{
-                  padding: '8px 12px',
-                  border: '1px solid #d1d5db',
-                  borderRadius: '6px',
-                  fontSize: '14px',
-                  outline: 'none'
-                }}
-              />
-              <textarea
-                placeholder="Papildoma informacija"
-                rows={3}
+                placeholder="Įmonės pavadinimas *"
+                value={inquiryForm.companyName}
+                onChange={(e) => setInquiryForm(prev => ({ ...prev, companyName: e.target.value }))}
                 style={{
                   padding: '8px 12px',
                   border: '1px solid #d1d5db',
                   borderRadius: '6px',
                   fontSize: '14px',
                   outline: 'none',
-                  resize: 'vertical'
+                  color: '#111827 !important'
+                }}
+              />
+              <input
+                type="text"
+                placeholder="Kontaktinis asmuo *"
+                value={inquiryForm.contactPerson}
+                onChange={(e) => setInquiryForm(prev => ({ ...prev, contactPerson: e.target.value }))}
+                style={{
+                  padding: '8px 12px',
+                  border: '1px solid #d1d5db',
+                  borderRadius: '6px',
+                  fontSize: '14px',
+                  outline: 'none',
+                  color: '#111827 !important'
+                }}
+              />
+              <input
+                type="email"
+                placeholder="El. paštas *"
+                value={inquiryForm.email}
+                onChange={(e) => setInquiryForm(prev => ({ ...prev, email: e.target.value }))}
+                style={{
+                  padding: '8px 12px',
+                  border: '1px solid #d1d5db',
+                  borderRadius: '6px',
+                  fontSize: '14px',
+                  outline: 'none',
+                  color: '#111827 !important'
+                }}
+              />
+              <input
+                type="tel"
+                placeholder="Telefono numeris *"
+                value={inquiryForm.phone}
+                onChange={(e) => setInquiryForm(prev => ({ ...prev, phone: e.target.value }))}
+                style={{
+                  padding: '8px 12px',
+                  border: '1px solid #d1d5db',
+                  borderRadius: '6px',
+                  fontSize: '14px',
+                  outline: 'none',
+                  color: '#111827 !important'
+                }}
+              />
+              <textarea
+                placeholder="Papildoma informacija"
+                rows={3}
+                value={inquiryForm.message}
+                onChange={(e) => setInquiryForm(prev => ({ ...prev, message: e.target.value }))}
+                style={{
+                  padding: '8px 12px',
+                  border: '1px solid #d1d5db',
+                  borderRadius: '6px',
+                  fontSize: '14px',
+                  outline: 'none',
+                  resize: 'vertical',
+                  color: '#111827 !important'
                 }}
               />
               <button
+                onClick={handleSubmitInquiry}
+                disabled={submittingInquiry}
                 style={{
-                  backgroundColor: '#2563eb',
+                  backgroundColor: submittingInquiry ? '#9ca3af' : '#2563eb',
                   color: 'white',
                   padding: '10px 16px',
                   borderRadius: '6px',
                   fontSize: '14px',
                   fontWeight: '500',
                   border: 'none',
-                  cursor: 'pointer'
+                  cursor: submittingInquiry ? 'not-allowed' : 'pointer'
                 }}
               >
-                Siųsti užklausą
+                {submittingInquiry ? 'Siunčiama...' : 'Siųsti užklausą'}
               </button>
             </div>
           </div>
