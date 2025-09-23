@@ -968,7 +968,7 @@ export default function Map({ selectedCity, selectedScreens: propSelectedScreens
               {screenCities && Object.keys(screenCities).length > 0 && (
                 <>
                   {(() => {
-                    const allBadges: JSX.Element[] = [];
+                    const allBadges: React.ReactElement[] = [];
                     const cityGroups = Object.entries(screenCities).reduce((acc, [screenName, city]) => {
                       if (!acc.find(([_, c]) => c === city)) {
                         acc.push([city, city]);
