@@ -101,11 +101,13 @@ export default function Map({ selectedCity, selectedScreens: propSelectedScreens
           console.error('Email send failed:', emailResult.error);
         }
 
-        // Show success message
+        // Show success message and clear filters
         setShowSuccessMessage(true);
-        setTimeout(() => {
-          setShowSuccessMessage(false);
-        }, 5000);
+        setSelectedScreens([]);
+        setScreenCities({});
+        setFromDate('');
+        setToDate('');
+        setShowInquiryForm(false);
         
         // Reset form
         setInquiryForm({
@@ -1170,9 +1172,26 @@ export default function Map({ selectedCity, selectedScreens: propSelectedScreens
                 padding: '12px',
                 borderRadius: '6px',
                 fontSize: '14px',
-                marginBottom: '12px'
+                marginBottom: '12px',
+                display: 'flex',
+                justifyContent: 'space-between',
+                alignItems: 'center'
               }}>
-                ✓ Užklausa sėkmingai išsiųsta! Susisieksime su jumis artimiausiu metu.
+                <span>✓ Užklausa sėkmingai išsiųsta! Susisieksime su jumis artimiausiu metu.</span>
+                <button
+                  onClick={() => setShowSuccessMessage(false)}
+                  style={{
+                    background: 'none',
+                    border: 'none',
+                    color: '#065f46',
+                    fontSize: '16px',
+                    cursor: 'pointer',
+                    padding: '0',
+                    marginLeft: '8px'
+                  }}
+                >
+                  ×
+                </button>
               </div>
             )}
             
