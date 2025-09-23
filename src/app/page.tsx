@@ -17,6 +17,7 @@ export default function Home() {
   const [showInquiryForm, setShowInquiryForm] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
   const [searchResults, setSearchResults] = useState<any[]>([]);
+  const [pendingPopupScreen, setPendingPopupScreen] = useState<string | null>(null);
   
   // Inquiry form state
   const [inquiryForm, setInquiryForm] = useState({
@@ -36,6 +37,20 @@ export default function Home() {
   useEffect(() => {
     initEmailJS();
   }, []);
+
+  // Handle pending popup after city change
+  useEffect(() => {
+    if (pendingPopupScreen && ledScreens.length > 0) {
+      const screen = ledScreens.find(s => s.id === pendingPopupScreen);
+      if (screen && screen.city === selectedCity) {
+        console.log('Opening pending popup for screen:', screen.name);
+        setTimeout(() => {
+          openPopupForScreen(pendingPopupScreen, screen);
+          setPendingPopupScreen(null);
+        }, 500); // Short delay to ensure map is updated
+      }
+    }
+  }, [selectedCity, pendingPopupScreen, ledScreens]);
 
   // Hash routing - handle URLs like #vilnius/compensa
   useEffect(() => {
@@ -188,11 +203,7 @@ export default function Home() {
       if (screen.city !== selectedCity) {
         console.log('Screen is in different city, changing from', selectedCity, 'to', screen.city);
         setSelectedCity(screen.city);
-        
-        // Wait for map to update with new city, then open popup
-        setTimeout(() => {
-          openPopupForScreen(screenId, screen);
-        }, 1000); // Give time for map to re-render with new city
+        setPendingPopupScreen(screenId); // Set pending popup to open after city change
       } else {
         // Screen is in current city, open popup immediately
         openPopupForScreen(screenId, screen);
