@@ -1154,6 +1154,36 @@ export default function Map({ selectedCity, selectedScreens: propSelectedScreens
           </div>
         )}
         
+        {/* Success Message - Show at top */}
+        {showSuccessMessage && (
+          <div style={{
+            backgroundColor: '#d1fae5',
+            color: '#065f46',
+            padding: '12px 16px',
+            fontSize: '14px',
+            display: 'flex',
+            justifyContent: 'space-between',
+            alignItems: 'center',
+            borderBottom: '1px solid #e5e7eb'
+          }}>
+            <span>✓ Užklausa sėkmingai išsiųsta! Susisieksime su jumis artimiausiu metu.</span>
+            <button
+              onClick={() => setShowSuccessMessage(false)}
+              style={{
+                background: 'none',
+                border: 'none',
+                color: '#065f46',
+                fontSize: '16px',
+                cursor: 'pointer',
+                padding: '0',
+                marginLeft: '8px'
+              }}
+            >
+              ×
+            </button>
+          </div>
+        )}
+
         {/* Inquiry Form - Show when end date is selected */}
         {showInquiryForm && toDate && (
           <div style={{
@@ -1165,35 +1195,6 @@ export default function Map({ selectedCity, selectedScreens: propSelectedScreens
             <h3 style={{ fontSize: '16px', fontWeight: '600', color: '#111827', marginBottom: '12px' }}>
               Užklausos forma
             </h3>
-            {showSuccessMessage && (
-              <div style={{
-                backgroundColor: '#d1fae5',
-                color: '#065f46',
-                padding: '12px',
-                borderRadius: '6px',
-                fontSize: '14px',
-                marginBottom: '12px',
-                display: 'flex',
-                justifyContent: 'space-between',
-                alignItems: 'center'
-              }}>
-                <span>✓ Užklausa sėkmingai išsiųsta! Susisieksime su jumis artimiausiu metu.</span>
-                <button
-                  onClick={() => setShowSuccessMessage(false)}
-                  style={{
-                    background: 'none',
-                    border: 'none',
-                    color: '#065f46',
-                    fontSize: '16px',
-                    cursor: 'pointer',
-                    padding: '0',
-                    marginLeft: '8px'
-                  }}
-                >
-                  ×
-                </button>
-              </div>
-            )}
             
             <div style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
               <input
