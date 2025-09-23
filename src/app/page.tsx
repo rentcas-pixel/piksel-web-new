@@ -182,45 +182,62 @@ export default function Home() {
     const screen = ledScreens.find(s => s.id === screenId);
     console.log('handleShowPopup - Looking for screenId:', screenId);
     console.log('handleShowPopup - Found screen:', screen?.name);
+    
     if (screen) {
-      // Store the screen to show popup and let Map component handle it
-      if ((window as any).mapInstance) {
-        // Find all layers (markers) on the map
-        const map = (window as any).mapInstance;
-        let foundMarker = false;
-        map.eachLayer((layer: any) => {
-          if (foundMarker) return; // Stop if already found
+      // If screen is in a different city, change to that city first
+      if (screen.city !== selectedCity) {
+        console.log('Screen is in different city, changing from', selectedCity, 'to', screen.city);
+        setSelectedCity(screen.city);
+        
+        // Wait for map to update with new city, then open popup
+        setTimeout(() => {
+          openPopupForScreen(screenId, screen);
+        }, 1000); // Give time for map to re-render with new city
+      } else {
+        // Screen is in current city, open popup immediately
+        openPopupForScreen(screenId, screen);
+      }
+    }
+  };
+
+  const openPopupForScreen = (screenId: string, screen: any) => {
+    if ((window as any).mapInstance) {
+      // Find all layers (markers) on the map
+      const map = (window as any).mapInstance;
+      let foundMarker = false;
+      
+      map.eachLayer((layer: any) => {
+        if (foundMarker) return; // Stop if already found
+        
+        // Check if this layer is a marker with our screen data
+        if (layer.options && layer.options.screenId === screenId) {
+          console.log('Found marker by screenId:', screenId);
+          layer.openPopup();
+          foundMarker = true;
+          return;
+        }
+        
+        // Check by coordinates as backup (more reliable)
+        if (layer.getLatLng && screen.coordinates) {
+          const markerLatLng = layer.getLatLng();
+          const screenLat = Array.isArray(screen.coordinates) ? screen.coordinates[0] : 0;
+          const screenLng = Array.isArray(screen.coordinates) ? screen.coordinates[1] : 0;
           
-          // Check if this layer is a marker with our screen data
-          if (layer.options && layer.options.screenId === screenId) {
-            console.log('Found marker by screenId:', screenId);
-            layer.openPopup();
-            foundMarker = true;
-            return;
-          }
-          
-          // Check by coordinates as backup (more reliable)
-          if (layer.getLatLng && screen.coordinates) {
-            const markerLatLng = layer.getLatLng();
-            const screenLat = Array.isArray(screen.coordinates) ? screen.coordinates[0] : 0;
-            const screenLng = Array.isArray(screen.coordinates) ? screen.coordinates[1] : 0;
-            
-            if (Math.abs(markerLatLng.lat - screenLat) < 0.0001 && 
-                Math.abs(markerLatLng.lng - screenLng) < 0.0001) {
-              // Additional check: popup content should contain screen name
-              if (layer.getPopup && layer.getPopup()) {
-                const popupContent = layer.getPopup().getContent();
-                if (popupContent && popupContent.includes(screen.name)) {
-                  console.log('Found marker by coordinates and name:', screen.name);
-                  layer.openPopup();
-                  foundMarker = true;
-                  return;
-                }
+          if (Math.abs(markerLatLng.lat - screenLat) < 0.0001 && 
+              Math.abs(markerLatLng.lng - screenLng) < 0.0001) {
+            // Additional check: popup content should contain screen name
+            if (layer.getPopup && layer.getPopup()) {
+              const popupContent = layer.getPopup().getContent();
+              if (popupContent && popupContent.includes(screen.name)) {
+                console.log('Found marker by coordinates and name:', screen.name);
+                layer.openPopup();
+                foundMarker = true;
+                return;
               }
             }
           }
-        });
-      }
+        }
+      });
     }
   };
 
