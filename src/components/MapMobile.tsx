@@ -1094,6 +1094,7 @@ export default function Map({ selectedCity, selectedScreens: propSelectedScreens
                     key="mobile-from-date"
                     type="date"
                     value={fromDate}
+                    placeholder="Nuo"
                     onChange={(e) => {
                       const newFromDate = e.target.value;
                       console.log('Mobile From date changed:', newFromDate);
@@ -1111,7 +1112,10 @@ export default function Map({ selectedCity, selectedScreens: propSelectedScreens
                       fontSize: '14px',
                       outline: 'none',
                       color: '#111827 !important',
-                      backgroundColor: '#f7f4f0'
+                      backgroundColor: '#f7f4f0',
+                      '::placeholder': {
+                        color: '#6b7280 !important'
+                      }
                     }}
                   />
                   <span style={{ color: '#6b7280', fontSize: '12px', flexShrink: 0 }}>iki</span>
@@ -1119,6 +1123,7 @@ export default function Map({ selectedCity, selectedScreens: propSelectedScreens
                     key="mobile-to-date"
                     type="date"
                     value={toDate}
+                    placeholder="Iki"
                     onChange={(e) => {
                       const newToDate = e.target.value;
                       console.log('Mobile To date changed:', newToDate);
@@ -1140,7 +1145,10 @@ export default function Map({ selectedCity, selectedScreens: propSelectedScreens
                       fontSize: '14px',
                       outline: 'none',
                       color: '#111827 !important',
-                      backgroundColor: '#f7f4f0'
+                      backgroundColor: '#f7f4f0',
+                      '::placeholder': {
+                        color: '#6b7280 !important'
+                      }
                     }}
                   />
                 </div>
