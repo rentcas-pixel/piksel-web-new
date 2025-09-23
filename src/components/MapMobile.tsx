@@ -49,6 +49,21 @@ export default function Map({ selectedCity, selectedScreens: propSelectedScreens
   useEffect(() => {
     initEmailJS();
   }, []);
+
+  // Auto-scroll to submit button when inquiry form opens
+  useEffect(() => {
+    if (showInquiryForm && toDate) {
+      setTimeout(() => {
+        const submitButton = document.getElementById('submit-inquiry-button');
+        if (submitButton) {
+          submitButton.scrollIntoView({ 
+            behavior: 'smooth', 
+            block: 'center' 
+          });
+        }
+      }, 300); // Small delay to ensure form is rendered
+    }
+  }, [showInquiryForm, toDate]);
   
   // Handle inquiry submission
   const handleSubmitInquiry = async () => {
@@ -1269,6 +1284,7 @@ export default function Map({ selectedCity, selectedScreens: propSelectedScreens
                 }}
               />
               <button
+                id="submit-inquiry-button"
                 onClick={handleSubmitInquiry}
                 disabled={submittingInquiry}
                 style={{
@@ -1279,7 +1295,8 @@ export default function Map({ selectedCity, selectedScreens: propSelectedScreens
                   fontSize: '14px',
                   fontWeight: '500',
                   border: 'none',
-                  cursor: submittingInquiry ? 'not-allowed' : 'pointer'
+                  cursor: submittingInquiry ? 'not-allowed' : 'pointer',
+                  marginTop: '8px'
                 }}
               >
                 {submittingInquiry ? 'Siunčiama...' : 'Siųsti užklausą'}
