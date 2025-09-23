@@ -40,7 +40,9 @@ export default function Map({ selectedCity, selectedScreens, screenCities, selec
     const checkMobile = () => {
       if (typeof window !== 'undefined') {
         const mediaQuery = window.matchMedia('(max-width: 767px)');
-        setIsMobile(mediaQuery.matches);
+        const isMobileDevice = mediaQuery.matches || window.innerWidth <= 767;
+        setIsMobile(isMobileDevice);
+        console.log('Mobile detection:', isMobileDevice, 'Window width:', window.innerWidth);
       }
     };
     
@@ -1013,6 +1015,7 @@ export default function Map({ selectedCity, selectedScreens, screenCities, selec
 
   // Use mobile component for mobile devices
   if (isMobile) {
+    console.log('Using MapMobile component');
     return (
       <MapMobile 
         selectedCity={selectedCity}
