@@ -40,14 +40,20 @@ export default function Home() {
 
   // Handle pending popup after city change
   useEffect(() => {
+    console.log('useEffect triggered - pendingPopupScreen:', pendingPopupScreen, 'selectedCity:', selectedCity, 'ledScreens length:', ledScreens.length);
+    
     if (pendingPopupScreen && ledScreens.length > 0) {
       const screen = ledScreens.find(s => s.id === pendingPopupScreen);
+      console.log('useEffect - Found screen:', screen?.name, 'Screen city:', screen?.city);
+      
       if (screen && screen.city === selectedCity) {
-        console.log('Opening pending popup for screen:', screen.name);
+        console.log('✅ Opening pending popup for screen:', screen.name);
         setTimeout(() => {
           openPopupForScreen(pendingPopupScreen, screen);
           setPendingPopupScreen(null);
         }, 500); // Short delay to ensure map is updated
+      } else {
+        console.log('❌ Conditions not met - screen:', !!screen, 'city match:', screen?.city === selectedCity);
       }
     }
   }, [selectedCity, pendingPopupScreen, ledScreens]);
@@ -197,6 +203,7 @@ export default function Home() {
     const screen = ledScreens.find(s => s.id === screenId);
     console.log('handleShowPopup - Looking for screenId:', screenId);
     console.log('handleShowPopup - Found screen:', screen?.name);
+    console.log('handleShowPopup - Screen city:', screen?.city, 'Selected city:', selectedCity);
     
     if (screen) {
       // If screen is in a different city, change to that city first
@@ -206,49 +213,59 @@ export default function Home() {
         setPendingPopupScreen(screenId); // Set pending popup to open after city change
       } else {
         // Screen is in current city, open popup immediately
+        console.log('Screen is in current city, opening popup immediately');
         openPopupForScreen(screenId, screen);
       }
+    } else {
+      console.log('❌ Screen not found for ID:', screenId);
     }
   };
 
   const openPopupForScreen = (screenId: string, screen: any) => {
+    console.log('openPopupForScreen called for:', screenId, screen?.name);
+    
     if ((window as any).mapInstance) {
-      // Find all layers (markers) on the map
       const map = (window as any).mapInstance;
+      console.log('Map instance found, searching for markers...');
+      
       let foundMarker = false;
+      let markerCount = 0;
       
       map.eachLayer((layer: any) => {
         if (foundMarker) return; // Stop if already found
         
+        // Count markers
+        if (layer.getLatLng && layer.options && layer.options.screenId) {
+          markerCount++;
+          console.log(`Marker ${markerCount}: screenId=${layer.options.screenId}, looking for=${screenId}`);
+        }
+        
         // Check if this layer is a marker with our screen data
         if (layer.options && layer.options.screenId === screenId) {
-          console.log('Found marker by screenId:', screenId);
+          console.log('✅ Found marker by screenId:', screenId);
           layer.openPopup();
           foundMarker = true;
           return;
         }
         
-        // Check by coordinates as backup (more reliable)
-        if (layer.getLatLng && screen.coordinates) {
-          const markerLatLng = layer.getLatLng();
-          const screenLat = Array.isArray(screen.coordinates) ? screen.coordinates[0] : 0;
-          const screenLng = Array.isArray(screen.coordinates) ? screen.coordinates[1] : 0;
-          
-          if (Math.abs(markerLatLng.lat - screenLat) < 0.0001 && 
-              Math.abs(markerLatLng.lng - screenLng) < 0.0001) {
-            // Additional check: popup content should contain screen name
-            if (layer.getPopup && layer.getPopup()) {
-              const popupContent = layer.getPopup().getContent();
-              if (popupContent && popupContent.includes(screen.name)) {
-                console.log('Found marker by coordinates and name:', screen.name);
-                layer.openPopup();
-                foundMarker = true;
-                return;
-              }
-            }
+        // Check by screen name in popup content
+        if (layer.getPopup && layer.getPopup()) {
+          const popupContent = layer.getPopup().getContent();
+          if (popupContent && popupContent.includes(screen.name)) {
+            console.log('✅ Found marker by screen name in popup:', screen.name);
+            layer.openPopup();
+            foundMarker = true;
+            return;
           }
         }
       });
+      
+      console.log(`Total markers checked: ${markerCount}`);
+      if (!foundMarker) {
+        console.log('❌ No marker found for screen:', screen.name, screenId);
+      }
+    } else {
+      console.log('❌ Map instance not found');
     }
   };
 
