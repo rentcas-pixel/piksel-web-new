@@ -266,7 +266,7 @@ export default function Home() {
       
       let foundMarker = false;
       let markerCount = 0;
-      let matchingMarkers: any[] = [];
+      const matchingMarkers: any[] = [];
       
       // Collect all markers with matching screenId
       map.eachLayer((layer: any) => {
