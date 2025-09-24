@@ -38,6 +38,24 @@ export default function Home() {
     initEmailJS();
   }, []);
 
+  // Debug: Check image sizes when screens are loaded
+  useEffect(() => {
+    if (ledScreens.length > 0) {
+      console.log('=== IMAGE SIZE DEBUG ===');
+      ledScreens.forEach((screen, index) => {
+        const img = new Image();
+        img.onload = () => {
+          console.log(`${index + 1}. ${screen.name}: ${img.naturalWidth}x${img.naturalHeight}px (${screen.city})`);
+        };
+        img.onerror = () => {
+          console.log(`${index + 1}. ${screen.name}: Failed to load image (${screen.city})`);
+        };
+        img.src = screen.image_url;
+      });
+      console.log('=== END IMAGE DEBUG ===');
+    }
+  }, [ledScreens]);
+
   // Handle pending popup after city change
   useEffect(() => {
     console.log('useEffect triggered - pendingPopupScreen:', pendingPopupScreen, 'selectedCity:', selectedCity, 'ledScreens length:', ledScreens.length);
@@ -48,10 +66,25 @@ export default function Home() {
       
       if (screen && screen.city === selectedCity) {
         console.log('✅ Opening pending popup for screen:', screen.name);
-        setTimeout(() => {
-          openPopupForScreen(pendingPopupScreen, screen);
-          setPendingPopupScreen(null);
-        }, 500); // Short delay to ensure map is updated
+        
+        // Try multiple times with increasing delays to handle timing issues
+        const tryOpenPopup = (attempt: number = 1) => {
+          setTimeout(() => {
+            if ((window as any).mapInstance) {
+              console.log(`Attempt ${attempt} to open popup for ${screen.name}`);
+              openPopupForScreen(pendingPopupScreen, screen);
+              setPendingPopupScreen(null);
+            } else if (attempt < 5) {
+              console.log(`Map not ready, retrying... (attempt ${attempt})`);
+              tryOpenPopup(attempt + 1);
+            } else {
+              console.log('❌ Map still not ready after 5 attempts');
+              setPendingPopupScreen(null);
+            }
+          }, attempt * 200); // Increasing delay: 200ms, 400ms, 600ms, 800ms, 1000ms
+        };
+        
+        tryOpenPopup();
       } else {
         console.log('❌ Conditions not met - screen:', !!screen, 'city match:', screen?.city === selectedCity);
       }
@@ -233,39 +266,113 @@ export default function Home() {
       
       let foundMarker = false;
       let markerCount = 0;
+      let matchingMarkers: any[] = [];
       
+      // Collect all markers with matching screenId
       map.eachLayer((layer: any) => {
-        if (foundMarker) return; // Stop if already found
-        
-        // Count markers
         if (layer.getLatLng && layer.options && layer.options.screenId) {
           markerCount++;
           console.log(`Marker ${markerCount}: screenId=${layer.options.screenId}, looking for=${screenId}`);
-        }
-        
-        // Check if this layer is a marker with our screen data
-        if (layer.options && layer.options.screenId === screenId) {
-          console.log('✅ Found marker by screenId:', screenId);
-          layer.openPopup();
-          foundMarker = true;
-          return;
-        }
-        
-        // Check by screen name in popup content
-        if (layer.getPopup && layer.getPopup()) {
-          const popupContent = layer.getPopup().getContent();
-          if (popupContent && popupContent.includes(screen.name)) {
-            console.log('✅ Found marker by screen name in popup:', screen.name);
-            layer.openPopup();
-            foundMarker = true;
-            return;
+          
+          if (layer.options.screenId === screenId) {
+            matchingMarkers.push(layer);
+            const latLng = layer.getLatLng();
+            console.log(`Found matching marker for ${screen.name} at [${latLng.lat}, ${latLng.lng}]`);
           }
         }
       });
       
+      console.log(`Found ${matchingMarkers.length} matching markers for screenId: ${screenId}`);
+      
+      // If we have matching markers, try to find the right one
+      if (matchingMarkers.length > 0) {
+        console.log(`Found ${matchingMarkers.length} markers with screenId: ${screenId}`);
+        
+        // First try: find marker with popup containing exact screen name
+        for (const marker of matchingMarkers) {
+          if (marker.getPopup && marker.getPopup()) {
+            const popupContent = marker.getPopup().getContent();
+            if (popupContent) {
+              // More precise name matching - check for exact screen name in popup
+              const nameMatch = popupContent.includes(`>${screen.name}<`) || 
+                               popupContent.includes(`"${screen.name}"`) ||
+                               popupContent.includes(`'${screen.name}'`) ||
+                               popupContent.includes(`alt="${screen.name}"`);
+              
+              if (nameMatch) {
+                console.log('✅ Found marker by screenId and exact name match:', screen.name);
+                marker.openPopup();
+                foundMarker = true;
+                break;
+              }
+            }
+          }
+        }
+        
+        // Second try: find by coordinates match (most reliable)
+        if (!foundMarker && screen.coordinates) {
+          const screenLat = Array.isArray(screen.coordinates) ? screen.coordinates[0] : 0;
+          const screenLng = Array.isArray(screen.coordinates) ? screen.coordinates[1] : 0;
+          
+          for (const marker of matchingMarkers) {
+            if (marker.getLatLng) {
+              const markerLatLng = marker.getLatLng();
+              
+              // Very precise coordinate comparison
+              if (Math.abs(markerLatLng.lat - screenLat) < 0.000001 && 
+                  Math.abs(markerLatLng.lng - screenLng) < 0.000001) {
+                console.log('✅ Found marker by exact coordinates match:', screen.name);
+                marker.openPopup();
+                foundMarker = true;
+                break;
+              }
+            }
+          }
+        }
+        
+        // Third try: if still not found, open the first marker (fallback)
+        if (!foundMarker && matchingMarkers.length > 0) {
+          console.log('⚠️ Using fallback - opening first matching marker for screenId:', screenId);
+          matchingMarkers[0].openPopup();
+          foundMarker = true;
+        }
+      }
+      
+      // If still not found, try by coordinates (backup method)
+      if (!foundMarker && screen.coordinates) {
+        console.log('Not found by screenId, trying by coordinates...');
+        const screenLat = Array.isArray(screen.coordinates) ? screen.coordinates[0] : 0;
+        const screenLng = Array.isArray(screen.coordinates) ? screen.coordinates[1] : 0;
+        
+        map.eachLayer((layer: any) => {
+          if (foundMarker) return;
+          
+          if (layer.getLatLng && layer.options && layer.options.screenId) {
+            const markerLatLng = layer.getLatLng();
+            
+            // More precise coordinate comparison
+            if (Math.abs(markerLatLng.lat - screenLat) < 0.00001 && 
+                Math.abs(markerLatLng.lng - screenLng) < 0.00001) {
+              
+              // Additional check: popup content should contain screen name
+              if (layer.getPopup && layer.getPopup()) {
+                const popupContent = layer.getPopup().getContent();
+                if (popupContent && popupContent.includes(screen.name)) {
+                  console.log('✅ Found marker by coordinates and name:', screen.name);
+                  layer.openPopup();
+                  foundMarker = true;
+                  return;
+                }
+              }
+            }
+          }
+        });
+      }
+      
       console.log(`Total markers checked: ${markerCount}`);
       if (!foundMarker) {
         console.log('❌ No marker found for screen:', screen.name, screenId);
+        console.log('Screen coordinates:', screen.coordinates);
       }
     } else {
       console.log('❌ Map instance not found');
