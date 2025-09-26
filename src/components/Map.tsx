@@ -87,7 +87,7 @@ export default function Map({ selectedCity, selectedScreens, screenCities, selec
         : ledScreens.filter(screen => screen.city === selectedCity);
 
       // Create custom LED screen icon function
-      const createLedScreenIcon = (isSelected: boolean, hasLastMinute: boolean, lastMinuteDate?: string, isDoubleSided?: boolean, isViaduct?: boolean) => L.divIcon({
+      const createLedScreenIcon = (isSelected: boolean, showLastMinute: boolean, lastMinuteDate?: string, isDoubleSided?: boolean, isViaduct?: boolean) => L.divIcon({
         className: 'led-screen-marker',
         html: `
           <div style="
@@ -117,13 +117,14 @@ export default function Map({ selectedCity, selectedScreens, screenCities, selec
               position: absolute;
               z-index: 1;
             "></div>
-            ${hasLastMinute ? `
+            ${showLastMinute ? `
             <!-- Last Minute Badge -->
             <div style="
               position: absolute;
               top: 50%;
-              right: -85px;
-              transform: translateY(-50%);
+              left: 100%;
+              margin-left: 5px;
+              transform: translateY(calc(-50% - 12.5px));
               background: #ef4444;
               color: white;
               font-size: 10px;
@@ -139,8 +140,9 @@ export default function Map({ selectedCity, selectedScreens, screenCities, selec
             <div style="
               position: absolute;
               top: 50%;
-              right: -85px;
-              transform: translateY(calc(-50% + 25px));
+              left: 100%;
+              margin-left: 5px;
+              transform: translateY(calc(-50% + 12.5px));
               background: #1f2937;
               color: white;
               font-size: 10px;
@@ -183,11 +185,15 @@ export default function Map({ selectedCity, selectedScreens, screenCities, selec
         const hasLastMinute = screen.is_last_minute || false;
         const lastMinuteDate = screen.last_minute_date;
         
+        // Check if last minute date has expired
+        const isLastMinuteExpired = hasLastMinute && lastMinuteDate && new Date(lastMinuteDate) < new Date();
+        const showLastMinute = hasLastMinute && !isLastMinuteExpired;
+        
         
         if (screen.is_double_sided) {
           
           // Create custom icons with pixel offset for fixed positioning
-          const createOffsetIcon = (isSelected: boolean, hasLastMinute: boolean, lastMinuteDate?: string, offsetX: number = 0, isViaduct?: boolean) => L.divIcon({
+          const createOffsetIcon = (isSelected: boolean, showLastMinute: boolean, lastMinuteDate?: string, offsetX: number = 0, isViaduct?: boolean) => L.divIcon({
             className: 'led-screen-marker',
             html: `
               <div style="
@@ -218,13 +224,14 @@ export default function Map({ selectedCity, selectedScreens, screenCities, selec
                   position: absolute;
                   z-index: 1;
                 "></div>
-                ${hasLastMinute ? `
+                ${showLastMinute ? `
                 <!-- Last Minute Badge -->
                 <div style="
                   position: absolute;
                   top: 50%;
-                  right: -85px;
-                  transform: translateY(-50%);
+                  left: 100%;
+                  margin-left: 5px;
+                  transform: translateY(calc(-50% - 12.5px));
                   background: #ef4444;
                   color: white;
                   font-size: 10px;
@@ -240,8 +247,9 @@ export default function Map({ selectedCity, selectedScreens, screenCities, selec
                 <div style="
                   position: absolute;
                   top: 50%;
-                  right: -85px;
-                  transform: translateY(calc(-50% + 25px));
+                  left: 100%;
+                  margin-left: 5px;
+                  transform: translateY(calc(-50% + 12.5px));
                   background: #1f2937;
                   color: white;
                   font-size: 10px;
@@ -262,7 +270,7 @@ export default function Map({ selectedCity, selectedScreens, screenCities, selec
           
           // Left marker (North side) - offset 19px left (half marker width + half gap)
           const leftMarker = L.marker([screen.coordinates[0], screen.coordinates[1]], {
-            icon: createOffsetIcon(Boolean(isSelected), hasLastMinute, lastMinuteDate, -19, Boolean(screen.is_viaduct)),
+            icon: createOffsetIcon(Boolean(isSelected), showLastMinute, lastMinuteDate, -19, Boolean(screen.is_viaduct)),
             screenId: screen.id
           })
             .addTo(map)
@@ -272,6 +280,25 @@ export default function Map({ selectedCity, selectedScreens, screenCities, selec
                 <div style="width: 468px; height: 468px; position: relative; background: #ddd; border-radius: 9px 0 0 9px !important; overflow: hidden;">
                   <img src="${screen.image_url}" alt="${screen.name} - Šiaurė"
                        style="width: 468px; height: 468px; object-fit: cover;"/>
+                  
+                  ${showLastMinute ? `
+                  <!-- Last Minute Badge -->
+                  <div style="
+                    position: absolute;
+                    top: 20px;
+                    left: 20px;
+                    background: #ef4444;
+                    color: white;
+                    font-size: 12px;
+                    font-weight: bold;
+                    padding: 6px 10px;
+                    border-radius: 6px;
+                    white-space: nowrap;
+                    box-shadow: 0 2px 8px rgba(0,0,0,0.3);
+                    z-index: 100;
+                    animation: pulse 2s infinite;
+                  ">LAST MINUTE</div>
+                  ` : ''}
                   
                   <!-- Expand Photo Button -->
                   <button onclick="window.openPhotoModal('${screen.image_url}', '${screen.name} - Šiaurė')" 
@@ -340,7 +367,7 @@ export default function Map({ selectedCity, selectedScreens, screenCities, selec
 
           // Right marker (South side) - offset 19px right (half marker width + half gap)
           const rightMarker = L.marker([screen.coordinates[0], screen.coordinates[1]], {
-            icon: createOffsetIcon(Boolean(isSelected), hasLastMinute, lastMinuteDate, 19, Boolean(screen.is_viaduct)),
+            icon: createOffsetIcon(Boolean(isSelected), showLastMinute, lastMinuteDate, 19, Boolean(screen.is_viaduct)),
             screenId: screen.id
           })
             .addTo(map)
@@ -350,6 +377,25 @@ export default function Map({ selectedCity, selectedScreens, screenCities, selec
                 <div style="width: 468px; height: 468px; position: relative; background: #ddd; border-radius: 9px 0 0 9px !important; overflow: hidden;">
                   <img src="${screen.image_url}" alt="${screen.name} - Pietūs"
                        style="width: 468px; height: 468px; object-fit: cover;"/>
+                  
+                  ${showLastMinute ? `
+                  <!-- Last Minute Badge -->
+                  <div style="
+                    position: absolute;
+                    top: 20px;
+                    left: 20px;
+                    background: #ef4444;
+                    color: white;
+                    font-size: 12px;
+                    font-weight: bold;
+                    padding: 6px 10px;
+                    border-radius: 6px;
+                    white-space: nowrap;
+                    box-shadow: 0 2px 8px rgba(0,0,0,0.3);
+                    z-index: 100;
+                    animation: pulse 2s infinite;
+                  ">LAST MINUTE</div>
+                  ` : ''}
                   
                   <!-- Expand Photo Button -->
                   <button onclick="window.openPhotoModal('${screen.image_url}', '${screen.name} - Pietūs')" 
@@ -418,40 +464,11 @@ export default function Map({ selectedCity, selectedScreens, screenCities, selec
         } else {
           // Single marker for regular screens
           const marker = L.marker([screen.coordinates[0], screen.coordinates[1]], {
-            icon: createLedScreenIcon(Boolean(isSelected), hasLastMinute, lastMinuteDate, false, Boolean(screen.is_viaduct)),
+            icon: createLedScreenIcon(Boolean(isSelected), showLastMinute, lastMinuteDate, false, Boolean(screen.is_viaduct)),
             screenId: screen.id
           })
             .addTo(map);
 
-          // Add Last Minute badge if applicable
-          if (hasLastMinute && lastMinuteDate) {
-            L.marker([screen.coordinates[0], screen.coordinates[1]], {
-              icon: L.divIcon({
-                className: 'last-minute-badge',
-                html: `
-                  <div style="
-                    position: absolute;
-                    top: -15px;
-                    left: 40px;
-                    background: #dc2626;
-                    color: white;
-                    padding: 3px 6px;
-                    border-radius: 3px;
-                    font-size: 9px;
-                    font-weight: 700;
-                    text-transform: uppercase;
-                    white-space: nowrap;
-                    box-shadow: 0 2px 4px rgba(0,0,0,0.3);
-                    z-index: 1000;
-                  ">
-                    LAST MINUTE
-                  </div>
-                `,
-                iconSize: [70, 15],
-                iconAnchor: [0, 0]
-              })
-            }).addTo(map);
-          }
 
           marker.bindPopup(`
               <div style="font-family: ui-sans-serif, system-ui, -apple-system, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, 'Noto Sans', sans-serif; width: 780px; height: 468px; border-radius: 0; overflow: visible; background: transparent; display: flex; gap: -8px; position: relative;">
@@ -459,6 +476,25 @@ export default function Map({ selectedCity, selectedScreens, screenCities, selec
                 <div style="width: 468px; height: 468px; position: relative; background: #ddd; border-radius: 9px 0 0 9px !important; overflow: hidden;">
                   <img src="${screen.image_url}" alt="${screen.name}"
                        style="width: 468px; height: 468px; object-fit: cover;"/>
+                  
+                  ${showLastMinute ? `
+                  <!-- Last Minute Badge -->
+                  <div style="
+                    position: absolute;
+                    top: 20px;
+                    left: 20px;
+                    background: #ef4444;
+                    color: white;
+                    font-size: 12px;
+                    font-weight: bold;
+                    padding: 6px 10px;
+                    border-radius: 6px;
+                    white-space: nowrap;
+                    box-shadow: 0 2px 8px rgba(0,0,0,0.3);
+                    z-index: 100;
+                    animation: pulse 2s infinite;
+                  ">LAST MINUTE</div>
+                  ` : ''}
                   
                   <!-- Expand Photo Button -->
                   <button onclick="window.openPhotoModal('${screen.image_url}', '${screen.name}')" 
@@ -566,7 +602,6 @@ export default function Map({ selectedCity, selectedScreens, screenCities, selec
             modal.innerHTML = `
               <div class="photo-modal-content">
                 <div class="photo-modal-badge" id="photo-modal-badge"></div>
-                <div class="photo-modal-add-badge" id="photo-modal-add-badge" onclick="window.toggleScreenFromModal()"></div>
                 <img class="photo-modal-image" id="photo-modal-image" src="" alt="" />
                 <button class="photo-modal-close" onclick="window.closePhotoModal()">×</button>
               </div>
@@ -591,18 +626,14 @@ export default function Map({ selectedCity, selectedScreens, screenCities, selec
           // Set image and title
           const img = document.getElementById('photo-modal-image') as HTMLImageElement;
           const badgeEl = document.getElementById('photo-modal-badge') as HTMLDivElement;
-          const addBadgeEl = document.getElementById('photo-modal-add-badge') as HTMLDivElement;
           
-          if (img && badgeEl && addBadgeEl) {
+          if (img && badgeEl) {
             img.src = imageUrl;
             img.alt = title;
             badgeEl.textContent = title;
             
             // Store current screen name for toggle function
             (window as any).currentModalScreen = title;
-            
-            // Hide add badge (removed functionality)
-            addBadgeEl.style.display = 'none';
             
             // Show modal
             modal.classList.add('show');
@@ -892,20 +923,18 @@ export default function Map({ selectedCity, selectedScreens, screenCities, selec
             position: absolute;
             top: 20px;
             left: 20px;
-            background: rgba(0, 0, 0, 0.9);
+            background: rgba(0, 0, 0, 0.6);
             color: white;
             padding: 12px 20px;
-            border-radius: 25px;
+            border-radius: 8px;
             font-size: 16px;
             font-weight: 600;
             z-index: 10001;
-            backdrop-filter: blur(10px);
-            border: 1px solid rgba(255, 255, 255, 0.1);
-            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
             width: 200px;
             text-align: center;
             white-space: nowrap;
           }
+          
           
           .photo-modal-add-badge {
             position: absolute;

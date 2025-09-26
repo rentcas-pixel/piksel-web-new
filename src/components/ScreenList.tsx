@@ -72,6 +72,10 @@ export default function ScreenList({ selectedCity, selectedScreens, onSelectScre
         <div className="space-y-3">
           {displayScreens.map((screen) => {
             const isSelected = selectedScreens.includes(screen.name);
+            const hasLastMinute = screen.is_last_minute || false;
+            const lastMinuteDate = screen.last_minute_date;
+            const isLastMinuteExpired = hasLastMinute && lastMinuteDate && new Date(lastMinuteDate) < new Date();
+            const showLastMinute = hasLastMinute && !isLastMinuteExpired;
             return (
               <div
                 key={screen.id}
@@ -93,8 +97,8 @@ export default function ScreenList({ selectedCity, selectedScreens, onSelectScre
                       onClick={() => onShowPopup ? onShowPopup(screen.id) : null}
                       title="Paspausti, kad pamatytumėte žemėlapyje"
                     />
-                    {false && (
-                      <div className="absolute top-2 left-2 bg-red-500 text-white text-xs font-bold px-2 py-1 rounded">
+                    {showLastMinute && (
+                      <div className="absolute top-2 left-2 bg-red-500 text-white text-[8px] font-bold px-1 py-0.5 rounded-md">
                         LAST MINUTE
                       </div>
                     )}

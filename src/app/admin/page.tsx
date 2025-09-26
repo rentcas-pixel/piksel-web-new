@@ -242,10 +242,9 @@ export default function AdminPanel() {
         traffic: formData.traffic || null,
         price: formData.price ? parseFloat(formData.price) : null,
         is_active: true,
-        display_order: screens.length,
-        // Temporarily commented out last minute fields
-        // is_last_minute: formData.is_last_minute || false,
-        // last_minute_date: formData.last_minute_date || null
+        display_order: editingScreen ? editingScreen.display_order : screens.length,
+        is_last_minute: formData.is_last_minute || false,
+        last_minute_date: formData.last_minute_date || null
       }
 
       console.log('Saving screen data:', screenData)
@@ -263,7 +262,10 @@ export default function AdminPanel() {
         if (error) {
           console.error('Update error:', error)
           console.error('Error details:', JSON.stringify(error, null, 2))
-          throw error
+          console.error('Screen data being updated:', JSON.stringify(screenData, null, 2))
+          console.error('Editing screen ID:', editingScreen.id)
+          alert(`Klaida atnaujinant ekraną: ${error.message || 'Nežinoma klaida'}`)
+          return
         }
         console.log('Updated screen:', data)
       } else {
@@ -276,7 +278,9 @@ export default function AdminPanel() {
         if (error) {
           console.error('Insert error:', error)
           console.error('Insert error details:', JSON.stringify(error, null, 2))
-          throw error
+          console.error('Screen data being inserted:', JSON.stringify(screenData, null, 2))
+          alert(`Klaida kuriant ekraną: ${error.message || 'Nežinoma klaida'}`)
+          return
         }
         console.log('Created screen:', data)
       }
@@ -802,9 +806,22 @@ export default function AdminPanel() {
                 <input
                   type="date"
                   value={formData.last_minute_date}
-                  onChange={(e) => setFormData({...formData, last_minute_date: e.target.value})}
+                  onChange={(e) => {
+                    console.log('Date changed:', e.target.value);
+                    setFormData({...formData, last_minute_date: e.target.value});
+                  }}
                   className="w-full border border-gray-300 rounded-lg px-3 py-2"
                   disabled={!formData.is_last_minute}
+                  style={{
+                    color: '#111827',
+                    backgroundColor: formData.is_last_minute ? 'white' : '#f9fafb',
+                    cursor: formData.is_last_minute ? 'pointer' : 'not-allowed'
+                  }}
+                  onClick={() => {
+                    if (formData.is_last_minute) {
+                      console.log('Date input clicked, is_last_minute:', formData.is_last_minute);
+                    }
+                  }}
                 />
               </div>
               <div>
