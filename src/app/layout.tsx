@@ -19,7 +19,10 @@ export const metadata: Metadata = {
   title: "PIKSEL - LED Ekranų Reklama Lietuvoje",
   description: "Profesionalūs LED ekranų reklamos sprendimai Lietuvoje. Kokybiškos reklamos paslaugos naudojant moderniausią technologiją.",
   icons: {
-    icon: '/favicon.svg',
+    icon: [
+      { url: '/favicon.ico', sizes: 'any' },
+      { url: '/favicon.svg', type: 'image/svg+xml' }
+    ],
     shortcut: '/favicon.ico',
     apple: '/favicon.svg',
   },
