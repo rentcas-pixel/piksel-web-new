@@ -182,6 +182,8 @@ export default function Map({ selectedCity, selectedScreens, screenCities, selec
       // Add markers for filtered screens
       filteredScreens.forEach((screen) => {
         const isSelected = selectedScreens && selectedScreens.includes(screen.name);
+        const isSelectedNorth = selectedScreens && selectedScreens.includes(`${screen.name} - Šiaurė`);
+        const isSelectedSouth = selectedScreens && selectedScreens.includes(`${screen.name} - Pietūs`);
         const hasLastMinute = screen.is_last_minute || false;
         const lastMinuteDate = screen.last_minute_date;
         
@@ -556,6 +558,16 @@ export default function Map({ selectedCity, selectedScreens, screenCities, selec
                     </div>
                   </div>
                   
+                  <!-- Action Button -->
+                  <div style="margin-top: auto;">
+                    <button onclick="window.selectScreen('${screen.name}')" 
+                            style="width: 100%; padding: 12px 20px; background: #f8fafc; color: #475569; border: 1px solid #e2e8f0; border-radius: 8px; font-size: 16px; font-weight: 600; cursor: pointer; transition: all 0.2s ease;"
+                            onmouseover="this.style.background='#f1f5f9';"
+                            onmouseout="this.style.background='#f8fafc';">
+                      ${isSelected ? 'Pridėtas' : '+ Pridėti'}
+                    </button>
+                  </div>
+                  
                 </div>
                 
                 <!-- Close Button -->
@@ -586,8 +598,11 @@ export default function Map({ selectedCity, selectedScreens, screenCities, selec
       // Add window functions for screen selection and photo modal
       if (typeof window !== 'undefined') {
         (window as any).selectScreen = (screenName: string) => {
+          console.log('selectScreen called with:', screenName);
           if (onSelectScreen) {
             onSelectScreen(screenName);
+          } else {
+            console.log('onSelectScreen is not defined');
           }
         };
         
