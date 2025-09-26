@@ -333,13 +333,6 @@ export default function Map({ selectedCity, selectedScreens, screenCities, selec
                     </div>
                   </div>
                   
-                  <!-- Button -->
-                  <div style="display: flex; justify-content: center; padding-top: 8px;">
-                    <button onclick="window.selectScreen('${screen.name} - Šiaurė')"
-                                     style="appearance: none; border: 1px solid #d1d5db; background: #f9fafb; padding: 8px 12px; border-radius: 12px; font-weight: 500; cursor: pointer; font-size: 14px; color: #4b5563; transition: background-color 0.2s;">
-                      ${selectedScreens && selectedScreens.includes(screen.name + ' - Šiaurė') ? '✓ Pridėtas' : '+ Pridėti'}
-                    </button>
-                  </div>
                 </div>
                 
               </div>
@@ -418,13 +411,6 @@ export default function Map({ selectedCity, selectedScreens, screenCities, selec
                     </div>
                   </div>
                   
-                  <!-- Button -->
-                  <div style="display: flex; justify-content: center; padding-top: 8px;">
-                    <button onclick="window.selectScreen('${screen.name} - Pietūs')"
-                                     style="appearance: none; border: 1px solid #d1d5db; background: #f9fafb; padding: 8px 12px; border-radius: 12px; font-weight: 500; cursor: pointer; font-size: 14px; color: #4b5563; transition: background-color 0.2s;">
-                      ${selectedScreens && selectedScreens.includes(screen.name + ' - Pietūs') ? '✓ Pridėtas' : '+ Pridėti'}
-                    </button>
-                  </div>
                 </div>
                 
               </div>
@@ -534,13 +520,6 @@ export default function Map({ selectedCity, selectedScreens, screenCities, selec
                     </div>
                   </div>
                   
-                  <!-- Button -->
-                  <div style="display: flex; justify-content: center; padding-top: 8px;">
-                    <button onclick="window.selectScreen('${screen.name}')"
-                                     style="appearance: none; border: 1px solid #d1d5db; background: #f9fafb; padding: 8px 12px; border-radius: 12px; font-weight: 500; cursor: pointer; font-size: 14px; color: #4b5563; transition: background-color 0.2s;">
-                      ${selectedScreens && selectedScreens.includes(screen.name) ? '✓ Pridėtas' : '+ Pridėti'}
-                    </button>
-            </div>
                 </div>
                 
                 <!-- Close Button -->
@@ -622,10 +601,8 @@ export default function Map({ selectedCity, selectedScreens, screenCities, selec
             // Store current screen name for toggle function
             (window as any).currentModalScreen = title;
             
-            // Update add badge text based on selection status
-            const isSelected = selectedScreens && selectedScreens.includes(title);
-            addBadgeEl.textContent = isSelected ? '✓ Pridėtas' : '+ Pridėti';
-            addBadgeEl.style.background = isSelected ? 'rgba(34, 197, 94, 0.95)' : 'rgba(59, 130, 246, 0.95)';
+            // Hide add badge (removed functionality)
+            addBadgeEl.style.display = 'none';
             
             // Show modal
             modal.classList.add('show');
@@ -1088,13 +1065,6 @@ export default function Map({ selectedCity, selectedScreens, screenCities, selec
             </div>
           </div>
           
-          <!-- Button -->
-          <div style="display: flex; justify-content: center; padding-top: 8px;">
-            <button onclick="window.selectScreen('${fullName}')"
-                     style="appearance: none; border: 1px solid #d1d5db; background: #f9fafb; padding: 8px 16px; border-radius: 8px; font-weight: 500; cursor: pointer; font-size: 14px; color: #4b5563; transition: background-color 0.2s;">
-              ${selectedScreens && selectedScreens.includes(fullName) ? '✓ Pridėtas' : '+ Pridėti'}
-            </button>
-          </div>
         </div>
       </div>
     `;
