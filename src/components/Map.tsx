@@ -277,11 +277,11 @@ export default function Map({ selectedCity, selectedScreens, screenCities, selec
           })
             .addTo(map)
             .bindPopup(`
-              <div style="font-family: ui-sans-serif, system-ui, -apple-system, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, 'Noto Sans', sans-serif; width: 780px; height: 468px; border-radius: 0; overflow: visible; background: transparent; display: flex; gap: -8px; position: relative;">
+              <div style="font-family: ui-sans-serif, system-ui, -apple-system, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, 'Noto Sans', sans-serif; width: 100%; max-width: 780px; height: 468px; border-radius: 0; overflow: visible; background: transparent; display: flex; gap: -8px; position: relative;" class="popup-container">
                 <!-- Photo -->
-                <div style="width: 468px; height: 468px; position: relative; background: #ddd; border-radius: 9px 0 0 9px !important; overflow: hidden;">
+                <div style="width: 468px; height: 468px; position: relative; background: #ddd; border-radius: 9px 0 0 9px !important; overflow: hidden; flex-shrink: 0;" class="popup-image">
                   <img src="${screen.image_url}" alt="${screen.name} - Šiaurė"
-                       style="width: 468px; height: 468px; object-fit: cover;"/>
+                       style="width: 100%; height: 100%; object-fit: cover;"/>
                   
                   ${showLastMinute ? `
                   <!-- Last Minute Badge -->
@@ -335,7 +335,7 @@ export default function Map({ selectedCity, selectedScreens, screenCities, selec
                 </div>
                 
                 <!-- Card -->
-                <div style="width: 270px; height: 468px; background: #ffffff; border-radius: 0 13px 13px 0; box-shadow: 0 13px 31px rgba(0,0,0,0.08); padding: 42px 42px 36px; display: flex; flex-direction: column; gap: 23px;" class="popup-card">
+                <div style="width: 270px; min-width: 270px; height: 468px; background: #ffffff; border-radius: 0 13px 13px 0; box-shadow: 0 13px 31px rgba(0,0,0,0.08); padding: 42px 42px 36px; display: flex; flex-direction: column; gap: 23px;" class="popup-card">
                   <!-- Header -->
                   <header>
                     <h1 style="font-weight: 800; font-size: 28px; margin: 0; color: #111827;">${screen.name} - Šiaurė</h1>
@@ -374,7 +374,7 @@ export default function Map({ selectedCity, selectedScreens, screenCities, selec
           })
             .addTo(map)
             .bindPopup(`
-              <div style="font-family: ui-sans-serif, system-ui, -apple-system, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, 'Noto Sans', sans-serif; width: 780px; height: 468px; border-radius: 0; overflow: visible; background: transparent; display: flex; gap: -8px; position: relative;">
+              <div style="font-family: ui-sans-serif, system-ui, -apple-system, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, 'Noto Sans', sans-serif; width: 100%; max-width: 780px; height: 468px; border-radius: 0; overflow: visible; background: transparent; display: flex; gap: -8px; position: relative;" class="popup-container">
                 <!-- Photo -->
                 <div style="width: 468px; height: 468px; position: relative; background: #ddd; border-radius: 9px 0 0 9px !important; overflow: hidden;">
                   <img src="${screen.image_url}" alt="${screen.name} - Pietūs"
@@ -432,7 +432,7 @@ export default function Map({ selectedCity, selectedScreens, screenCities, selec
                 </div>
                 
                 <!-- Card -->
-                <div style="width: 270px; height: 468px; background: #ffffff; border-radius: 0 13px 13px 0; box-shadow: 0 13px 31px rgba(0,0,0,0.08); padding: 42px 42px 36px; display: flex; flex-direction: column; gap: 23px;" class="popup-card">
+                <div style="width: 270px; min-width: 270px; height: 468px; background: #ffffff; border-radius: 0 13px 13px 0; box-shadow: 0 13px 31px rgba(0,0,0,0.08); padding: 42px 42px 36px; display: flex; flex-direction: column; gap: 23px;" class="popup-card">
                   <!-- Header -->
                   <header>
                     <h1 style="font-weight: 800; font-size: 28px; margin: 0; color: #111827;">${screen.name} - Pietūs</h1>
@@ -473,11 +473,11 @@ export default function Map({ selectedCity, selectedScreens, screenCities, selec
 
 
           marker.bindPopup(`
-              <div style="font-family: ui-sans-serif, system-ui, -apple-system, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, 'Noto Sans', sans-serif; width: 780px; height: 468px; border-radius: 0; overflow: visible; background: transparent; display: flex; gap: -8px; position: relative;" class="popup-container">
+              <div style="font-family: ui-sans-serif, system-ui, -apple-system, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, 'Noto Sans', sans-serif; width: 100%; max-width: 780px; height: 468px; border-radius: 0; overflow: visible; background: transparent; display: flex; gap: -8px; position: relative;" class="popup-container">
                 <!-- Photo -->
-                <div style="width: 468px; height: 468px; position: relative; background: #ddd; border-radius: 9px 0 0 9px !important; overflow: hidden;" class="popup-image">
+                <div style="width: 468px; height: 468px; position: relative; background: #ddd; border-radius: 9px 0 0 9px !important; overflow: hidden; flex-shrink: 0;" class="popup-image">
                   <img src="${screen.image_url}" alt="${screen.name}"
-                       style="width: 468px; height: 468px; object-fit: cover;"/>
+                       style="width: 100%; height: 100%; object-fit: cover;"/>
                   
                   ${showLastMinute ? `
                   <!-- Last Minute Badge -->
@@ -531,7 +531,7 @@ export default function Map({ selectedCity, selectedScreens, screenCities, selec
                 </div>
                 
                 <!-- Card -->
-                <div style="width: 270px; height: 468px; background: #ffffff; border-radius: 0 13px 13px 0; box-shadow: 0 13px 31px rgba(0,0,0,0.08); padding: 42px 42px 36px; display: flex; flex-direction: column; gap: 23px;" class="popup-card">
+                <div style="width: 270px; min-width: 270px; height: 468px; background: #ffffff; border-radius: 0 13px 13px 0; box-shadow: 0 13px 31px rgba(0,0,0,0.08); padding: 42px 42px 36px; display: flex; flex-direction: column; gap: 23px;" class="popup-card">
                   <!-- Header -->
                   <header>
                     <h1 style="font-weight: 800; font-size: 28px; margin: 0; color: #111827;">${screen.name}</h1>
@@ -727,12 +727,24 @@ export default function Map({ selectedCity, selectedScreens, screenCities, selec
               max-width: 80vw !important;
               width: 80vw !important;
             }
+            .popup-container .popup-image {
+              width: min(468px, 55vw) !important;
+            }
+            .popup-container .popup-card {
+              width: min(270px, 45vw) !important;
+            }
           }
           
           @media (max-width: 900px) {
             .leaflet-popup-content {
               max-width: 75vw !important;
               width: 75vw !important;
+            }
+            .popup-container .popup-image {
+              width: min(468px, 60vw) !important;
+            }
+            .popup-container .popup-card {
+              width: min(270px, 40vw) !important;
             }
           }
           
@@ -746,19 +758,22 @@ export default function Map({ selectedCity, selectedScreens, screenCities, selec
             }
             .popup-container {
               flex-direction: column !important;
-              width: 95vw !important;
+              width: 100% !important;
               height: auto !important;
+              max-width: none !important;
             }
             .popup-image {
               width: 100% !important;
               height: 200px !important;
               border-radius: 9px 9px 0 0 !important;
+              min-width: 0 !important;
             }
             .popup-card {
               width: 100% !important;
               height: auto !important;
               border-radius: 0 0 9px 9px !important;
               padding: 24px !important;
+              min-width: 0 !important;
             }
           }
           
