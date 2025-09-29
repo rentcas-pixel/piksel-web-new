@@ -326,7 +326,7 @@ export default function Map({ selectedCity, selectedScreens, screenCities, selec
                   <!-- Copy Coordinates Button -->
                   <button class="copy-coordinates-tooltip" onclick="navigator.clipboard.writeText('${screen.coordinates[0]}, ${screen.coordinates[1]}'); this.style.background='#10b981'; setTimeout(() => this.style.background='rgba(0,0,0,0.8)', 1000);" 
                           style="position: absolute; top: 62px; right: 20px; width: 32px; height: 32px; background: rgba(0,0,0,0.8); color: white; border: none; border-radius: 8px; display: flex; align-items: center; justify-content: center; cursor: pointer; z-index: 1000; transition: all 0.2s ease;"
-                          title="Kopijuoti koordinates">
+                          title="Kopijuoti koordinates" class="popup-image">
                     <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
                       <path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"></path>
                       <circle cx="12" cy="10" r="3"></circle>
@@ -335,7 +335,7 @@ export default function Map({ selectedCity, selectedScreens, screenCities, selec
                 </div>
                 
                 <!-- Card -->
-                <div style="width: 270px; height: 468px; background: #ffffff; border-radius: 0 13px 13px 0; box-shadow: 0 13px 31px rgba(0,0,0,0.08); padding: 42px 42px 36px; display: flex; flex-direction: column; gap: 23px;">
+                <div style="width: 270px; height: 468px; background: #ffffff; border-radius: 0 13px 13px 0; box-shadow: 0 13px 31px rgba(0,0,0,0.08); padding: 42px 42px 36px; display: flex; flex-direction: column; gap: 23px;" class="popup-card">
                   <!-- Header -->
                   <header>
                     <h1 style="font-weight: 800; font-size: 28px; margin: 0; color: #111827;">${screen.name} - Šiaurė</h1>
@@ -423,7 +423,7 @@ export default function Map({ selectedCity, selectedScreens, screenCities, selec
                   <!-- Copy Coordinates Button -->
                   <button class="copy-coordinates-tooltip" onclick="navigator.clipboard.writeText('${screen.coordinates[0]}, ${screen.coordinates[1]}'); this.style.background='#10b981'; setTimeout(() => this.style.background='rgba(0,0,0,0.8)', 1000);" 
                           style="position: absolute; top: 62px; right: 20px; width: 32px; height: 32px; background: rgba(0,0,0,0.8); color: white; border: none; border-radius: 8px; display: flex; align-items: center; justify-content: center; cursor: pointer; z-index: 1000; transition: all 0.2s ease;"
-                          title="Kopijuoti koordinates">
+                          title="Kopijuoti koordinates" class="popup-image">
                     <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
                       <path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"></path>
                       <circle cx="12" cy="10" r="3"></circle>
@@ -432,7 +432,7 @@ export default function Map({ selectedCity, selectedScreens, screenCities, selec
                 </div>
                 
                 <!-- Card -->
-                <div style="width: 270px; height: 468px; background: #ffffff; border-radius: 0 13px 13px 0; box-shadow: 0 13px 31px rgba(0,0,0,0.08); padding: 42px 42px 36px; display: flex; flex-direction: column; gap: 23px;">
+                <div style="width: 270px; height: 468px; background: #ffffff; border-radius: 0 13px 13px 0; box-shadow: 0 13px 31px rgba(0,0,0,0.08); padding: 42px 42px 36px; display: flex; flex-direction: column; gap: 23px;" class="popup-card">
                   <!-- Header -->
                   <header>
                     <h1 style="font-weight: 800; font-size: 28px; margin: 0; color: #111827;">${screen.name} - Pietūs</h1>
@@ -473,9 +473,9 @@ export default function Map({ selectedCity, selectedScreens, screenCities, selec
 
 
           marker.bindPopup(`
-              <div style="font-family: ui-sans-serif, system-ui, -apple-system, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, 'Noto Sans', sans-serif; width: 780px; height: 468px; border-radius: 0; overflow: visible; background: transparent; display: flex; gap: -8px; position: relative;">
+              <div style="font-family: ui-sans-serif, system-ui, -apple-system, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, 'Noto Sans', sans-serif; width: 780px; height: 468px; border-radius: 0; overflow: visible; background: transparent; display: flex; gap: -8px; position: relative;" class="popup-container">
                 <!-- Photo -->
-                <div style="width: 468px; height: 468px; position: relative; background: #ddd; border-radius: 9px 0 0 9px !important; overflow: hidden;">
+                <div style="width: 468px; height: 468px; position: relative; background: #ddd; border-radius: 9px 0 0 9px !important; overflow: hidden;" class="popup-image">
                   <img src="${screen.image_url}" alt="${screen.name}"
                        style="width: 468px; height: 468px; object-fit: cover;"/>
                   
@@ -522,7 +522,7 @@ export default function Map({ selectedCity, selectedScreens, screenCities, selec
                   <!-- Copy Coordinates Button -->
                   <button class="copy-coordinates-tooltip" onclick="navigator.clipboard.writeText('${screen.coordinates[0]}, ${screen.coordinates[1]}'); this.style.background='#10b981'; setTimeout(() => this.style.background='rgba(0,0,0,0.8)', 1000);" 
                           style="position: absolute; top: 62px; right: 20px; width: 32px; height: 32px; background: rgba(0,0,0,0.8); color: white; border: none; border-radius: 8px; display: flex; align-items: center; justify-content: center; cursor: pointer; z-index: 1000; transition: all 0.2s ease;"
-                          title="Kopijuoti koordinates">
+                          title="Kopijuoti koordinates" class="popup-image">
                     <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
                       <path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"></path>
                       <circle cx="12" cy="10" r="3"></circle>
@@ -531,7 +531,7 @@ export default function Map({ selectedCity, selectedScreens, screenCities, selec
                 </div>
                 
                 <!-- Card -->
-                <div style="width: 270px; height: 468px; background: #ffffff; border-radius: 0 13px 13px 0; box-shadow: 0 13px 31px rgba(0,0,0,0.08); padding: 42px 42px 36px; display: flex; flex-direction: column; gap: 23px;">
+                <div style="width: 270px; height: 468px; background: #ffffff; border-radius: 0 13px 13px 0; box-shadow: 0 13px 31px rgba(0,0,0,0.08); padding: 42px 42px 36px; display: flex; flex-direction: column; gap: 23px;" class="popup-card">
                   <!-- Header -->
                   <header>
                     <h1 style="font-weight: 800; font-size: 28px; margin: 0; color: #111827;">${screen.name}</h1>
@@ -714,6 +714,54 @@ export default function Map({ selectedCity, selectedScreens, screenCities, selec
             width: 780px !important;
           }
           
+          /* Progressive responsive popup styles */
+          @media (max-width: 1400px) {
+            .leaflet-popup-content {
+              max-width: 85vw !important;
+              width: 85vw !important;
+            }
+          }
+          
+          @media (max-width: 1200px) {
+            .leaflet-popup-content {
+              max-width: 80vw !important;
+              width: 80vw !important;
+            }
+          }
+          
+          @media (max-width: 900px) {
+            .leaflet-popup-content {
+              max-width: 75vw !important;
+              width: 75vw !important;
+            }
+          }
+          
+          @media (max-width: 768px) {
+            .leaflet-popup-content {
+              max-width: 95vw !important;
+              width: 95vw !important;
+            }
+            .leaflet-popup-content-wrapper {
+              padding: 0 !important;
+            }
+            .popup-container {
+              flex-direction: column !important;
+              width: 95vw !important;
+              height: auto !important;
+            }
+            .popup-image {
+              width: 100% !important;
+              height: 200px !important;
+              border-radius: 9px 9px 0 0 !important;
+            }
+            .popup-card {
+              width: 100% !important;
+              height: auto !important;
+              border-radius: 0 0 9px 9px !important;
+              padding: 24px !important;
+            }
+          }
+          
           .leaflet-popup-pane {
             background: transparent !important;
           }
@@ -739,6 +787,34 @@ export default function Map({ selectedCity, selectedScreens, screenCities, selec
             width: 587px !important;
           }
           
+          @media (max-width: 1400px) {
+            .leaflet-popup-content:has(div[style*="display: flex; gap: 5px"]) {
+              max-width: 85vw !important;
+              width: 85vw !important;
+            }
+          }
+          
+          @media (max-width: 1200px) {
+            .leaflet-popup-content:has(div[style*="display: flex; gap: 5px"]) {
+              max-width: 80vw !important;
+              width: 80vw !important;
+            }
+          }
+          
+          @media (max-width: 900px) {
+            .leaflet-popup-content:has(div[style*="display: flex; gap: 5px"]) {
+              max-width: 75vw !important;
+              width: 75vw !important;
+            }
+          }
+          
+          @media (max-width: 768px) {
+            .leaflet-popup-content:has(div[style*="display: flex; gap: 5px"]) {
+              max-width: 95vw !important;
+              width: 95vw !important;
+            }
+          }
+          
           .leaflet-popup-tip {
             background: white !important;
             box-shadow: 0 4px 12px rgba(0,0,0,0.15) !important;
@@ -752,6 +828,25 @@ export default function Map({ selectedCity, selectedScreens, screenCities, selec
           .info-popup .leaflet-popup-content {
             width: 291px !important;
             max-width: 291px !important;
+          }
+          
+          /* Responsive info popup */
+          @media (max-width: 1200px) {
+            .info-popup .leaflet-popup-content-wrapper {
+              margin-left: 0 !important;
+              position: absolute !important;
+              top: 0 !important;
+              left: 50% !important;
+              transform: translateX(-50%) !important;
+              margin-top: 320px !important;
+            }
+          }
+          
+          @media (max-width: 768px) {
+            .info-popup .leaflet-popup-content {
+              width: 90vw !important;
+              max-width: 90vw !important;
+            }
           }
           
           /* Hide default close button */
@@ -919,6 +1014,32 @@ export default function Map({ selectedCity, selectedScreens, screenCities, selec
             box-shadow: 0 25px 50px rgba(0, 0, 0, 0.5);
             transform: scale(0.8);
             transition: transform 0.3s ease;
+          }
+          
+          /* Responsive photo modal */
+          @media (max-width: 768px) {
+            .photo-modal-content {
+              max-width: 98vw;
+              max-height: 98vh;
+              border-radius: 8px;
+            }
+            .photo-modal-image {
+              max-width: 98vw;
+              max-height: 85vh;
+            }
+            .photo-modal-badge {
+              width: auto;
+              max-width: calc(100% - 40px);
+              padding: 8px 16px;
+              font-size: 14px;
+            }
+            .photo-modal-close {
+              width: 36px;
+              height: 36px;
+              top: 12px;
+              right: 12px;
+              font-size: 18px;
+            }
           }
           
           .photo-modal.show .photo-modal-content {
