@@ -1,5 +1,23 @@
 'use client';
 
+/**
+ * PIKSEL Website - Main Page Component
+ * 
+ * This is the main page for the LED screen advertising website.
+ * Features:
+ * - City-based screen filtering
+ * - Screen selection and inquiry forms
+ * - Responsive design (desktop sidebar + mobile inline)
+ * - Integration with Supabase for LED screen data
+ * - EmailJS for inquiry submissions
+ * 
+ * Key state management:
+ * - selectedCity: Current city filter (Vilnius, Kaunas, etc.)
+ * - selectedScreens: Array of selected screen names
+ * - showInquiryForm: Shows/hides inquiry form sidebar
+ * - dateRange: Selected advertising period
+ */
+
 import { useState, useEffect } from 'react';
 import Sidebar from '@/components/Sidebar';
 import Map from '@/components/Map';
