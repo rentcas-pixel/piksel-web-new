@@ -387,9 +387,6 @@ export default function Home() {
     }
   };
 
-  const handleCloseInquiryForm = () => {
-    setShowInquiryForm(false);
-  };
 
   // Handle inquiry form submission
   const handleSubmitInquiry = async (e: React.FormEvent) => {
@@ -576,12 +573,6 @@ export default function Home() {
                   <p className="text-sm text-gray-600">Užklausa</p>
                 </div>
               </div>
-              <button
-                onClick={handleCloseInquiryForm}
-                className="text-gray-400 hover:text-gray-600 p-1 rounded-md hover:bg-gray-100 transition-colors"
-              >
-                <X className="w-5 h-5" />
-              </button>
             </div>
 
             {/* Selected Cities */}
