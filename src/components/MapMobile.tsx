@@ -1386,12 +1386,6 @@ export default function Map({ selectedCity, selectedScreens: propSelectedScreens
           zIndex: 10,
           minHeight: '200px'
         }}>
-          {/* Debug info */}
-          <div style={{ fontSize: '12px', color: '#666', marginBottom: '8px' }}>
-            Debug: {selectedCity} - Total screens: {ledScreens?.length || 0}, 
-            Kaunas screens: {ledScreens?.filter(s => s.city === 'Kaunas').length || 0},
-            Selected city screens: {ledScreens?.filter(s => s.city === selectedCity).length || 0}
-          </div>
           <div style={{ display: 'flex', flexDirection: 'column', gap: '12px', overflowY: 'auto', maxHeight: 'calc(100vh - 200px)', paddingBottom: '8px' }}>
             {ledScreens && ledScreens
               .filter(screen => {
@@ -1414,12 +1408,6 @@ export default function Map({ selectedCity, selectedScreens: propSelectedScreens
                 }}>
                   {/* Screen Image */}
                   <div style={{ marginBottom: '12px' }}>
-                    {/* Debug info */}
-                    <div style={{ fontSize: '10px', color: '#999', marginBottom: '4px' }}>
-                      Desktop: {screen.image_url ? 'Yes' : 'No'} | 
-                      Mobile: {screen.mobile_image_url ? 'Yes' : 'No'} | 
-                      City: {screen.city}
-                    </div>
                     <ResponsiveImage
                       desktopSrc={screen.image_url}
                       mobileSrc={screen.mobile_image_url}

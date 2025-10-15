@@ -95,12 +95,6 @@ export default function ResponsiveImage({
         </>
       )}
       
-      {/* Debug info in development */}
-      {process.env.NODE_ENV === 'development' && (
-        <div className="absolute top-2 left-2 bg-black/50 text-white text-xs px-2 py-1 rounded">
-          {isMobile ? 'Mobile' : 'Desktop'} | {mobileSrc && mobileSrc.trim() !== '' ? 'Optimized' : 'Fallback'} | Src: {imageSrc ? 'OK' : 'NULL'} | Error: {hasError ? 'Yes' : 'No'}
-        </div>
-      )}
     </div>
   )
 }
