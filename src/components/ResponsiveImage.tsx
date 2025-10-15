@@ -28,6 +28,7 @@ export default function ResponsiveImage({
 }: ResponsiveImageProps) {
   const [isMobile, setIsMobile] = useState(false)
   const [isLoading, setIsLoading] = useState(true)
+  const [hasError, setHasError] = useState(false)
 
   useEffect(() => {
     const checkMobile = () => {
@@ -49,44 +50,55 @@ export default function ResponsiveImage({
 
   const handleError = () => {
     setIsLoading(false)
-    console.warn(`Failed to load image: ${imageSrc}`)
+    setHasError(true)
+    console.error(`Failed to load image: ${imageSrc}`)
+    console.error(`Mobile: ${isMobile}, MobileSrc: ${mobileSrc}, DesktopSrc: ${desktopSrc}`)
   }
 
   return (
     <div className={`relative ${className}`}>
-      {isLoading && (
+      {isLoading && !hasError && (
         <div className="absolute inset-0 bg-gray-200 animate-pulse rounded-lg flex items-center justify-center">
           <div className="text-gray-400 text-sm">Kraunama...</div>
         </div>
       )}
       
-      {fill ? (
-        <Image
-          src={imageSrc}
-          alt={alt}
-          fill
-          className={`${isLoading ? 'opacity-0' : 'opacity-100'} transition-opacity duration-300 object-${objectFit}`}
-          onLoad={handleLoad}
-          onError={handleError}
-          priority={priority}
-        />
+      {hasError ? (
+        <div className="absolute inset-0 bg-gray-100 rounded-lg flex flex-col items-center justify-center text-gray-500">
+          <div className="text-2xl mb-2">📷</div>
+          <div className="text-sm text-center px-2">Nuotrauka neprieinama<br/>(402 error)</div>
+        </div>
       ) : (
-        <Image
-          src={imageSrc}
-          alt={alt}
-          width={width}
-          height={height}
-          className={`${isLoading ? 'opacity-0' : 'opacity-100'} transition-opacity duration-300 object-${objectFit}`}
-          onLoad={handleLoad}
-          onError={handleError}
-          priority={priority}
-        />
+        <>
+          {fill ? (
+            <Image
+              src={imageSrc}
+              alt={alt}
+              fill
+              className={`${isLoading ? 'opacity-0' : 'opacity-100'} transition-opacity duration-300 object-${objectFit}`}
+              onLoad={handleLoad}
+              onError={handleError}
+              priority={priority}
+            />
+          ) : (
+            <Image
+              src={imageSrc}
+              alt={alt}
+              width={width}
+              height={height}
+              className={`${isLoading ? 'opacity-0' : 'opacity-100'} transition-opacity duration-300 object-${objectFit}`}
+              onLoad={handleLoad}
+              onError={handleError}
+              priority={priority}
+            />
+          )}
+        </>
       )}
       
       {/* Debug info in development */}
       {process.env.NODE_ENV === 'development' && (
         <div className="absolute top-2 left-2 bg-black/50 text-white text-xs px-2 py-1 rounded">
-          {isMobile ? 'Mobile' : 'Desktop'} | {mobileSrc && mobileSrc.trim() !== '' ? 'Optimized' : 'Fallback'} | Src: {imageSrc ? 'OK' : 'NULL'}
+          {isMobile ? 'Mobile' : 'Desktop'} | {mobileSrc && mobileSrc.trim() !== '' ? 'Optimized' : 'Fallback'} | Src: {imageSrc ? 'OK' : 'NULL'} | Error: {hasError ? 'Yes' : 'No'}
         </div>
       )}
     </div>

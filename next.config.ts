@@ -14,6 +14,8 @@ const config: NextConfig = {
     deviceSizes: [320, 640],
     imageSizes: [16, 32, 48, 64, 96, 128, 256],
     formats: ['image/webp'],
+    // Disable image optimization to avoid Vercel limits
+    unoptimized: true,
   },
   async headers() {
     return [
