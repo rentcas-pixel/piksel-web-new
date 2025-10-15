@@ -86,18 +86,13 @@ export default function Map({ selectedCity, selectedScreens: propSelectedScreens
       setTimeout(() => {
         const submitButton = document.getElementById('submit-inquiry-button');
         if (submitButton) {
-          // For iOS Safari - use visual viewport for accurate positioning
-          const rect = submitButton.getBoundingClientRect();
-          const scrollTop = window.pageYOffset || document.documentElement.scrollTop;
-          const viewportHeight = window.visualViewport ? window.visualViewport.height : window.innerHeight;
-          const targetPosition = rect.top + scrollTop - (viewportHeight * 0.7); // Position higher
-          
+          // Force scroll to bottom to show submit button
           window.scrollTo({
-            top: Math.max(0, targetPosition),
+            top: document.body.scrollHeight,
             behavior: 'smooth'
           });
         }
-      }, 300); // Small delay to ensure form is rendered
+      }, 500); // Longer delay to ensure form is fully rendered
     }
   }, [showInquiryForm, toDate]);
 
@@ -105,21 +100,12 @@ export default function Map({ selectedCity, selectedScreens: propSelectedScreens
   useEffect(() => {
     const handleInputFocus = () => {
       setTimeout(() => {
-        const submitButton = document.getElementById('submit-inquiry-button');
-        if (submitButton && showInquiryForm) {
-          // For iOS Safari - calculate position accounting for keyboard using visual viewport
-          const rect = submitButton.getBoundingClientRect();
-          const scrollTop = window.pageYOffset || document.documentElement.scrollTop;
-          const viewportHeight = window.visualViewport ? window.visualViewport.height : window.innerHeight;
-          const keyboardHeight = (window.innerHeight - viewportHeight) || (window.innerHeight * 0.4);
-          const targetPosition = rect.top + scrollTop - (viewportHeight - 120); // 120px buffer above keyboard
-          
-          window.scrollTo({
-            top: Math.max(0, targetPosition),
-            behavior: 'smooth'
-          });
-        }
-      }, 800); // Longer delay for iOS keyboard animation
+        // Force scroll to bottom when keyboard opens
+        window.scrollTo({
+          top: document.body.scrollHeight,
+          behavior: 'smooth'
+        });
+      }, 1000); // Longer delay for keyboard animation
     };
 
     // Add event listeners to all input fields
@@ -1367,8 +1353,12 @@ export default function Map({ selectedCity, selectedScreens: propSelectedScreens
                   border: 'none',
                   cursor: submittingInquiry ? 'not-allowed' : 'pointer',
                   marginTop: '12px',
-                  marginBottom: '20px',
-                  minHeight: '44px' // Minimum touch target size for mobile
+                  marginBottom: '40px', // Extra bottom margin for mobile
+                  minHeight: '44px', // Minimum touch target size for mobile
+                  position: 'sticky',
+                  bottom: '20px',
+                  zIndex: 1000,
+                  boxShadow: '0 4px 12px rgba(0,0,0,0.15)'
                 }}
               >
                 {submittingInquiry ? 'Siunčiama...' : 'Siųsti užklausą'}
@@ -1387,9 +1377,23 @@ export default function Map({ selectedCity, selectedScreens: propSelectedScreens
           zIndex: 10,
           minHeight: '200px'
         }}>
+          {/* Debug info */}
+          <div style={{ fontSize: '12px', color: '#666', marginBottom: '8px' }}>
+            Debug: {selectedCity} - Total screens: {ledScreens?.length || 0}, 
+            Kaunas screens: {ledScreens?.filter(s => s.city === 'Kaunas').length || 0},
+            Selected city screens: {ledScreens?.filter(s => s.city === selectedCity).length || 0}
+          </div>
           <div style={{ display: 'flex', flexDirection: 'column', gap: '12px', overflowY: 'auto', maxHeight: 'calc(100vh - 200px)', paddingBottom: '8px' }}>
             {ledScreens && ledScreens
-              .filter(screen => screen.city === selectedCity)
+              .filter(screen => {
+                if (selectedCity === 'Lietuva') {
+                  return true; // Show all screens for Lithuania
+                } else if (selectedCity === 'Regionai') {
+                  return !['Vilnius', 'Kaunas', 'Klaipėda', 'Šiauliai', 'Panevėžys'].includes(screen.city);
+                } else {
+                  return screen.city === selectedCity;
+                }
+              })
               .map(screen => (
                 <div key={screen.slug} style={{ 
                   backgroundColor: 'white',
@@ -1401,6 +1405,12 @@ export default function Map({ selectedCity, selectedScreens: propSelectedScreens
                 }}>
                   {/* Screen Image */}
                   <div style={{ marginBottom: '12px' }}>
+                    {/* Debug info */}
+                    <div style={{ fontSize: '10px', color: '#999', marginBottom: '4px' }}>
+                      Desktop: {screen.image_url ? 'Yes' : 'No'} | 
+                      Mobile: {screen.mobile_image_url ? 'Yes' : 'No'} | 
+                      City: {screen.city}
+                    </div>
                     <ResponsiveImage
                       desktopSrc={screen.image_url}
                       mobileSrc={screen.mobile_image_url}
