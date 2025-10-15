@@ -10,6 +10,10 @@ const config: NextConfig = {
         pathname: '/storage/v1/object/public/**',
       },
     ],
+    // Reduce image sizes to save bandwidth
+    deviceSizes: [320, 640],
+    imageSizes: [16, 32, 48, 64, 96, 128, 256],
+    formats: ['image/webp'],
   },
   async headers() {
     return [
