@@ -41,7 +41,7 @@ export default function ResponsiveImage({
   }, [])
 
   // Choose the appropriate image source
-  const imageSrc = isMobile && mobileSrc ? mobileSrc : desktopSrc
+  const imageSrc = isMobile && mobileSrc && mobileSrc.trim() !== '' ? mobileSrc : desktopSrc
 
   const handleLoad = () => {
     setIsLoading(false)
@@ -86,7 +86,7 @@ export default function ResponsiveImage({
       {/* Debug info in development */}
       {process.env.NODE_ENV === 'development' && (
         <div className="absolute top-2 left-2 bg-black/50 text-white text-xs px-2 py-1 rounded">
-          {isMobile ? 'Mobile' : 'Desktop'} | {mobileSrc ? 'Optimized' : 'Fallback'}
+          {isMobile ? 'Mobile' : 'Desktop'} | {mobileSrc && mobileSrc.trim() !== '' ? 'Optimized' : 'Fallback'} | Src: {imageSrc ? 'OK' : 'NULL'}
         </div>
       )}
     </div>

@@ -1261,6 +1261,7 @@ export default function Map({ selectedCity, selectedScreens: propSelectedScreens
             backgroundColor: 'white',
             borderBottom: '1px solid #e5e7eb',
             padding: '16px',
+            paddingBottom: '100px', // Space for fixed submit button
             flexShrink: 0
           }}>
             <h3 style={{ fontSize: '16px', fontWeight: '600', color: '#111827', marginBottom: '12px' }}>
@@ -1339,30 +1340,38 @@ export default function Map({ selectedCity, selectedScreens: propSelectedScreens
                   color: '#111827 !important'
                 }}
               />
-              <button
-                id="submit-inquiry-button"
-                onClick={handleSubmitInquiry}
-                disabled={submittingInquiry}
-                style={{
-                  backgroundColor: submittingInquiry ? '#9ca3af' : '#2563eb',
-                  color: 'white',
-                  padding: '12px 16px',
-                  borderRadius: '6px',
-                  fontSize: '14px',
-                  fontWeight: '500',
-                  border: 'none',
-                  cursor: submittingInquiry ? 'not-allowed' : 'pointer',
-                  marginTop: '12px',
-                  marginBottom: '40px', // Extra bottom margin for mobile
-                  minHeight: '44px', // Minimum touch target size for mobile
-                  position: 'sticky',
-                  bottom: '20px',
-                  zIndex: 1000,
-                  boxShadow: '0 4px 12px rgba(0,0,0,0.15)'
-                }}
-              >
-                {submittingInquiry ? 'Siunčiama...' : 'Siųsti užklausą'}
-              </button>
+       <div style={{
+         position: 'fixed',
+         bottom: '0',
+         left: '0',
+         right: '0',
+         padding: '16px',
+         backgroundColor: 'white',
+         borderTop: '1px solid #e5e7eb',
+         zIndex: 1000,
+         boxShadow: '0 -4px 12px rgba(0,0,0,0.15)'
+       }}>
+         <button
+           id="submit-inquiry-button"
+           onClick={handleSubmitInquiry}
+           disabled={submittingInquiry}
+           style={{
+             backgroundColor: submittingInquiry ? '#9ca3af' : '#2563eb',
+             color: 'white',
+             padding: '16px 20px',
+             borderRadius: '8px',
+             fontSize: '16px',
+             fontWeight: '600',
+             border: 'none',
+             cursor: submittingInquiry ? 'not-allowed' : 'pointer',
+             width: '100%',
+             minHeight: '52px', // Larger touch target
+             boxShadow: '0 2px 8px rgba(0,0,0,0.1)'
+           }}
+         >
+           {submittingInquiry ? 'Siunčiama...' : 'Siųsti užklausą'}
+         </button>
+       </div>
             </div>
           </div>
         )}
