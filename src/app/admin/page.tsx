@@ -220,8 +220,17 @@ export default function AdminPanel() {
         return
       }
 
+      // Generate slug from name
+      const slug = formData.name
+        .toLowerCase()
+        .replace(/[^a-z0-9\s-]/g, '')
+        .replace(/\s+/g, '-')
+        .replace(/-+/g, '-')
+        .trim();
+
       const screenData = {
         name: formData.name,
+        slug: slug,
         custom_url: formData.custom_url || null,
         city: formData.city,
         district: formData.district,

@@ -559,7 +559,7 @@ export default function Map({ selectedCity, selectedScreens, screenCities, selec
                   </div>
                   
                   <!-- Action Button -->
-                  <div style="margin-top: auto;">
+                  <div style="margin-top: auto; padding-top: 8px;">
                     <button onclick="window.selectScreen('${screen.name}')" 
                             style="width: 100%; padding: 12px 20px; background: #f8fafc; color: #475569; border: 1px solid #e2e8f0; border-radius: 8px; font-size: 16px; font-weight: 600; cursor: pointer; transition: all 0.2s ease;"
                             onmouseover="this.style.background='#f1f5f9';"

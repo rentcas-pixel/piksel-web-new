@@ -45,6 +45,36 @@ export default function Map({ selectedCity, selectedScreens: propSelectedScreens
   // Check if mobile
   const [isMobile, setIsMobile] = useState(false);
   
+  // iOS Safari viewport fix
+  useEffect(() => {
+    const isIOS = /iPad|iPhone|iPod/.test(navigator.userAgent);
+    if (isIOS) {
+      // Add viewport meta tag for iOS
+      let viewport = document.querySelector('meta[name="viewport"]');
+      if (!viewport) {
+        viewport = document.createElement('meta');
+        viewport.setAttribute('name', 'viewport');
+        document.head.appendChild(viewport);
+      }
+      viewport.setAttribute('content', 'width=device-width, initial-scale=1, viewport-fit=cover');
+      
+      // Fix iOS Safari visual viewport
+      const setViewportHeight = () => {
+        const vh = window.visualViewport ? window.visualViewport.height : window.innerHeight;
+        document.documentElement.style.setProperty('--vh', `${vh}px`);
+      };
+      
+      setViewportHeight();
+      window.visualViewport?.addEventListener('resize', setViewportHeight);
+      window.addEventListener('resize', setViewportHeight);
+      
+      return () => {
+        window.visualViewport?.removeEventListener('resize', setViewportHeight);
+        window.removeEventListener('resize', setViewportHeight);
+      };
+    }
+  }, []);
+  
   // Initialize EmailJS
   useEffect(() => {
     initEmailJS();
@@ -56,10 +86,15 @@ export default function Map({ selectedCity, selectedScreens: propSelectedScreens
       setTimeout(() => {
         const submitButton = document.getElementById('submit-inquiry-button');
         if (submitButton) {
-          // Scroll to bottom to ensure submit button is visible above keyboard
-          submitButton.scrollIntoView({ 
-            behavior: 'smooth', 
-            block: 'end' 
+          // For iOS Safari - use visual viewport for accurate positioning
+          const rect = submitButton.getBoundingClientRect();
+          const scrollTop = window.pageYOffset || document.documentElement.scrollTop;
+          const viewportHeight = window.visualViewport ? window.visualViewport.height : window.innerHeight;
+          const targetPosition = rect.top + scrollTop - (viewportHeight * 0.7); // Position higher
+          
+          window.scrollTo({
+            top: Math.max(0, targetPosition),
+            behavior: 'smooth'
           });
         }
       }, 300); // Small delay to ensure form is rendered
@@ -72,12 +107,19 @@ export default function Map({ selectedCity, selectedScreens: propSelectedScreens
       setTimeout(() => {
         const submitButton = document.getElementById('submit-inquiry-button');
         if (submitButton && showInquiryForm) {
-          submitButton.scrollIntoView({ 
-            behavior: 'smooth', 
-            block: 'end' 
+          // For iOS Safari - calculate position accounting for keyboard using visual viewport
+          const rect = submitButton.getBoundingClientRect();
+          const scrollTop = window.pageYOffset || document.documentElement.scrollTop;
+          const viewportHeight = window.visualViewport ? window.visualViewport.height : window.innerHeight;
+          const keyboardHeight = (window.innerHeight - viewportHeight) || (window.innerHeight * 0.4);
+          const targetPosition = rect.top + scrollTop - (viewportHeight - 120); // 120px buffer above keyboard
+          
+          window.scrollTo({
+            top: Math.max(0, targetPosition),
+            behavior: 'smooth'
           });
         }
-      }, 500); // Delay to account for keyboard animation
+      }, 800); // Longer delay for iOS keyboard animation
     };
 
     // Add event listeners to all input fields
