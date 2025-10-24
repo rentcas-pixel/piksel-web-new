@@ -61,3 +61,5 @@ LED screen advertising website (piksel.lt) for Lithuania market.
 - Vercel Pro plan (resolves image optimization limits)
 - Supabase Pro plan (resolves bandwidth limits)
 - Custom domain: piksel.lt
+
+

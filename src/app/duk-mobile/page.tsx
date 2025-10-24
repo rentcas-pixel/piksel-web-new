@@ -12,7 +12,7 @@ export default function DUKMobile() {
   const faqData = [
     {
       question: "Ar galiu reklamuotis tik viename viaduke?",
-      answer: "Viadukų ekranai parduodami tik kaip bendras reklamos paketas, apimantis 7 viadukų ekranus. Tik taip galime užtikrinti maksimalų reklamos pasiekiamumą."
+      answer: "Viadukų ekranai parduodami tik kaip bendras reklamos paketas, apimantis 8 viadukų ekranus. Tik taip galime užtikrinti maksimalų reklamos pasiekiamumą."
     },
     {
       question: "Kokia vidutinė reklamos transliacijų trukmė?",
