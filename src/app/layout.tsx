@@ -42,6 +42,9 @@ export const metadata: Metadata = {
     "reklamos ekranai",
     "LED ekranų reklama"
   ],
+  alternates: {
+    canonical: "https://piksel.lt",
+  },
   openGraph: {
     title: "PIKSEL - LED Reklamos Tinklas ir Lyderis Lietuvoje",
     description: "PIKSEL - didžiausias LED ekranų reklamos tinklas Lietuvoje. Profesionalūs LED reklamos ekranai su aukšta kokybe ir strateginėmis vietomis. Reklama lauke Vilniuje, Kaune, Klaipėdoje.",
