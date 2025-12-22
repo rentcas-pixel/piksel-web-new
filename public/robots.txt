@@ -2,7 +2,7 @@ User-agent: *
 Allow: /
 
 # Allow all search engines to crawl all pages
-Sitemap: https://nextjs-table-app-stable.vercel.app/sitemap.xml
+Sitemap: https://piksel.lt/sitemap.xml
 
 # Block admin and private areas
 Disallow: /admin/
