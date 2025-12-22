@@ -84,7 +84,7 @@ export default function ScreenPage() {
           <div className="relative overflow-hidden">
             <Image
               src={screen.image}
-              alt={screen.name}
+              alt={`${screen.name} - lauko ekranas, video ekranas, ${screen.city}, PIKSEL reklamos tinklas`}
               width={1920}
               height={1080}
               className="w-full h-[70vh] object-contain bg-gray-100 aspect-video"

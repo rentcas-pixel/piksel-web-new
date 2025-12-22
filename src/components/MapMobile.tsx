@@ -275,7 +275,7 @@ export default function Map({ selectedCity, selectedScreens: propSelectedScreens
       <div style="font-family: ui-sans-serif, system-ui, -apple-system, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, 'Noto Sans', sans-serif; width: 320px; max-width: 90vw; background: white; border-radius: 12px; overflow: hidden; box-shadow: 0 10px 25px rgba(0,0,0,0.15);">
         <!-- Photo -->
         <div style="width: 100%; height: 200px; position: relative; background: #ddd; overflow: hidden;">
-          <img src="${screen.image_url}" alt="${fullName}"
+          <img src="${screen.image_url}" alt="${fullName} - LED ekranas, reklama ekranuose, ${screen.city}"
                style="width: 100%; height: 100%; object-fit: cover;"/>
           
           ${screen.is_viaduct ? `
@@ -354,7 +354,7 @@ export default function Map({ selectedCity, selectedScreens: propSelectedScreens
       <div style="font-family: ui-sans-serif, system-ui, -apple-system, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, 'Noto Sans', sans-serif; width: 400px; background: white; border-radius: 12px; overflow: hidden; box-shadow: 0 10px 25px rgba(0,0,0,0.15);">
         <!-- Photo -->
         <div style="width: 100%; height: 250px; position: relative; background: #ddd; overflow: hidden;">
-          <img src="${screen.image_url}" alt="${fullName}"
+          <img src="${screen.image_url}" alt="${fullName} - LED ekranas, reklama led ekrane, ${screen.city}"
                style="width: 100%; height: 100%; object-fit: cover;"/>
           
           ${screen.is_viaduct ? `
@@ -483,7 +483,7 @@ export default function Map({ selectedCity, selectedScreens: propSelectedScreens
           const popupContent = `
             <div style="text-align: center; min-width: 200px;">
               <div style="margin-bottom: 12px;">
-                <img src="${screen.image_url}" alt="${screen.name}" 
+                <img src="${screen.image_url}" alt="${screen.name} - lauko ekranas, video ekranas, ${screen.city}" 
                      style="width: 100%; height: 120px; object-fit: cover; border-radius: 8px; margin-bottom: 8px;">
               </div>
               <h3 style="font-size: 16px; font-weight: 600; color: #111827; margin-bottom: 8px;">
@@ -1411,7 +1411,7 @@ export default function Map({ selectedCity, selectedScreens: propSelectedScreens
                     <ResponsiveImage
                       desktopSrc={screen.image_url}
                       mobileSrc={screen.mobile_image_url}
-                      alt={screen.name}
+                      alt={`${screen.name} - LED ekranas, reklama ekranuose, ${screen.city}`}
                       width={300}
                       height={176}
                       className="w-full"

@@ -10,17 +10,17 @@ export default function Slideshow() {
     {
       id: 1,
       image: "/sliede-1.jpeg",
-      alt: "LED ekranas Vilniaus centre"
+      alt: "Lauko reklamos LED ekranas Vilniuje - PIKSEL reklamos tinklas, reklama led ekrane"
     },
     {
       id: 2,
       image: "/sliede-2.jpeg",
-      alt: "LED ekranas su reklama"
+      alt: "Video ekranas su reklama - LED ekranai Lietuvoje, lauko ekranai"
     },
     {
       id: 3,
       image: "/sliede-3.jpeg",
-      alt: "LED ekranų valdymo sistema"
+      alt: "PIKSEL LED ekranų valdymas - lauko reklamos tinklas, reklama ekranuose"
     }
   ];
 

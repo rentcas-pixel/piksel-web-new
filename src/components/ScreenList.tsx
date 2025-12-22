@@ -90,7 +90,7 @@ export default function ScreenList({ selectedCity, selectedScreens, onSelectScre
                   <div className="relative mb-3">
                     <Image
                       src={screen.image_url}
-                      alt={screen.name}
+                      alt={`${screen.name} - LED ekranas, reklama led ekrane, ${screen.city}`}
                       width={300}
                       height={150}
                       className="w-full h-32 object-cover rounded-md cursor-pointer hover:opacity-90 transition-opacity"

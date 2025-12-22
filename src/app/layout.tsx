@@ -4,6 +4,7 @@ import "./globals.css";
 import Navigation from "@/components/Navigation";
 import Footer from "@/components/Footer";
 import GlobalSidebar from "@/components/GlobalSidebar";
+import StructuredData from "@/components/StructuredData";
 
 const inter = Inter({
   subsets: ["latin"],
@@ -16,8 +17,53 @@ const manrope = Manrope({
 });
 
 export const metadata: Metadata = {
-  title: "PIKSEL - LED Ekranų Reklama Lietuvoje",
-  description: "Profesionalūs LED ekranų reklamos sprendimai Lietuvoje. Kokybiškos reklamos paslaugos naudojant moderniausią technologiją.",
+  title: "PIKSEL - LED Reklamos Tinklas ir Lyderis Lietuvoje | Reklama Lauke",
+  description: "PIKSEL - didžiausias LED ekranų reklamos tinklas Lietuvoje. Profesionalūs LED reklamos ekranai Vilniuje, Kaune, Klaipėdoje ir kituose miestuose. Reklama lauke su aukšta kokybe ir strateginėmis vietomis. LED reklamos lyderiai ir tinklas Lietuvoje.",
+  keywords: [
+    "reklama ekranuose",
+    "reklama led ekrane",
+    "led ekranai",
+    "lauko ekranai",
+    "reklamos tinklas",
+    "lauko reklamos tinklas",
+    "video ekranai",
+    "LED reklamos tinklas Lietuvoje",
+    "LED reklamos lyderiai",
+    "reklama lauke",
+    "LED ekranai Lietuvoje",
+    "LED reklama Vilnius",
+    "LED reklama Kaunas",
+    "LED reklama Klaipėda",
+    "outdoor advertising Lithuania",
+    "LED screen advertising",
+    "didžiausias LED tinklas",
+    "ryškių ekranų tinklas",
+    "LED reklamos paslaugos",
+    "reklamos ekranai",
+    "LED ekranų reklama"
+  ],
+  openGraph: {
+    title: "PIKSEL - LED Reklamos Tinklas ir Lyderis Lietuvoje",
+    description: "PIKSEL - didžiausias LED ekranų reklamos tinklas Lietuvoje. Profesionalūs LED reklamos ekranai su aukšta kokybe ir strateginėmis vietomis. Reklama lauke Vilniuje, Kaune, Klaipėdoje.",
+    url: "https://piksel.lt",
+    siteName: "PIKSEL",
+    images: [
+      {
+        url: "https://piksel.lt/sliede-1.jpeg",
+        width: 1200,
+        height: 630,
+        alt: "PIKSEL LED reklamos ekranas - LED reklamos tinklas Lietuvoje",
+      },
+    ],
+    locale: "lt_LT",
+    type: "website",
+  },
+  twitter: {
+    card: "summary_large_image",
+    title: "PIKSEL - LED Reklamos Tinklas ir Lyderis Lietuvoje",
+    description: "PIKSEL - didžiausias LED ekranų reklamos tinklas Lietuvoje. Reklama lauke su aukšta kokybe.",
+    images: ["https://piksel.lt/sliede-1.jpeg"],
+  },
   icons: {
     icon: [
       { url: '/favicon.ico', sizes: 'any' },
@@ -35,6 +81,9 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="lt">
+      <head>
+        <StructuredData />
+      </head>
       <body className={`${inter.variable} ${manrope.variable} font-sans antialiased`}>
         <GlobalSidebar />
         <Navigation />

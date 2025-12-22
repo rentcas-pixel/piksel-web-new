@@ -280,7 +280,7 @@ export default function Map({ selectedCity, selectedScreens, screenCities, selec
               <div style="font-family: ui-sans-serif, system-ui, -apple-system, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, 'Noto Sans', sans-serif; width: 100%; max-width: 780px; height: 468px; border-radius: 0; overflow: visible; background: transparent; display: flex; gap: -8px; position: relative;" class="popup-container">
                 <!-- Photo -->
                 <div style="width: 468px; height: 468px; position: relative; background: #ddd; border-radius: 9px 0 0 9px !important; overflow: hidden; flex-shrink: 0;" class="popup-image">
-                  <img src="${screen.image_url}" alt="${screen.name} - Šiaurė"
+                  <img src="${screen.image_url}" alt="${screen.name} - LED ekranas, reklama ekranuose, ${screen.city}"
                        style="width: 100%; height: 100%; object-fit: cover;"/>
                   
                   ${showLastMinute ? `
@@ -377,7 +377,7 @@ export default function Map({ selectedCity, selectedScreens, screenCities, selec
               <div style="font-family: ui-sans-serif, system-ui, -apple-system, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, 'Noto Sans', sans-serif; width: 100%; max-width: 780px; height: 468px; border-radius: 0; overflow: visible; background: transparent; display: flex; gap: -8px; position: relative;" class="popup-container">
                 <!-- Photo -->
                 <div style="width: 468px; height: 468px; position: relative; background: #ddd; border-radius: 9px 0 0 9px !important; overflow: hidden;">
-                  <img src="${screen.image_url}" alt="${screen.name} - Pietūs"
+                  <img src="${screen.image_url}" alt="${screen.name} - LED ekranas, reklama led ekrane, ${screen.city}"
                        style="width: 468px; height: 468px; object-fit: cover;"/>
                   
                   ${showLastMinute ? `
@@ -476,7 +476,7 @@ export default function Map({ selectedCity, selectedScreens, screenCities, selec
               <div style="font-family: ui-sans-serif, system-ui, -apple-system, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, 'Noto Sans', sans-serif; width: 100%; max-width: 780px; height: 468px; border-radius: 0; overflow: visible; background: transparent; display: flex; gap: -8px; position: relative;" class="popup-container">
                 <!-- Photo -->
                 <div style="width: 468px; height: 468px; position: relative; background: #ddd; border-radius: 9px 0 0 9px !important; overflow: hidden; flex-shrink: 0;" class="popup-image">
-                  <img src="${screen.image_url}" alt="${screen.name}"
+                  <img src="${screen.image_url}" alt="${screen.name} - lauko ekranas, video ekranas, ${screen.city}, reklamos tinklas"
                        style="width: 100%; height: 100%; object-fit: cover;"/>
                   
                   ${showLastMinute ? `
