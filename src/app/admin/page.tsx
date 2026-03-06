@@ -4,7 +4,6 @@ import { useState, useEffect } from 'react'
 import { supabase } from '@/lib/supabase'
 import { generateScreenImageFileName, generateNewsImageFileName } from '@/lib/seoImageUtils'
 import { LEDScreen, NewsItem } from '@/lib/supabase'
-import { ClipRequirement, defaultClipsData } from '@/data/clipsData'
 import { useAuth } from '@/hooks/useAuth'
 import LoginForm from '@/components/LoginForm'
 
@@ -16,19 +15,6 @@ export default function AdminPanel() {
   const [showForm, setShowForm] = useState(false)
   const [editingScreen, setEditingScreen] = useState<LEDScreen | null>(null)
   
-  // Clips data state – load from localStorage (admin saves here)
-  const [clipsData, setClipsData] = useState<ClipRequirement[]>(() => {
-    if (typeof window === 'undefined') return defaultClipsData
-    try {
-      const stored = localStorage.getItem('clipsData')
-      if (stored) {
-        const parsed = JSON.parse(stored) as ClipRequirement[]
-        if (Array.isArray(parsed) && parsed.length > 0) return parsed
-      }
-    } catch {}
-    return defaultClipsData
-  })
-  const [draggedItem, setDraggedItem] = useState<number | null>(null)
   const [draggedScreen, setDraggedScreen] = useState<string | null>(null)
 
   // News state
@@ -43,34 +29,6 @@ export default function AdminPanel() {
     created_at: new Date().toISOString().slice(0, 10), // YYYY-MM-DD
   })
   const [newsUploading, setNewsUploading] = useState(false)
-
-  // Drag and drop functions
-  const handleDragStart = (e: React.DragEvent, id: number) => {
-    setDraggedItem(id)
-    e.dataTransfer.effectAllowed = 'move'
-  }
-
-  const handleDragOver = (e: React.DragEvent) => {
-    e.preventDefault()
-    e.dataTransfer.dropEffect = 'move'
-  }
-
-  const handleDrop = (e: React.DragEvent, targetId: number) => {
-    e.preventDefault()
-    if (!draggedItem) return
-
-    const newClipsData = [...clipsData]
-    const draggedIndex = newClipsData.findIndex(item => item.id === draggedItem)
-    const targetIndex = newClipsData.findIndex(item => item.id === targetId)
-
-    if (draggedIndex !== -1 && targetIndex !== -1) {
-      const [draggedItemData] = newClipsData.splice(draggedIndex, 1)
-      newClipsData.splice(targetIndex, 0, draggedItemData)
-      setClipsData(newClipsData)
-    }
-
-    setDraggedItem(null)
-  }
 
   // Screen drag and drop functions
   const handleScreenDragStart = (e: React.DragEvent, screenId: string) => {
@@ -116,43 +74,6 @@ export default function AdminPanel() {
     }
 
     setDraggedScreen(null)
-  }
-
-  const handleTooltipChange = (id: number, newTooltip: string) => {
-    setClipsData(prev => prev.map(item => 
-      item.id === id ? { ...item, tooltip: newTooltip } : item
-    ))
-  }
-
-  const addNewClip = () => {
-    console.log('Adding new clip, current clipsData:', clipsData)
-    const newId = clipsData.length > 0 ? Math.max(...clipsData.map(item => item.id)) + 1 : 1
-    const newClip = {
-      id: newId,
-      city: 'Naujas miestas',
-      format: 'Horizontalus',
-      width: '1920',
-      height: '1080',
-      tooltip: 'Įveskite ekranų pavadinimus'
-    }
-    console.log('New clip:', newClip)
-    setClipsData(prev => {
-      console.log('Previous state:', prev)
-      const newState = [...prev, newClip]
-      console.log('New state:', newState)
-      return newState
-    })
-  }
-
-  const removeClip = (id: number) => {
-    setClipsData(prev => prev.filter(item => item.id !== id))
-  }
-
-  const saveClipsData = () => {
-    console.log('Saving clips data:', clipsData)
-    // Išsaugome localStorage
-    localStorage.setItem('clipsData', JSON.stringify(clipsData))
-    alert(`Išsaugota ${clipsData.length} eilučių!`)
   }
 
   // Form state
@@ -1148,16 +1069,6 @@ export default function AdminPanel() {
                 Ekranai ({screens.length})
               </button>
               <button
-                onClick={() => setActiveTab('clips')}
-                className={`flex-shrink-0 py-4 px-6 text-sm font-medium border-b-2 whitespace-nowrap ${
-                  activeTab === 'clips'
-                    ? 'border-blue-500 text-blue-600'
-                    : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'
-                }`}
-              >
-                Klipai
-              </button>
-              <button
                 onClick={() => setActiveTab('news')}
                 className={`flex-shrink-0 py-4 px-6 text-sm font-medium border-b-2 whitespace-nowrap ${
                   activeTab === 'news'
@@ -1275,127 +1186,6 @@ export default function AdminPanel() {
             </table>
           </div>
         </div>
-        )}
-
-        {/* Clips Tab */}
-        {activeTab === 'clips' && (
-          <div className="bg-white rounded-lg shadow-lg overflow-hidden">
-            <div className="px-6 py-4 border-b border-gray-200 flex justify-between items-center">
-              <div>
-                <h2 className="text-lg font-semibold">Klipų reikalavimai</h2>
-                <p className="text-sm text-gray-600 mt-1">Redaguokite tooltip tekstus ir eiliškumą. Tempkite eilutes, kad keistumėte eiliškumą.</p>
-                <p className="text-xs text-blue-600 mt-1">DEBUG: Iš viso eilučių: {clipsData.length}</p>
-              </div>
-              <button
-                onClick={addNewClip}
-                className="bg-green-600 text-white px-4 py-2 rounded-lg hover:bg-green-700 text-sm"
-              >
-                + Pridėti eilutę
-              </button>
-            </div>
-            <div className="p-6">
-              <div className="space-y-4">
-                {clipsData.map((clip, index) => (
-                  <div
-                    key={clip.id}
-                    draggable
-                    onDragStart={(e) => handleDragStart(e, clip.id)}
-                    onDragOver={handleDragOver}
-                    onDrop={(e) => handleDrop(e, clip.id)}
-                    className={`bg-gray-50 p-4 rounded-lg border-2 transition-all cursor-move ${
-                      draggedItem === clip.id ? 'border-blue-500 bg-blue-50' : 'border-transparent hover:border-gray-300'
-                    }`}
-                  >
-                    <div className="flex items-center justify-between mb-3">
-                      <div className="flex items-center gap-3">
-                        <div className="text-gray-400 text-sm">⋮⋮</div>
-                        <h3 className="font-medium text-gray-900">
-                          {clip.city || 'Nauja eilutė'} - {clip.format} ({clip.width}x{clip.height})
-                        </h3>
-                        <span className="text-xs text-gray-500">ID: {clip.id}</span>
-                      </div>
-                      <button
-                        onClick={() => removeClip(clip.id)}
-                        className="text-red-500 hover:text-red-700 text-sm"
-                      >
-                        🗑️ Ištrinti
-                      </button>
-                    </div>
-                    <div className="grid grid-cols-2 gap-4 mb-3">
-                      <div>
-                        <label className="block text-sm font-medium text-gray-700 mb-1">Miestas</label>
-                        <input
-                          type="text"
-                          value={clip.city}
-                          onChange={(e) => setClipsData(prev => prev.map(item => 
-                            item.id === clip.id ? { ...item, city: e.target.value } : item
-                          ))}
-                          className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 text-sm"
-                          placeholder="Įveskite miestą"
-                        />
-                      </div>
-                      <div>
-                        <label className="block text-sm font-medium text-gray-700 mb-1">Formatas</label>
-                        <select
-                          value={clip.format}
-                          onChange={(e) => setClipsData(prev => prev.map(item => 
-                            item.id === clip.id ? { ...item, format: e.target.value } : item
-                          ))}
-                          className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 text-sm"
-                        >
-                          <option value="Horizontalus">Horizontalus</option>
-                          <option value="Vertikalus">Vertikalus</option>
-                          <option value="Viadukai">Viadukai</option>
-                        </select>
-                      </div>
-                      <div>
-                        <label className="block text-sm font-medium text-gray-700 mb-1">Plotis</label>
-                        <input
-                          type="text"
-                          value={clip.width}
-                          onChange={(e) => setClipsData(prev => prev.map(item => 
-                            item.id === clip.id ? { ...item, width: e.target.value } : item
-                          ))}
-                          className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 text-sm"
-                          placeholder="Įveskite plotį"
-                        />
-                      </div>
-                      <div>
-                        <label className="block text-sm font-medium text-gray-700 mb-1">Aukštis</label>
-                        <input
-                          type="text"
-                          value={clip.height}
-                          onChange={(e) => setClipsData(prev => prev.map(item => 
-                            item.id === clip.id ? { ...item, height: e.target.value } : item
-                          ))}
-                          className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 text-sm"
-                          placeholder="Įveskite aukštį"
-                        />
-                      </div>
-                    </div>
-                    <div>
-                      <label className="block text-sm font-medium text-gray-700 mb-1">Tooltip tekstas</label>
-                      <input
-                        type="text"
-                        value={clip.tooltip}
-                        onChange={(e) => handleTooltipChange(clip.id, e.target.value)}
-                        className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-                        placeholder="Įveskite ekranų pavadinimus, atskirtus kableliu"
-                      />
-                    </div>
-                  </div>
-                ))}
-                <div className="flex justify-end pt-4">
-                  <button 
-                    onClick={saveClipsData}
-                    className="bg-blue-600 text-white px-6 py-2 rounded-lg hover:bg-blue-700"
-                  >
-                    Išsaugoti pakeitimus
-                  </button>
-                </div>
-              </div>
-            </div>
-          </div>
         )}
 
         {/* News Tab */}
