@@ -4,6 +4,7 @@ import { useState } from 'react';
 import { Plus, Minus } from 'lucide-react';
 import Link from 'next/link';
 import { useNews } from '@/hooks/useNews';
+import MobileNavMenu from '@/components/MobileNavMenu';
 
 export default function DUKMobile() {
   const [openItems, setOpenItems] = useState<number[]>([0]); // First item open by default
@@ -72,65 +73,59 @@ export default function DUKMobile() {
       overflow: 'auto'
     }}>
       
-      {/* Header */}
+      {/* Header - same style as naujienos mobile */}
       <div style={{ 
         backgroundColor: 'white', 
         borderBottom: '1px solid #e5e7eb', 
-        padding: '24px 32px',
-        flexShrink: 0
+        padding: '0 16px',
+        height: '56px',
+        flexShrink: 0,
+        display: 'flex',
+        alignItems: 'center',
+        justifyContent: 'space-between'
       }}>
-        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
-          <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
-            <Link href="/" style={{ textDecoration: 'none' }}>
-              <img 
-                src="/Piksel-logo-black-2023.png" 
-                alt="Piksel Logo" 
-                style={{ height: '31px', width: 'auto' }}
-              />
-            </Link>
-          </div>
-          <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-            <button 
-              onClick={() => setShowHamburgerMenu(true)}
-              style={{ 
-                padding: '8px', 
-                backgroundColor: '#3b82f6', 
-                color: 'white', 
-                borderRadius: '11px', 
-                fontSize: '16px',
-                fontWeight: 'bold',
-                border: 'none',
-                cursor: 'pointer',
-                display: 'flex',
-                alignItems: 'center',
-                justifyContent: 'center',
-                width: '32px',
-                height: '32px'
-              }}
-            >
-              ☰
-            </button>
-            <button 
-              onClick={() => setShowContactPopup(true)}
-              style={{ 
-                padding: '8px', 
-                backgroundColor: '#3b82f6', 
-                color: 'white', 
-                borderRadius: '11px', 
-                fontSize: '16px',
-                fontWeight: 'bold',
-                border: 'none',
-                cursor: 'pointer',
-                display: 'flex',
-                alignItems: 'center',
-                justifyContent: 'center',
-                width: '32px',
-                height: '32px'
-              }}
-            >
-              i
-            </button>
-          </div>
+        <Link href="/" style={{ textDecoration: 'none' }}>
+          <img 
+            src="/Piksel-logo-black-2023.png" 
+            alt="Piksel Logo" 
+            style={{ height: '28px', width: 'auto' }}
+          />
+        </Link>
+        <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+          <button 
+            onClick={() => setShowHamburgerMenu(true)}
+            style={{ 
+              padding: '8px', 
+              backgroundColor: 'transparent', 
+              color: '#374151', 
+              borderRadius: '8px',
+              fontSize: '16px',
+              border: 'none',
+              cursor: 'pointer',
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center'
+            }}
+          >
+            ☰
+          </button>
+          <button 
+            onClick={() => setShowContactPopup(true)}
+            style={{ 
+              padding: '8px', 
+              backgroundColor: 'transparent', 
+              color: '#374151', 
+              borderRadius: '8px',
+              fontSize: '16px',
+              border: 'none',
+              cursor: 'pointer',
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center'
+            }}
+          >
+            i
+          </button>
         </div>
       </div>
 
@@ -151,25 +146,25 @@ export default function DUKMobile() {
           msOverflowStyle: 'none',
           WebkitOverflowScrolling: 'touch'
         }}>
-          {['Vilnius', 'Kaunas', 'Klaipėda', 'Šiauliai', 'Panevėžys', 'Regionai', 'Reikalavimai klipams', 'DUK'].map(city => (
+          {['Vilnius', 'Kaunas', 'Klaipėda', 'Šiauliai', 'Panevėžys', 'Regionai', 'Naujienos', 'Reikalavimai klipams', 'DUK'].map(item => (
             <Link
-              key={city}
-              href={city === 'DUK' ? '/duk-mobile' : city === 'Reikalavimai klipams' ? '/klipai-mobile' : '/'}
+              key={item}
+              href={item === 'DUK' ? '/duk-mobile' : item === 'Reikalavimai klipams' ? '/klipai-mobile' : item === 'Naujienos' ? '/naujienos' : '/'}
               style={{
                 padding: '6px 12px',
                 borderRadius: '9999px',
                 fontSize: '13px',
                 fontWeight: '500',
-                backgroundColor: city === 'DUK' ? '#3b82f6' : 'white',
-                color: city === 'DUK' ? 'white' : '#374151',
-                border: city === 'DUK' ? 'none' : '1px solid #d1d5db',
+                backgroundColor: item === 'DUK' ? '#3b82f6' : 'white',
+                color: item === 'DUK' ? 'white' : '#374151',
+                border: item === 'DUK' ? 'none' : '1px solid #d1d5db',
                 cursor: 'pointer',
                 whiteSpace: 'nowrap',
                 flexShrink: 0,
                 textDecoration: 'none'
               }}
             >
-              {city}
+              {item}
             </Link>
           ))}
         </div>
@@ -396,158 +391,12 @@ export default function DUKMobile() {
         </div>
       )}
 
-      {/* Hamburger Menu */}
-      {showHamburgerMenu && (
-        <div style={{
-          position: 'fixed',
-          top: 0,
-          left: 0,
-          right: 0,
-          bottom: 0,
-          backgroundColor: 'rgba(0, 0, 0, 0.5)',
-          zIndex: 2000,
-          display: 'flex',
-          alignItems: 'center',
-          justifyContent: 'center'
-        }}>
-          <div style={{
-            backgroundColor: 'white',
-            borderRadius: '16px',
-            padding: '24px',
-            maxWidth: '320px',
-            width: '90%',
-            maxHeight: '80vh',
-            overflowY: 'auto',
-            boxShadow: '0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04)',
-            backdropFilter: 'blur(10px)',
-            fontFamily: "'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif"
-          }}>
-            {/* Header */}
-            <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '20px' }}>
-              <img 
-                src="/Piksel-logo-black-2023.png" 
-                alt="Piksel Logo" 
-                style={{ height: '31px', width: 'auto' }}
-              />
-              <button
-                onClick={() => setShowHamburgerMenu(false)}
-                style={{
-                  background: 'rgba(107, 114, 128, 0.1)',
-                  border: 'none',
-                  fontSize: '20px',
-                  color: '#6b7280',
-                  cursor: 'pointer',
-                  padding: '8px',
-                  borderRadius: '50%',
-                  width: '36px',
-                  height: '36px',
-                  display: 'flex',
-                  alignItems: 'center',
-                  justifyContent: 'center',
-                  transition: 'all 0.2s ease'
-                }}
-              >
-                ×
-              </button>
-            </div>
-
-            {/* Menu Items */}
-            <div style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
-              <Link 
-                href="/"
-                style={{
-                  display: 'flex',
-                  alignItems: 'center',
-                  gap: '12px',
-                  padding: '12px',
-                  borderRadius: '8px',
-                  textDecoration: 'none',
-                  color: '#374151',
-                  backgroundColor: '#f9fafb',
-                  border: '1px solid #e5e7eb',
-                  fontSize: '14px',
-                  fontWeight: '500'
-                }}
-                onClick={() => setShowHamburgerMenu(false)}
-              >
-                <span>🗺️</span>
-                <span>Žemėlapis</span>
-              </Link>
-              <Link 
-                href="/naujienos"
-                style={{
-                  display: 'flex',
-                  alignItems: 'center',
-                  gap: '12px',
-                  padding: '12px',
-                  borderRadius: '8px',
-                  textDecoration: 'none',
-                  color: '#374151',
-                  backgroundColor: '#f9fafb',
-                  border: '1px solid #e5e7eb',
-                  fontSize: '14px',
-                  fontWeight: '500'
-                }}
-                onClick={() => setShowHamburgerMenu(false)}
-              >
-                <span>📰</span>
-                <span>Naujienos</span>
-                {newsItems.length > 0 && (
-                  <span style={{
-                    marginLeft: 'auto',
-                    background: '#3b82f6',
-                    color: 'white',
-                    fontSize: '11px',
-                    fontWeight: '600',
-                    padding: '2px 8px',
-                    borderRadius: '10px'
-                  }}>{newsItems.length}</span>
-                )}
-              </Link>
-              <Link 
-                href="/klipai-mobile"
-                style={{
-                  display: 'flex',
-                  alignItems: 'center',
-                  gap: '12px',
-                  padding: '12px',
-                  borderRadius: '8px',
-                  textDecoration: 'none',
-                  color: '#374151',
-                  backgroundColor: '#f9fafb',
-                  border: '1px solid #e5e7eb',
-                  fontSize: '14px',
-                  fontWeight: '500'
-                }}
-                onClick={() => setShowHamburgerMenu(false)}
-              >
-                <span>📋</span>
-                <span>Reikalavimai klipams</span>
-              </Link>
-              <Link 
-                href="/duk-mobile"
-                style={{
-                  display: 'flex',
-                  alignItems: 'center',
-                  gap: '12px',
-                  padding: '12px',
-                  borderRadius: '8px',
-                  textDecoration: 'none',
-                  backgroundColor: '#3b82f6',
-                  border: '1px solid #3b82f6',
-                  fontSize: '14px',
-                  fontWeight: '500',
-                  color: 'white'
-                }}
-                onClick={() => setShowHamburgerMenu(false)}
-              >
-                <span>❓</span>
-                <span>DUK</span>
-              </Link>
-            </div>
-          </div>
-        </div>
-      )}
+      <MobileNavMenu
+        isOpen={showHamburgerMenu}
+        onClose={() => setShowHamburgerMenu(false)}
+        newsCount={newsItems.length}
+        topOffset={56}
+      />
 
     </div>
   );

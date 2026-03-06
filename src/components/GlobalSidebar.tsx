@@ -5,6 +5,7 @@ import Image from 'next/image';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import { MapPin, FileText, Calendar, Mail, ChevronRight, Play, HelpCircle, Phone, Monitor, Users, Clock, MapPin as LocationIcon, Search, X, Flag, Newspaper, Menu } from 'lucide-react';
+import MobileNavMenu from './MobileNavMenu';
 import { useLEDScreens } from '@/hooks/useLEDScreens';
 import { useNews } from '@/hooks/useNews';
 
@@ -99,45 +100,35 @@ export default function GlobalSidebar() {
 
   return (
     <>
-      {/* Mobile: top bar with hamburger menu */}
-      <div className="md:hidden fixed top-0 left-0 right-0 h-14 bg-black z-30 flex items-center justify-between px-4">
+      {/* Mobile: top bar with hamburger menu (white, same as klipai-mobile/duk-mobile) */}
+      <div className="md:hidden fixed top-0 left-0 right-0 h-14 bg-white border-b border-gray-200 z-30 flex items-center justify-between px-4">
         <Link href="/" className="flex items-center flex-shrink-0" onClick={() => setMobileMenuOpen(false)}>
-          <Image src="/Piksel-logo-black-2023.png" alt="Piksel" width={100} height={32} className="h-7 w-auto brightness-0 invert" />
+          <Image src="/Piksel-logo-black-2023.png" alt="Piksel" width={100} height={32} className="h-7 w-auto" />
         </Link>
         <button
           onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
-          className="p-2 text-white rounded-lg hover:bg-white/10"
+          className="p-2 text-gray-700 rounded-lg hover:bg-gray-100"
           aria-label="Meniu"
         >
           <Menu className="w-6 h-6" />
         </button>
       </div>
-      {/* Mobile menu dropdown */}
-      {mobileMenuOpen && (
-        <>
-          <div className="md:hidden fixed inset-0 top-14 bg-black/30 z-40" onClick={() => setMobileMenuOpen(false)} aria-hidden />
-          <div className="md:hidden fixed top-14 left-0 right-0 bg-black/95 z-50 py-4 px-4 shadow-lg">
-            <nav className="flex flex-col gap-1">
-            <Link href="/" className="px-4 py-3 text-white text-base font-medium rounded-lg hover:bg-white/10" onClick={() => setMobileMenuOpen(false)}>Žemėlapis</Link>
-            <Link href="/naujienos" className={`px-4 py-3 text-base font-medium rounded-lg hover:bg-white/10 flex items-center gap-2 ${pathname === '/naujienos' ? 'bg-white/20 text-white' : 'text-white'}`} onClick={() => setMobileMenuOpen(false)}>
-              Naujienos
-              {newsItems.length > 0 && (
-                <span className="bg-white/30 text-white text-xs font-semibold px-2 py-0.5 rounded-full">{newsItems.length}</span>
-              )}
-            </Link>
-            <Link href="/klipai" className={`px-4 py-3 text-base font-medium rounded-lg hover:bg-white/10 ${pathname === '/klipai' ? 'bg-white/20 text-white' : 'text-white'}`} onClick={() => setMobileMenuOpen(false)}>Klipai</Link>
-            <Link href="/duk" className={`px-4 py-3 text-base font-medium rounded-lg hover:bg-white/10 ${pathname === '/duk' ? 'bg-white/20 text-white' : 'text-white'}`} onClick={() => setMobileMenuOpen(false)}>DUK</Link>
-          </nav>
-          </div>
-        </>
-      )}
+      {/* Mobile menu dropdown - bendras su visais mobile puslapiais */}
+      <div className="md:hidden">
+        <MobileNavMenu
+          isOpen={mobileMenuOpen}
+          onClose={() => setMobileMenuOpen(false)}
+          newsCount={newsItems.length}
+          topOffset={56}
+        />
+      </div>
       {/* Desktop: full sidebar */}
     <div className="hidden md:flex fixed left-0 top-0 h-screen w-80 bg-gray-50 border-r border-gray-200 flex-col z-30">
-      {/* Header */}
-      <div className="p-6 bg-black border-b border-gray-200 flex justify-center">
-        <button 
-          onClick={() => handleCityFilter('Vilnius')}
-          className="flex flex-col items-center gap-1 w-full hover:bg-gray-900 rounded-lg p-2 -m-2 transition-colors"
+      {/* Header - white, same as mobile */}
+      <div className="p-6 bg-white border-b border-gray-200 flex justify-center">
+        <Link 
+          href="/"
+          className="flex flex-col items-center gap-1 w-full hover:bg-gray-50 rounded-lg p-2 -m-2 transition-colors"
         >
           <div className="flex flex-col items-center text-center">
             <Image
@@ -145,10 +136,10 @@ export default function GlobalSidebar() {
               alt="Piksel Logo"
               width={120}
               height={40}
-              className="h-[31px] w-auto brightness-0 invert"
+              className="h-[31px] w-auto"
             />
           </div>
-        </button>
+        </Link>
       </div>
 
       {/* Search */}

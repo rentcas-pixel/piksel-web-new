@@ -4,6 +4,7 @@ import { useState } from 'react';
 import { Plus, Minus } from 'lucide-react';
 import Link from 'next/link';
 import { useNews } from '@/hooks/useNews';
+import MobileNavMenu from './MobileNavMenu';
 
 export default function DUKMobileContent() {
   const [openItems, setOpenItems] = useState<number[]>([0]); // First item open by default
@@ -144,24 +145,24 @@ export default function DUKMobileContent() {
           msOverflowStyle: 'none',
           WebkitOverflowScrolling: 'touch'
         }}>
-          {['Vilnius', 'Kaunas', 'Klaipėda', 'Šiauliai', 'Panevėžys', 'Regionai'].map(city => (
+          {['Vilnius', 'Kaunas', 'Klaipėda', 'Šiauliai', 'Panevėžys', 'Regionai', 'Naujienos', 'Reikalavimai klipams', 'DUK'].map(item => (
             <Link
-              key={city}
-              href="/"
+              key={item}
+              href={item === 'DUK' ? '/duk-mobile' : item === 'Reikalavimai klipams' ? '/klipai-mobile' : item === 'Naujienos' ? '/naujienos' : '/'}
               style={{
                 padding: '6px 12px',
                 borderRadius: '9999px',
                 fontSize: '13px',
                 fontWeight: '500',
-                backgroundColor: 'white',
-                color: '#374151',
-                border: '1px solid #d1d5db',
+                backgroundColor: item === 'DUK' ? '#3b82f6' : 'white',
+                color: item === 'DUK' ? 'white' : '#374151',
+                border: item === 'DUK' ? 'none' : '1px solid #d1d5db',
                 textDecoration: 'none',
                 whiteSpace: 'nowrap',
                 flexShrink: 0
               }}
             >
-              {city}
+              {item}
             </Link>
           ))}
         </div>
@@ -362,162 +363,12 @@ export default function DUKMobileContent() {
         </div>
       )}
 
-      {/* Hamburger Menu */}
-      {showHamburgerMenu && (
-        <div style={{
-          position: 'fixed',
-          top: 0,
-          left: 0,
-          right: 0,
-          bottom: 0,
-          backgroundColor: 'rgba(0,0,0,0.5)',
-          display: 'flex',
-          alignItems: 'flex-start',
-          justifyContent: 'flex-end',
-          zIndex: 2000,
-          padding: '20px'
-        }}>
-          <div style={{
-            backgroundColor: 'white',
-            borderRadius: '16px',
-            padding: '24px',
-            width: '280px',
-            maxHeight: '80vh',
-            overflowY: 'auto'
-          }}>
-            <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '24px' }}>
-              <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
-                <div style={{ 
-                  width: '40px', 
-                  height: '40px', 
-                  backgroundColor: '#3b82f6', 
-                  borderRadius: '50%',
-                  display: 'flex',
-                  alignItems: 'center',
-                  justifyContent: 'center',
-                  color: 'white',
-                  fontSize: '18px',
-                  fontWeight: 'bold'
-                }}>
-                  P
-                </div>
-                <div>
-                  <img 
-                    src="/Piksel-logo-black-2023.png" 
-                    alt="Piksel - LED reklamos ekranai Lietuvoje, reklama ekranuose, led reklama"
-                    style={{ height: '35px' }}
-                  />
-                  <p style={{ fontSize: '12px', color: '#6b7280', margin: 0 }}>ryškių ekranų tinklas</p>
-                </div>
-              </div>
-              <button
-                onClick={() => setShowHamburgerMenu(false)}
-                style={{
-                  background: 'none',
-                  border: 'none',
-                  cursor: 'pointer',
-                  padding: '8px',
-                  borderRadius: '8px',
-                  fontSize: '20px',
-                  color: '#6b7280'
-                }}
-              >
-                ×
-              </button>
-            </div>
-
-            {/* Menu Items */}
-            <div style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
-              <Link 
-                href="/"
-                style={{
-                  display: 'flex',
-                  alignItems: 'center',
-                  padding: '16px',
-                  backgroundColor: '#f8fafc',
-                  borderRadius: '12px',
-                  textDecoration: 'none',
-                  color: '#374151',
-                  fontSize: '16px',
-                  fontWeight: '500',
-                  transition: 'all 0.2s ease',
-                  border: '1px solid #e5e7eb'
-                }}
-                onClick={() => setShowHamburgerMenu(false)}
-              >
-                🗺️ Žemėlapis
-              </Link>
-              <Link 
-                href="/naujienos"
-                style={{
-                  display: 'flex',
-                  alignItems: 'center',
-                  padding: '16px',
-                  backgroundColor: '#f8fafc',
-                  borderRadius: '12px',
-                  textDecoration: 'none',
-                  color: '#374151',
-                  fontSize: '16px',
-                  fontWeight: '500',
-                  transition: 'all 0.2s ease',
-                  border: '1px solid #e5e7eb'
-                }}
-                onClick={() => setShowHamburgerMenu(false)}
-              >
-                <span style={{ flex: 1 }}>📰 Naujienos</span>
-                {newsItems.length > 0 && (
-                  <span style={{
-                    background: '#3b82f6',
-                    color: 'white',
-                    fontSize: '11px',
-                    fontWeight: '600',
-                    padding: '2px 8px',
-                    borderRadius: '10px'
-                  }}>{newsItems.length}</span>
-                )}
-              </Link>
-              <Link 
-                href="/klipai-mobile"
-                style={{
-                  display: 'flex',
-                  alignItems: 'center',
-                  padding: '16px',
-                  backgroundColor: '#f8fafc',
-                  borderRadius: '12px',
-                  textDecoration: 'none',
-                  color: '#374151',
-                  fontSize: '16px',
-                  fontWeight: '500',
-                  transition: 'all 0.2s ease',
-                  border: '1px solid #e5e7eb'
-                }}
-                onClick={() => setShowHamburgerMenu(false)}
-              >
-                📹 Klipai
-              </Link>
-              <Link 
-                href="/duk-mobile"
-                style={{
-                  display: 'flex',
-                  alignItems: 'center',
-                  padding: '16px',
-                  backgroundColor: '#f8fafc',
-                  borderRadius: '12px',
-                  textDecoration: 'none',
-                  color: '#374151',
-                  fontSize: '16px',
-                  fontWeight: '500',
-                  transition: 'all 0.2s ease',
-                  border: '1px solid #e5e7eb'
-                }}
-                onClick={() => setShowHamburgerMenu(false)}
-              >
-                ❓ DUK
-              </Link>
-            </div>
-          </div>
-        </div>
-      )}
+      <MobileNavMenu
+        isOpen={showHamburgerMenu}
+        onClose={() => setShowHamburgerMenu(false)}
+        newsCount={newsItems.length}
+        topOffset={56}
+      />
     </div>
   );
 }

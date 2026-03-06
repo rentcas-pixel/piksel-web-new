@@ -8,6 +8,7 @@ import ResponsiveImage from './ResponsiveImage';
 import { sendInquiryEmail, initEmailJS } from '@/lib/emailjs';
 import { useToast } from '@/components/ui/Toast';
 import { useNews } from '@/hooks/useNews';
+import MobileNavMenu from './MobileNavMenu';
 
 interface MapProps {
   selectedCity: string;
@@ -762,63 +763,57 @@ export default function Map({ selectedCity, selectedScreens: propSelectedScreens
       zIndex: 1000
     }}>
       
-      {/* Main Sidebar - Horizontal */}
+      {/* Main Sidebar - Horizontal - 56px height for menu alignment */}
       <div style={{ 
         backgroundColor: 'white', 
         borderBottom: '1px solid #e5e7eb', 
-        padding: '24px 32px',
-        flexShrink: 0
+        padding: '0 16px',
+        height: '56px',
+        flexShrink: 0,
+        display: 'flex',
+        alignItems: 'center',
+        justifyContent: 'space-between'
       }}>
-        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
-          <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
-            <img 
-              src="/Piksel-logo-black-2023.png" 
-              alt="Piksel Logo" 
-              style={{ height: '31px', width: 'auto' }}
-            />
-          </div>
-          <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-            <button 
-              onClick={() => setShowHamburgerMenu(true)}
-              style={{ 
-                padding: '8px', 
-                backgroundColor: '#1329d4', 
-                color: 'white', 
-                borderRadius: '11px', 
-                fontSize: '16px',
-                fontWeight: 'bold',
-                border: 'none',
-                cursor: 'pointer',
-                display: 'flex',
-                alignItems: 'center',
-                justifyContent: 'center',
-                width: '32px',
-                height: '32px'
-              }}
-            >
-              ☰
-            </button>
-            <button 
-              onClick={() => setShowContactPopup(true)}
-              style={{ 
-                padding: '8px', 
-                backgroundColor: '#1329d4', 
-                color: 'white', 
-                borderRadius: '11px', 
-                fontSize: '16px',
-                fontWeight: 'bold',
-                border: 'none',
-                cursor: 'pointer',
-                display: 'flex',
-                alignItems: 'center',
-                justifyContent: 'center',
-                width: '32px',
-                height: '32px'
-              }}
-            >
-              i
-            </button>
-          </div>
+        <img 
+          src="/Piksel-logo-black-2023.png" 
+          alt="Piksel Logo" 
+          style={{ height: '28px', width: 'auto' }}
+        />
+        <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+          <button 
+            onClick={() => setShowHamburgerMenu(true)}
+            style={{ 
+              padding: '8px', 
+              backgroundColor: 'transparent', 
+              color: '#374151', 
+              borderRadius: '8px',
+              fontSize: '16px',
+              border: 'none',
+              cursor: 'pointer',
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center'
+            }}
+          >
+            ☰
+          </button>
+          <button 
+            onClick={() => setShowContactPopup(true)}
+            style={{ 
+              padding: '8px', 
+              backgroundColor: 'transparent', 
+              color: '#374151', 
+              borderRadius: '8px',
+              fontSize: '16px',
+              border: 'none',
+              cursor: 'pointer',
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center'
+            }}
+          >
+            i
+          </button>
         </div>
       </div>
 
@@ -983,17 +978,19 @@ export default function Map({ selectedCity, selectedScreens: propSelectedScreens
           msOverflowStyle: 'none',
           WebkitOverflowScrolling: 'touch'
         }}>
-          {['Vilnius', 'Kaunas', 'Klaipėda', 'Šiauliai', 'Panevėžys', 'Regionai', 'Reikalavimai klipams', 'DUK'].map(city => (
+          {['Vilnius', 'Kaunas', 'Klaipėda', 'Šiauliai', 'Panevėžys', 'Regionai', 'Naujienos', 'Reikalavimai klipams', 'DUK'].map(item => (
             <button
-              key={city}
+              key={item}
               onClick={() => {
-                if (city === 'Reikalavimai klipams') {
+                if (item === 'Reikalavimai klipams') {
                   window.location.href = '/klipai-mobile';
-                } else if (city === 'DUK') {
+                } else if (item === 'DUK') {
                   window.location.href = '/duk-mobile';
+                } else if (item === 'Naujienos') {
+                  window.location.href = '/naujienos';
                 } else {
                   if (onCityChange) {
-                    onCityChange(city);
+                    onCityChange(item);
                   }
                 }
               }}
@@ -1002,15 +999,15 @@ export default function Map({ selectedCity, selectedScreens: propSelectedScreens
                 borderRadius: '9999px',
                 fontSize: '13px',
                 fontWeight: '500',
-                backgroundColor: selectedCity === city ? '#1329d4' : 'white',
-                color: selectedCity === city ? 'white' : '#374151',
-                border: selectedCity === city ? 'none' : '1px solid #d1d5db',
+                backgroundColor: selectedCity === item ? '#1329d4' : 'white',
+                color: selectedCity === item ? 'white' : '#374151',
+                border: selectedCity === item ? 'none' : '1px solid #d1d5db',
                 cursor: 'pointer',
                 whiteSpace: 'nowrap',
                 flexShrink: 0
               }}
             >
-              {city}
+              {item}
             </button>
           ))}
         </div>
@@ -1470,155 +1467,12 @@ export default function Map({ selectedCity, selectedScreens: propSelectedScreens
         </div>
       )}
 
-      {/* Hamburger Menu */}
-      {showHamburgerMenu && (
-        <div style={{
-          position: 'fixed',
-          top: 0,
-          left: 0,
-          right: 0,
-          bottom: 0,
-          backgroundColor: 'rgba(0, 0, 0, 0.5)',
-          zIndex: 2000,
-          display: 'flex',
-          alignItems: 'center',
-          justifyContent: 'center'
-        }}>
-          <div style={{
-            backgroundColor: 'white',
-            borderRadius: '16px',
-            padding: '24px',
-            maxWidth: '320px',
-            width: '90%',
-            boxShadow: '0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04)',
-            fontFamily: "'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif"
-          }}>
-            {/* Header */}
-            <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '20px' }}>
-              <img 
-                src="/Piksel-logo-black-2023.png" 
-                alt="Piksel Logo" 
-                style={{ height: '31px', width: 'auto' }}
-              />
-              <button
-                onClick={() => setShowHamburgerMenu(false)}
-                style={{
-                  background: 'rgba(107, 114, 128, 0.1)',
-                  border: 'none',
-                  fontSize: '20px',
-                  color: '#6b7280',
-                  cursor: 'pointer',
-                  padding: '8px',
-                  borderRadius: '50%',
-                  width: '36px',
-                  height: '36px',
-                  display: 'flex',
-                  alignItems: 'center',
-                  justifyContent: 'center',
-                  transition: 'all 0.2s ease'
-                }}
-              >
-                ×
-              </button>
-            </div>
-
-            {/* Menu Items */}
-            <div style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
-              <Link 
-                href="/"
-                style={{
-                  display: 'flex',
-                  alignItems: 'center',
-                  gap: '12px',
-                  padding: '12px',
-                  borderRadius: '8px',
-                  textDecoration: 'none',
-                  color: '#374151',
-                  backgroundColor: '#f9fafb',
-                  border: '1px solid #e5e7eb',
-                  fontSize: '14px',
-                  fontWeight: '500'
-                }}
-                onClick={() => setShowHamburgerMenu(false)}
-              >
-                <span>🗺️</span>
-                <span>Žemėlapis</span>
-              </Link>
-              <Link 
-                href="/naujienos"
-                style={{
-                  display: 'flex',
-                  alignItems: 'center',
-                  gap: '12px',
-                  padding: '12px',
-                  borderRadius: '8px',
-                  textDecoration: 'none',
-                  color: '#374151',
-                  backgroundColor: '#f9fafb',
-                  border: '1px solid #e5e7eb',
-                  fontSize: '14px',
-                  fontWeight: '500'
-                }}
-                onClick={() => setShowHamburgerMenu(false)}
-              >
-                <span>📰</span>
-                <span>Naujienos</span>
-                {newsItems.length > 0 && (
-                  <span style={{
-                    marginLeft: 'auto',
-                    background: '#3b82f6',
-                    color: 'white',
-                    fontSize: '11px',
-                    fontWeight: '600',
-                    padding: '2px 8px',
-                    borderRadius: '10px'
-                  }}>{newsItems.length}</span>
-                )}
-              </Link>
-              <Link 
-                href="/klipai-mobile"
-                style={{
-                  display: 'flex',
-                  alignItems: 'center',
-                  gap: '12px',
-                  padding: '12px',
-                  borderRadius: '8px',
-                  textDecoration: 'none',
-                  color: '#374151',
-                  backgroundColor: '#f9fafb',
-                  border: '1px solid #e5e7eb',
-                  fontSize: '14px',
-                  fontWeight: '500'
-                }}
-                onClick={() => setShowHamburgerMenu(false)}
-              >
-                <span>📋</span>
-                <span>Reikalavimai klipams</span>
-              </Link>
-              <Link 
-                href="/duk-mobile"
-                style={{
-                  display: 'flex',
-                  alignItems: 'center',
-                  gap: '12px',
-                  padding: '12px',
-                  borderRadius: '8px',
-                  textDecoration: 'none',
-                  color: '#374151',
-                  backgroundColor: '#f9fafb',
-                  border: '1px solid #e5e7eb',
-                  fontSize: '14px',
-                  fontWeight: '500'
-                }}
-                onClick={() => setShowHamburgerMenu(false)}
-              >
-                <span>❓</span>
-                <span>DUK</span>
-              </Link>
-            </div>
-          </div>
-        </div>
-      )}
+      <MobileNavMenu
+        isOpen={showHamburgerMenu}
+        onClose={() => setShowHamburgerMenu(false)}
+        newsCount={newsItems.length}
+        topOffset={56}
+      />
 
     </div>
   );
