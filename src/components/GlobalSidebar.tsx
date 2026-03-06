@@ -4,7 +4,7 @@ import { useState } from 'react';
 import Image from 'next/image';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
-import { MapPin, FileText, Calendar, Mail, ChevronRight, Play, HelpCircle, Phone, Monitor, Users, Clock, MapPin as LocationIcon, Search, X, Flag } from 'lucide-react';
+import { MapPin, FileText, Calendar, Mail, ChevronRight, Play, HelpCircle, Phone, Monitor, Users, Clock, MapPin as LocationIcon, Search, X, Flag, Newspaper } from 'lucide-react';
 import { useLEDScreens } from '@/hooks/useLEDScreens';
 
 export default function GlobalSidebar() {
@@ -18,6 +18,7 @@ export default function GlobalSidebar() {
   const { screens: ledScreens, loading, error } = useLEDScreens();
 
   const navigationItems = [
+    { name: 'Naujienos', icon: Newspaper, href: '/naujienos' },
     { name: 'Klipai', icon: Play, href: '/klipai' },
     { name: 'DUK', icon: HelpCircle, href: '/duk' }
   ];
@@ -102,6 +103,7 @@ export default function GlobalSidebar() {
         </Link>
         <div className="flex items-center gap-1 sm:gap-2">
           <Link href="/" className="px-2 sm:px-3 py-1.5 text-white text-sm font-medium rounded-lg hover:bg-white/10">Žemėlapis</Link>
+          <Link href="/naujienos" className="px-2 sm:px-3 py-1.5 text-white text-sm font-medium rounded-lg hover:bg-white/10">Naujienos</Link>
           <Link href="/klipai" className="px-2 sm:px-3 py-1.5 text-white text-sm font-medium rounded-lg hover:bg-white/10">Klipai</Link>
           <Link href="/duk" className="px-2 sm:px-3 py-1.5 text-white text-sm font-medium rounded-lg hover:bg-white/10">DUK</Link>
         </div>

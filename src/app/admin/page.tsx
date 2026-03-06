@@ -2,7 +2,8 @@
 
 import { useState, useEffect } from 'react'
 import { supabase } from '@/lib/supabase'
-import { LEDScreen } from '@/lib/supabase'
+import { generateScreenImageFileName, generateNewsImageFileName } from '@/lib/seoImageUtils'
+import { LEDScreen, NewsItem } from '@/lib/supabase'
 import { ClipRequirement, defaultClipsData } from '@/data/clipsData'
 import { useAuth } from '@/hooks/useAuth'
 import LoginForm from '@/components/LoginForm'
@@ -19,6 +20,19 @@ export default function AdminPanel() {
   const [clipsData, setClipsData] = useState<ClipRequirement[]>(defaultClipsData)
   const [draggedItem, setDraggedItem] = useState<number | null>(null)
   const [draggedScreen, setDraggedScreen] = useState<string | null>(null)
+
+  // News state
+  const [newsItems, setNewsItems] = useState<NewsItem[]>([])
+  const [showNewsForm, setShowNewsForm] = useState(false)
+  const [editingNews, setEditingNews] = useState<NewsItem | null>(null)
+  const [newsFormData, setNewsFormData] = useState({
+    title: '',
+    image_url: '',
+    content: '',
+    tag: 'NAUJIENA',
+    created_at: new Date().toISOString().slice(0, 10), // YYYY-MM-DD
+  })
+  const [newsUploading, setNewsUploading] = useState(false)
 
   // Drag and drop functions
   const handleDragStart = (e: React.DragEvent, id: number) => {
@@ -178,11 +192,120 @@ export default function AdminPanel() {
     }
   }
 
+  const fetchNews = async () => {
+    try {
+      const { data, error } = await supabase
+        .from('news')
+        .select('*')
+        .order('created_at', { ascending: false })
+
+      if (error) throw error
+      setNewsItems(data || [])
+    } catch (error) {
+      console.error('Error fetching news:', error)
+      setNewsItems([])
+    }
+  }
+
   useEffect(() => {
     if (isAuthenticated) {
       fetchScreens()
+      fetchNews()
     }
   }, [isAuthenticated])
+
+  const slugify = (text: string) =>
+    text
+      .toLowerCase()
+      .replace(/[ąčęėįšųūž]/g, (c) => ({ ą: 'a', č: 'c', ę: 'e', ė: 'e', į: 'i', š: 's', ų: 'u', ū: 'u', ž: 'z' }[c] || c))
+      .replace(/[^a-z0-9\s-]/g, '')
+      .replace(/\s+/g, '-')
+      .replace(/-+/g, '-')
+      .trim()
+
+  const handleNewsImageUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0]
+    if (!file) return
+    try {
+      setNewsUploading(true)
+      if (file.size > 5 * 1024 * 1024) {
+        alert('Failo dydis negali viršyti 5MB')
+        return
+      }
+      const fileExt = file.name.split('.').pop() || 'jpg'
+      const fileName = generateNewsImageFileName(newsFormData.title, fileExt)
+      const { error } = await supabase.storage.from('led-screen-images').upload(fileName, file)
+      if (error) throw error
+      const { data: { publicUrl } } = supabase.storage.from('led-screen-images').getPublicUrl(fileName)
+      setNewsFormData(prev => ({ ...prev, image_url: publicUrl }))
+      alert('Nuotrauka sėkmingai įkelta!')
+    } catch (error) {
+      console.error('Error uploading news image:', error)
+      alert(`Klaida įkeliant: ${error instanceof Error ? error.message : 'Nežinoma klaida'}`)
+    } finally {
+      setNewsUploading(false)
+    }
+  }
+
+  const handleNewsSubmit = async (e: React.FormEvent) => {
+    e.preventDefault()
+    try {
+      const slug = slugify(newsFormData.title)
+      const excerpt = newsFormData.content.slice(0, 150) + (newsFormData.content.length > 150 ? '...' : '')
+      const payload = {
+        slug,
+        title: newsFormData.title,
+        excerpt,
+        content: newsFormData.content,
+        image_url: newsFormData.image_url || null,
+        tag: newsFormData.tag,
+        created_at: newsFormData.created_at ? new Date(newsFormData.created_at).toISOString() : new Date().toISOString(),
+        updated_at: new Date().toISOString(),
+      }
+      if (editingNews) {
+        const { error } = await supabase.from('news').update(payload).eq('id', editingNews.id)
+        if (error) throw error
+        alert('Naujiena atnaujinta!')
+      } else {
+        const { error } = await supabase.from('news').insert(payload)
+        if (error) throw error
+        alert('Naujiena sukurta!')
+      }
+      setShowNewsForm(false)
+      setEditingNews(null)
+      setNewsFormData({ title: '', image_url: '', content: '', tag: 'NAUJIENA', created_at: new Date().toISOString().slice(0, 10) })
+      fetchNews()
+    } catch (error) {
+      console.error('Error saving news:', error)
+      alert(`Klaida: ${error instanceof Error ? error.message : 'Nežinoma klaida'}`)
+    }
+  }
+
+  const handleEditNews = (item: NewsItem) => {
+    setEditingNews(item)
+    const dateStr = item.created_at ? new Date(item.created_at).toISOString().slice(0, 10) : new Date().toISOString().slice(0, 10)
+    setNewsFormData({
+      title: item.title,
+      image_url: item.image_url || '',
+      content: item.content,
+      tag: item.tag,
+      created_at: dateStr,
+    })
+    setShowNewsForm(true)
+  }
+
+  const handleDeleteNews = async (id: string) => {
+    if (!confirm('Ištrinti šią naujieną?')) return
+    try {
+      const { error } = await supabase.from('news').delete().eq('id', id)
+      if (error) throw error
+      alert('Naujiena ištrinta')
+      fetchNews()
+    } catch (error) {
+      console.error('Error deleting news:', error)
+      alert('Klaida trinant')
+    }
+  }
 
   // Show loading while checking authentication
   if (authLoading) {
@@ -502,11 +625,9 @@ export default function AdminPanel() {
         return
       }
       
-      // Create unique filename
-      const fileExt = file.name.split('.').pop()
-      const fileName = `${Date.now()}.${fileExt}`
-      
-      // Upload to Supabase Storage
+      const fileExt = file.name.split('.').pop() || 'jpg'
+      const fileName = generateScreenImageFileName(formData.city, formData.name, type, fileExt)
+
       const { data, error } = await supabase.storage
         .from('led-screen-images')
         .upload(fileName, file)
@@ -1004,11 +1125,11 @@ export default function AdminPanel() {
 
         {/* Tab Navigation */}
         <div className="bg-white rounded-lg shadow-lg overflow-hidden mb-6">
-          <div className="border-b border-gray-200">
-            <nav className="-mb-px flex">
+          <div className="border-b border-gray-200 overflow-x-auto">
+            <nav className="-mb-px flex min-w-max">
               <button
                 onClick={() => setActiveTab('screens')}
-                className={`py-4 px-6 text-sm font-medium border-b-2 ${
+                className={`flex-shrink-0 py-4 px-6 text-sm font-medium border-b-2 whitespace-nowrap ${
                   activeTab === 'screens'
                     ? 'border-blue-500 text-blue-600'
                     : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'
@@ -1018,13 +1139,23 @@ export default function AdminPanel() {
               </button>
               <button
                 onClick={() => setActiveTab('clips')}
-                className={`py-4 px-6 text-sm font-medium border-b-2 ${
+                className={`flex-shrink-0 py-4 px-6 text-sm font-medium border-b-2 whitespace-nowrap ${
                   activeTab === 'clips'
                     ? 'border-blue-500 text-blue-600'
                     : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'
                 }`}
               >
                 Klipai
+              </button>
+              <button
+                onClick={() => setActiveTab('news')}
+                className={`flex-shrink-0 py-4 px-6 text-sm font-medium border-b-2 whitespace-nowrap ${
+                  activeTab === 'news'
+                    ? 'border-blue-500 text-blue-600'
+                    : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'
+                }`}
+              >
+                Naujienos ({newsItems.length})
               </button>
             </nav>
           </div>
@@ -1253,6 +1384,146 @@ export default function AdminPanel() {
                   </button>
                 </div>
               </div>
+            </div>
+          </div>
+        )}
+
+        {/* News Tab */}
+        {activeTab === 'news' && (
+          <div className="bg-white rounded-lg shadow-lg overflow-hidden">
+            <div className="px-6 py-4 border-b border-gray-200 flex justify-between items-center">
+              <div>
+                <h2 className="text-lg font-semibold">Naujienos</h2>
+                <p className="text-sm text-gray-600 mt-1">Kurkite ir redaguokite naujienų straipsnius</p>
+              </div>
+              <button
+                onClick={() => { setEditingNews(null); setNewsFormData({ title: '', image_url: '', content: '', tag: 'NAUJIENA', created_at: new Date().toISOString().slice(0, 10) }); setShowNewsForm(true) }}
+                className="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 text-sm"
+              >
+                + Nauja naujiena
+              </button>
+            </div>
+
+            {showNewsForm && (
+              <div className="p-6 border-b border-gray-200 bg-gray-50">
+                <h3 className="font-medium text-gray-900 mb-4">{editingNews ? 'Redaguoti naujieną' : 'Nauja naujiena'}</h3>
+                <form onSubmit={handleNewsSubmit} className="space-y-4">
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-1">1. Antraštė</label>
+                    <input
+                      type="text"
+                      value={newsFormData.title}
+                      onChange={(e) => setNewsFormData(prev => ({ ...prev, title: e.target.value }))}
+                      className="w-full border border-gray-300 rounded-lg px-3 py-2"
+                      placeholder="Straipsnio antraštė"
+                      required
+                    />
+                  </div>
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-1">2. Nuotrauka</label>
+                    <input
+                      type="file"
+                      accept="image/*"
+                      onChange={handleNewsImageUpload}
+                      disabled={newsUploading}
+                      className="block w-full text-sm text-gray-500 file:mr-4 file:py-2 file:px-4 file:rounded-lg file:border-0 file:bg-blue-50 file:text-blue-700 hover:file:bg-blue-100"
+                    />
+                    {newsUploading && <span className="text-sm text-gray-500">Įkeliama...</span>}
+                    {newsFormData.image_url && (
+                      <div className="mt-2">
+                        <img src={newsFormData.image_url} alt="Preview" className="h-24 object-cover rounded-lg border" />
+                      </div>
+                    )}
+                  </div>
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-1">3. Tekstas</label>
+                    <textarea
+                      value={newsFormData.content}
+                      onChange={(e) => setNewsFormData(prev => ({ ...prev, content: e.target.value }))}
+                      className="w-full border border-gray-300 rounded-lg px-3 py-2 min-h-[120px]"
+                      placeholder="Straipsnio turinys..."
+                      required
+                    />
+                  </div>
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-1">4. Badge tekstas</label>
+                    <input
+                      type="text"
+                      value={newsFormData.tag}
+                      onChange={(e) => setNewsFormData(prev => ({ ...prev, tag: e.target.value }))}
+                      className="w-full border border-gray-300 rounded-lg px-3 py-2"
+                      placeholder="NAUJIENA, ATNAUJINIMAS, ĮVYKIS..."
+                    />
+                  </div>
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-1">5. Data</label>
+                    <input
+                      type="text"
+                      value={newsFormData.created_at}
+                      onChange={(e) => setNewsFormData(prev => ({ ...prev, created_at: e.target.value }))}
+                      placeholder="YYYY-MM-DD"
+                      pattern="\d{4}-\d{2}-\d{2}"
+                      className="w-full border border-gray-300 rounded-lg px-3 py-2"
+                    />
+                    <p className="text-xs text-gray-500 mt-1">Formatas: 2025-03-06</p>
+                  </div>
+                  <div className="flex gap-2">
+                    <button type="submit" className="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700">
+                      {editingNews ? 'Atnaujinti' : 'Sukurti'}
+                    </button>
+                    <button
+                      type="button"
+                      onClick={() => { setShowNewsForm(false); setEditingNews(null) }}
+                      className="bg-gray-200 text-gray-700 px-4 py-2 rounded-lg hover:bg-gray-300"
+                    >
+                      Atšaukti
+                    </button>
+                  </div>
+                </form>
+              </div>
+            )}
+
+            <div className="overflow-x-auto">
+              <table className="w-full">
+                <thead className="bg-gray-50">
+                  <tr>
+                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Antraštė</th>
+                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Badge</th>
+                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Data</th>
+                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Veiksmai</th>
+                  </tr>
+                </thead>
+                <tbody className="divide-y divide-gray-200">
+                  {newsItems.length === 0 ? (
+                    <tr>
+                      <td colSpan={4} className="px-6 py-8 text-center text-gray-500">
+                        Naujienų nėra. Pirmiausia paleiskite migraciją supabase-migration-news.sql Supabase SQL Editor.
+                      </td>
+                    </tr>
+                  ) : (
+                    newsItems.map((item) => (
+                      <tr key={item.id} className="hover:bg-gray-50">
+                        <td className="px-6 py-4">
+                          <div className="text-sm font-medium text-gray-900">{item.title}</div>
+                          <div className="text-xs text-gray-500">{item.slug}</div>
+                        </td>
+                        <td className="px-6 py-4">
+                          <span className="px-2 py-0.5 text-xs font-semibold text-white bg-[#141414] rounded">{item.tag}</span>
+                        </td>
+                        <td className="px-6 py-4 text-sm text-gray-600">
+                          {new Date(item.created_at).toLocaleDateString('lt-LT')}
+                        </td>
+                        <td className="px-6 py-4">
+                          <div className="flex gap-2">
+                            <button onClick={() => handleEditNews(item)} className="text-blue-600 hover:text-blue-900 text-sm">✏️ Redaguoti</button>
+                            <button onClick={() => handleDeleteNews(item.id)} className="text-red-600 hover:text-red-900 text-sm">🗑️ Ištrinti</button>
+                          </div>
+                        </td>
+                      </tr>
+                    ))
+                  )}
+                </tbody>
+              </table>
             </div>
           </div>
         )}

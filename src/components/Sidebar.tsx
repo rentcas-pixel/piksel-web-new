@@ -4,7 +4,7 @@ import { useState } from 'react';
 import { useLEDScreens } from '@/hooks/useLEDScreens';
 import Image from 'next/image';
 import Link from 'next/link';
-import { MapPin, FileText, Calendar, Mail, ChevronRight, Play, HelpCircle, Phone, Monitor, Users, Clock, MapPin as LocationIcon, Search, X } from 'lucide-react';
+import { MapPin, FileText, Calendar, Mail, ChevronRight, Play, HelpCircle, Phone, Monitor, Users, Clock, MapPin as LocationIcon, Search, X, Newspaper } from 'lucide-react';
 
 interface SidebarProps {
   onCityFilter: (city: string) => void;
@@ -87,6 +87,7 @@ export default function Sidebar({ onCityFilter, selectedCity, onSearchResults }:
   const cities = getCityCounts();
 
   const navigationItems = [
+    { name: 'Naujienos', icon: Newspaper, href: '/naujienos' },
     { name: 'Klipai', icon: Play, href: '/klipai' },
     { name: 'DUK', icon: HelpCircle, href: '/duk' }
   ];

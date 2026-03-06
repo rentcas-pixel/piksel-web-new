@@ -2,6 +2,7 @@
 
 import { useEffect, useRef, useState } from 'react';
 import { LEDScreen } from '@/lib/supabase';
+import { generateScreenImageAlt } from '@/lib/seoImageUtils';
 import MapMobile from './MapMobile';
 
 interface MapProps {
@@ -281,7 +282,7 @@ export default function Map({ selectedCity, selectedScreens, screenCities, selec
               <div style="font-family: ui-sans-serif, system-ui, -apple-system, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, 'Noto Sans', sans-serif; width: 100%; max-width: 780px; height: 468px; border-radius: 0; overflow: visible; background: transparent; display: flex; gap: -8px; position: relative;" class="popup-container">
                 <!-- Photo -->
                 <div style="width: 468px; height: 468px; position: relative; background: #ddd; border-radius: 9px 0 0 9px !important; overflow: hidden; flex-shrink: 0;" class="popup-image">
-                  <img src="${screen.image_url}" alt="${screen.name} - LED ekranas, reklama ekranuose, ${screen.city}"
+                  <img src="${screen.image_url}" alt="${generateScreenImageAlt(screen.name, screen.city, { sideName: 'Šiaurė' })}"
                        style="width: 100%; height: 100%; object-fit: cover;"/>
                   
                   ${showLastMinute ? `
@@ -304,7 +305,7 @@ export default function Map({ selectedCity, selectedScreens, screenCities, selec
                   ` : ''}
                   
                   <!-- Expand Photo Button -->
-                  <button onclick="window.openPhotoModal('${screen.image_url}', '${screen.name} - Šiaurė')" 
+                  <button onclick="window.openPhotoModal('${screen.image_url}', '${screen.name} - Šiaurė', '${generateScreenImageAlt(screen.name, screen.city, { sideName: 'Šiaurė' })}')" 
                           style="position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); width: 60px; height: 60px; background: rgba(0,0,0,0.7); color: white; border: none; border-radius: 50%; display: flex; align-items: center; justify-content: center; cursor: pointer; z-index: 999; font-size: 28px; font-weight: bold; transition: all 0.3s ease; opacity: 0.8;"
                           onmouseover="this.style.opacity='1'; this.style.background='rgba(0,0,0,0.9)'; this.style.transform='translate(-50%, -50%) scale(1.1)';"
                           onmouseout="this.style.opacity='0.8'; this.style.background='rgba(0,0,0,0.7)'; this.style.transform='translate(-50%, -50%) scale(1)';"
@@ -378,7 +379,7 @@ export default function Map({ selectedCity, selectedScreens, screenCities, selec
               <div style="font-family: ui-sans-serif, system-ui, -apple-system, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, 'Noto Sans', sans-serif; width: 100%; max-width: 780px; height: 468px; border-radius: 0; overflow: visible; background: transparent; display: flex; gap: -8px; position: relative;" class="popup-container">
                 <!-- Photo -->
                 <div style="width: 468px; height: 468px; position: relative; background: #ddd; border-radius: 9px 0 0 9px !important; overflow: hidden;">
-                  <img src="${screen.image_url}" alt="${screen.name} - LED ekranas, reklama led ekrane, ${screen.city}"
+                  <img src="${screen.image_url}" alt="${generateScreenImageAlt(screen.name, screen.city, { sideName: 'Pietūs' })}"
                        style="width: 468px; height: 468px; object-fit: cover;"/>
                   
                   ${showLastMinute ? `
@@ -401,7 +402,7 @@ export default function Map({ selectedCity, selectedScreens, screenCities, selec
                   ` : ''}
                   
                   <!-- Expand Photo Button -->
-                  <button onclick="window.openPhotoModal('${screen.image_url}', '${screen.name} - Pietūs')" 
+                  <button onclick="window.openPhotoModal('${screen.image_url}', '${screen.name} - Pietūs', '${generateScreenImageAlt(screen.name, screen.city, { sideName: 'Pietūs' })}')" 
                           style="position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); width: 60px; height: 60px; background: rgba(0,0,0,0.7); color: white; border: none; border-radius: 50%; display: flex; align-items: center; justify-content: center; cursor: pointer; z-index: 999; font-size: 28px; font-weight: bold; transition: all 0.3s ease; opacity: 0.8;"
                           onmouseover="this.style.opacity='1'; this.style.background='rgba(0,0,0,0.9)'; this.style.transform='translate(-50%, -50%) scale(1.1)';"
                           onmouseout="this.style.opacity='0.8'; this.style.background='rgba(0,0,0,0.7)'; this.style.transform='translate(-50%, -50%) scale(1)';"
@@ -477,7 +478,7 @@ export default function Map({ selectedCity, selectedScreens, screenCities, selec
               <div style="font-family: ui-sans-serif, system-ui, -apple-system, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, 'Noto Sans', sans-serif; width: 100%; max-width: 780px; height: 468px; border-radius: 0; overflow: visible; background: transparent; display: flex; gap: -8px; position: relative;" class="popup-container">
                 <!-- Photo -->
                 <div style="width: 468px; height: 468px; position: relative; background: #ddd; border-radius: 9px 0 0 9px !important; overflow: hidden; flex-shrink: 0;" class="popup-image">
-                  <img src="${screen.image_url}" alt="${screen.name} - lauko ekranas, video ekranas, ${screen.city}, reklamos tinklas"
+                  <img src="${screen.image_url}" alt="${generateScreenImageAlt(screen.name, screen.city, { isViaduct: screen.is_viaduct })}"
                        style="width: 100%; height: 100%; object-fit: cover;"/>
                   
                   ${showLastMinute ? `
@@ -500,7 +501,7 @@ export default function Map({ selectedCity, selectedScreens, screenCities, selec
                   ` : ''}
                   
                   <!-- Expand Photo Button -->
-                  <button onclick="window.openPhotoModal('${screen.image_url}', '${screen.name}')" 
+                  <button onclick="window.openPhotoModal('${screen.image_url}', '${screen.name}', '${generateScreenImageAlt(screen.name, screen.city, { isViaduct: screen.is_viaduct })}')" 
                           style="position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); width: 60px; height: 60px; background: rgba(0,0,0,0.7); color: white; border: none; border-radius: 50%; display: flex; align-items: center; justify-content: center; cursor: pointer; z-index: 999; font-size: 28px; font-weight: bold; transition: all 0.3s ease; opacity: 0.8;"
                           onmouseover="this.style.opacity='1'; this.style.background='rgba(0,0,0,0.9)'; this.style.transform='translate(-50%, -50%) scale(1.1)';"
                           onmouseout="this.style.opacity='0.8'; this.style.background='rgba(0,0,0,0.7)'; this.style.transform='translate(-50%, -50%) scale(1)';"
@@ -608,7 +609,7 @@ export default function Map({ selectedCity, selectedScreens, screenCities, selec
         };
         
         // Photo modal functions
-        (window as any).openPhotoModal = (imageUrl: string, title: string) => {
+        (window as any).openPhotoModal = (imageUrl: string, title: string, alt?: string) => {
           // Create modal if it doesn't exist
           let modal = document.getElementById('photo-modal');
           if (!modal) {
@@ -645,7 +646,7 @@ export default function Map({ selectedCity, selectedScreens, screenCities, selec
           
           if (img && badgeEl) {
             img.src = imageUrl;
-            img.alt = title;
+            img.alt = alt || title;
             badgeEl.textContent = title;
             
             // Store current screen name for toggle function
@@ -1301,7 +1302,7 @@ export default function Map({ selectedCity, selectedScreens, screenCities, selec
       <div style="font-family: ui-sans-serif, system-ui, -apple-system, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, 'Noto Sans', sans-serif; width: 320px; max-width: 90vw; background: white; border-radius: 12px; overflow: hidden; box-shadow: 0 10px 25px rgba(0,0,0,0.15);">
         <!-- Photo -->
         <div style="width: 100%; height: 200px; position: relative; background: #ddd; overflow: hidden;">
-          <img src="${screen.image_url}" alt="${fullName}"
+          <img src="${screen.image_url}" alt="${generateScreenImageAlt(screen.name, screen.city, { sideName: sideName || undefined })}"
                style="width: 100%; height: 100%; object-fit: cover;"/>
           
           ${screen.is_viaduct ? `

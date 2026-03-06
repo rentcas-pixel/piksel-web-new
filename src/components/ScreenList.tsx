@@ -1,6 +1,7 @@
 'use client';
 
 import { LEDScreen } from '@/lib/supabase';
+import { generateScreenImageAlt } from '@/lib/seoImageUtils';
 import { useLEDScreens } from '@/hooks/useLEDScreens';
 import Image from 'next/image';
 import { MapPin, Clock, Info, Plus, Check } from 'lucide-react';
@@ -113,7 +114,7 @@ export default function ScreenList({ selectedCity, selectedScreens, onSelectScre
                   <div className="relative mb-3">
                     <Image
                       src={screen.image_url}
-                      alt={`${screen.name} - LED ekranas, reklama led ekrane, ${screen.city}`}
+                      alt={generateScreenImageAlt(screen.name, screen.city)}
                       width={300}
                       height={150}
                       className="w-full h-32 object-cover rounded-md cursor-pointer hover:opacity-90 transition-opacity"

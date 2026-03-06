@@ -53,6 +53,18 @@ export interface Pricing {
   created_at: string
 }
 
+export interface NewsItem {
+  id: string
+  slug: string
+  title: string
+  excerpt?: string
+  content: string
+  image_url?: string
+  tag: string
+  created_at: string
+  updated_at: string
+}
+
 export interface Inquiry {
   id: string
   screen_id: string // Legacy field (keep for compatibility)

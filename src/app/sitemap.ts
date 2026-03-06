@@ -1,5 +1,6 @@
 import type { MetadataRoute } from 'next';
 import { supabase } from '@/lib/supabase';
+import { newsItems } from '@/data/newsData';
 
 const BASE_URL = 'https://piksel.lt';
 
@@ -9,6 +10,7 @@ const staticRoutes: { path: string; changefreq: 'weekly' | 'monthly'; priority: 
   { path: 'viadukai', changefreq: 'weekly', priority: 0.9 },
   { path: 'planuoti-reklama', changefreq: 'weekly', priority: 0.9 },
   { path: 'kainos', changefreq: 'monthly', priority: 0.8 },
+  { path: 'naujienos', changefreq: 'weekly', priority: 0.8 },
   { path: 'klipai', changefreq: 'monthly', priority: 0.8 },
   { path: 'kontaktai', changefreq: 'monthly', priority: 0.8 },
   { path: 'paslaugos', changefreq: 'monthly', priority: 0.8 },
@@ -54,6 +56,34 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     }
   } catch (e) {
     console.error('Sitemap: failed to fetch screens', e);
+  }
+
+  // News from Supabase (fallback to static)
+  try {
+    const { data: news, error } = await supabase
+      .from('news')
+      .select('slug, updated_at')
+      .order('created_at', { ascending: false });
+
+    const newsSlugs = !error && news?.length ? news : newsItems.map((n) => ({ slug: n.slug, updated_at: null }));
+    for (const item of newsSlugs) {
+      entries.push({
+        url: `${BASE_URL}/naujienos/${item.slug}`,
+        lastModified: item.updated_at ? new Date(item.updated_at) : now,
+        changeFrequency: 'monthly',
+        priority: 0.7,
+      });
+    }
+  } catch (e) {
+    console.error('Sitemap: failed to fetch news', e);
+    for (const item of newsItems) {
+      entries.push({
+        url: `${BASE_URL}/naujienos/${item.slug}`,
+        lastModified: now,
+        changeFrequency: 'monthly',
+        priority: 0.7,
+      });
+    }
   }
 
   return entries;
