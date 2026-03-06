@@ -94,7 +94,20 @@ export default function GlobalSidebar() {
   }
 
   return (
-    <div className="fixed left-0 top-0 h-screen w-80 bg-gray-50 border-r border-gray-200 flex flex-col z-30">
+    <>
+      {/* Mobile: compact top bar with nav */}
+      <div className="md:hidden fixed top-0 left-0 right-0 h-14 bg-black z-30 flex items-center justify-between px-4">
+        <Link href="/" className="flex items-center">
+          <Image src="/Piksel-logo-black-2023.png" alt="Piksel" width={100} height={32} className="h-7 w-auto brightness-0 invert" />
+        </Link>
+        <div className="flex items-center gap-1 sm:gap-2">
+          <Link href="/" className="px-2 sm:px-3 py-1.5 text-white text-sm font-medium rounded-lg hover:bg-white/10">Žemėlapis</Link>
+          <Link href="/klipai" className="px-2 sm:px-3 py-1.5 text-white text-sm font-medium rounded-lg hover:bg-white/10">Klipai</Link>
+          <Link href="/duk" className="px-2 sm:px-3 py-1.5 text-white text-sm font-medium rounded-lg hover:bg-white/10">DUK</Link>
+        </div>
+      </div>
+      {/* Desktop: full sidebar */}
+    <div className="hidden md:flex fixed left-0 top-0 h-screen w-80 bg-gray-50 border-r border-gray-200 flex-col z-30">
       {/* Header */}
       <div className="p-6 bg-black border-b border-gray-200 flex justify-center">
         <button 
@@ -229,5 +242,6 @@ export default function GlobalSidebar() {
         </div>
       </nav>
     </div>
+    </>
   );
 }

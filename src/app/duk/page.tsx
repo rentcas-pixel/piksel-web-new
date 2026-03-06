@@ -54,9 +54,9 @@ export default function DUK() {
   };
 
   return (
-    <div className="min-h-screen bg-white ml-80">
+    <div className="min-h-screen bg-white pt-14 md:pt-0 ml-0 md:ml-80">
       {/* Main Content */}
-      <div className="max-w-4xl mx-auto px-6 py-12">
+      <div className="max-w-4xl mx-auto px-4 sm:px-6 py-8 md:py-12">
         {/* Header */}
         <div className="text-center mb-12">
           <h1 className="text-4xl font-bold text-gray-900">Dažniausiai užduodami klausimai</h1>

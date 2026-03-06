@@ -715,44 +715,123 @@ export default function Map({ selectedCity, selectedScreens, screenCities, selec
             width: 780px !important;
           }
           
-          /* Progressive responsive popup styles */
+          /* Responsive popup - fit within viewport using real dimensions */
           @media (max-width: 1400px) {
             .leaflet-popup-content {
-              max-width: 85vw !important;
-              width: 85vw !important;
+              max-width: min(780px, 55vw) !important;
+              width: min(780px, 55vw) !important;
+              max-height: 75vh !important;
+              overflow: hidden !important;
             }
+            .popup-container {
+              height: min(468px, 45vh) !important;
+              max-height: 45vh !important;
+              overflow: hidden !important;
+            }
+            .popup-container .popup-image {
+              width: 60% !important;
+              height: 100% !important;
+              min-width: 0 !important;
+            }
+            .popup-container .popup-card {
+              width: 40% !important;
+              min-width: 0 !important;
+              height: 100% !important;
+              padding: 20px 16px !important;
+            }
+            .popup-container .popup-card h1 { font-size: 20px !important; }
+            .popup-container .popup-card p { font-size: 13px !important; }
           }
           
           @media (max-width: 1200px) {
             .leaflet-popup-content {
-              max-width: 80vw !important;
-              width: 80vw !important;
+              max-width: min(520px, 48vw) !important;
+              width: min(520px, 48vw) !important;
+              max-height: 70vh !important;
+              overflow: hidden !important;
+            }
+            .popup-container {
+              height: min(312px, 42vh) !important;
+              max-height: 42vh !important;
+              overflow: hidden !important;
             }
             .popup-container .popup-image {
-              width: min(468px, 55vw) !important;
+              width: 60% !important;
+              height: 100% !important;
+              min-width: 0 !important;
             }
             .popup-container .popup-card {
-              width: min(270px, 45vw) !important;
+              width: 40% !important;
+              min-width: 0 !important;
+              height: 100% !important;
+              padding: 14px 12px !important;
             }
+            .popup-container .popup-card h1 { font-size: 18px !important; }
+            .popup-container .popup-card p { font-size: 12px !important; }
+            .popup-container .popup-card > div > div { padding: 8px 0 !important; font-size: 13px !important; }
+          }
+          
+          @media (max-width: 1000px) {
+            .leaflet-popup-content {
+              max-width: min(450px, 55vw) !important;
+              width: min(450px, 55vw) !important;
+              max-height: 65vh !important;
+              overflow: hidden !important;
+            }
+            .popup-container {
+              height: min(270px, 38vh) !important;
+              max-height: 38vh !important;
+              overflow: hidden !important;
+            }
+            .popup-container .popup-image {
+              width: 60% !important;
+              height: 100% !important;
+              min-width: 0 !important;
+            }
+            .popup-container .popup-card {
+              width: 40% !important;
+              min-width: 0 !important;
+              height: 100% !important;
+              padding: 12px 10px !important;
+            }
+            .popup-container .popup-card h1 { font-size: 16px !important; }
+            .popup-container .popup-card p { font-size: 11px !important; }
+            .popup-container .popup-card > div > div { padding: 6px 0 !important; font-size: 12px !important; }
           }
           
           @media (max-width: 900px) {
             .leaflet-popup-content {
-              max-width: 75vw !important;
-              width: 75vw !important;
+              max-width: min(400px, 60vw) !important;
+              width: min(400px, 60vw) !important;
+              max-height: 60vh !important;
+              overflow: hidden !important;
+            }
+            .popup-container {
+              height: min(240px, 35vh) !important;
+              max-height: 35vh !important;
+              overflow: hidden !important;
             }
             .popup-container .popup-image {
-              width: min(468px, 60vw) !important;
+              width: 60% !important;
+              height: 100% !important;
+              min-width: 0 !important;
             }
             .popup-container .popup-card {
-              width: min(270px, 40vw) !important;
+              width: 40% !important;
+              min-width: 0 !important;
+              height: 100% !important;
+              padding: 10px 8px !important;
             }
+            .popup-container .popup-card h1 { font-size: 14px !important; }
+            .popup-container .popup-card p { font-size: 10px !important; }
+            .popup-container .popup-card > div > div { padding: 4px 0 !important; font-size: 11px !important; }
           }
           
           @media (max-width: 768px) {
             .leaflet-popup-content {
               max-width: 95vw !important;
               width: 95vw !important;
+              max-height: 90vh !important;
             }
             .leaflet-popup-content-wrapper {
               padding: 0 !important;
@@ -762,6 +841,8 @@ export default function Map({ selectedCity, selectedScreens, screenCities, selec
               width: 100% !important;
               height: auto !important;
               max-width: none !important;
+              max-height: 85vh !important;
+              overflow-y: auto !important;
             }
             .popup-image {
               width: 100% !important;
@@ -805,22 +886,22 @@ export default function Map({ selectedCity, selectedScreens, screenCities, selec
           
           @media (max-width: 1400px) {
             .leaflet-popup-content:has(div[style*="display: flex; gap: 5px"]) {
-              max-width: 85vw !important;
-              width: 85vw !important;
+              max-width: 75vw !important;
+              width: 75vw !important;
             }
           }
           
           @media (max-width: 1200px) {
             .leaflet-popup-content:has(div[style*="display: flex; gap: 5px"]) {
-              max-width: 80vw !important;
-              width: 80vw !important;
+              max-width: 58vw !important;
+              width: 58vw !important;
             }
           }
           
           @media (max-width: 900px) {
             .leaflet-popup-content:has(div[style*="display: flex; gap: 5px"]) {
-              max-width: 75vw !important;
-              width: 75vw !important;
+              max-width: 52vw !important;
+              width: 52vw !important;
             }
           }
           
