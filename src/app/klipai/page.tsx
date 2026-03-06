@@ -1,181 +1,108 @@
 'use client';
 
-import { Download, Image, Video } from 'lucide-react';
-import { ledScreens } from '@/data/ledScreens';
-import { defaultClipsData, ClipRequirement } from '@/data/clipsData';
-import { useEffect, useState } from 'react';
-import jsPDF from 'jspdf';
-import 'jspdf-autotable';
+import { Image, Video, Search, Square } from 'lucide-react';
+import { clipScreensFromExcel } from '@/data/clipsData';
+import { useState, useMemo } from 'react';
 
 export default function Klipai() {
-  const [requirementsData, setRequirementsData] = useState<ClipRequirement[]>(defaultClipsData);
+  const [searchQuery, setSearchQuery] = useState('');
 
-  useEffect(() => {
-    // Skaityti duomenis iš localStorage
-    const savedData = localStorage.getItem('clipsData');
-    console.log('Saved data from localStorage:', savedData);
-    if (savedData) {
-      try {
-        const parsedData = JSON.parse(savedData);
-        console.log('Parsed data:', parsedData);
-        setRequirementsData(parsedData);
-      } catch (error) {
-        console.error('Error parsing saved clips data:', error);
-      }
-    } else {
-      console.log('No saved data found in localStorage');
-    }
-  }, []);
-
-  // Function to get screen names for a city and format
-  const getScreenNames = (city: string, format: string) => {
-    const cityName = city.replace(' ▲', '').replace(' (Outlet)', '').replace(' (Centras)', '').replace(' (RYO/Klaipėdos)', '');
-    return ledScreens.filter(screen => 
-      screen.city === cityName && 
-      (format === 'Horizontalus' || format === 'Vertikalus' || format === 'Viadukai')
-    ).map(screen => screen.name);
-  };
-
-  // Function to download data as PDF
-  const handleDownload = () => {
-    const doc = new jsPDF('l', 'mm', 'a4'); // landscape orientation
-    
-    // Add title
-    doc.setFontSize(18);
-    doc.text('Reikalavimai klipams', 14, 15);
-    
-    // Prepare table data
-    const tableData = requirementsData.map(item => {
-      const screenNames = item.tooltip ? item.tooltip.split(', ').join(', ') : '';
-      return [
-        item.city,
-        item.format,
-        item.width.toString(),
-        item.height.toString(),
-        screenNames
-      ];
-    });
-    
-    // Create table
-    (doc as any).autoTable({
-      head: [['Miestas', 'Formatas', 'Plotis (PX)', 'Aukštis (PX)', 'Ekranai']],
-      body: tableData,
-      startY: 25,
-      styles: { fontSize: 9 },
-      headStyles: { fillColor: [249, 250, 251], textColor: [17, 24, 39], fontStyle: 'bold' },
-      alternateRowStyles: { fillColor: [255, 255, 255] },
-      columnStyles: {
-        0: { cellWidth: 40 },
-        1: { cellWidth: 40 },
-        2: { cellWidth: 30 },
-        3: { cellWidth: 30 },
-        4: { cellWidth: 100 }
-      }
-    });
-    
-    // Save PDF
-    doc.save(`klipu-reikalavimai-${new Date().toISOString().split('T')[0]}.pdf`);
-  };
-
+  const filteredScreens = useMemo(() => {
+    if (!searchQuery.trim()) return clipScreensFromExcel;
+    const q = searchQuery.toLowerCase().trim();
+    return clipScreensFromExcel.filter(
+      item =>
+        item.screen.toLowerCase().includes(q) ||
+        item.city.toLowerCase().includes(q)
+    );
+  }, [searchQuery]);
   return (
     <div className="min-h-screen bg-white ml-80">
-      {/* Main Content */}
-      <div className="max-w-6xl mx-auto px-6 py-8">
-        <div className="flex items-center gap-3 mb-8">
-          <h2 className="text-4xl font-bold text-gray-900">Reikalavimai klipams</h2>
-          <button
-            onClick={handleDownload}
-            className="p-2 hover:bg-gray-100 rounded-lg transition-colors cursor-pointer"
-            title="Atsisiųsti PDF"
-          >
-            <Download className="w-5 h-5 text-gray-600" />
-          </button>
-        </div>
-            
-            {/* Table */}
-            <div className="bg-white border border-gray-200 rounded-lg overflow-hidden">
-              <div className="overflow-x-auto">
-                <table className="w-full">
-                  <thead className="bg-gray-50">
+      <div className="max-w-6xl mx-auto px-6 py-12">
+        {/* Reklaminiai ekranai */}
+        <div className="mb-12">
+          <div className="flex items-center justify-between gap-4 mb-6 flex-wrap">
+            <div>
+              <h2 className="text-4xl font-bold text-gray-900">Reikalavimai klipams</h2>
+              <p className="text-sm text-gray-500 mt-1">Atnaujinta: 2026-03-06</p>
+            </div>
+            <div className="relative">
+              <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" />
+              <input
+                type="text"
+                placeholder="Ieškoti"
+                value={searchQuery}
+                onChange={(e) => setSearchQuery(e.target.value)}
+                className="pl-10 pr-4 py-2.5 border border-gray-300 rounded-lg text-sm placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-[#1329d4] focus:border-transparent w-72"
+              />
+            </div>
+          </div>
+          <div className="bg-white border border-gray-200 rounded-lg overflow-hidden">
+            <div className="overflow-x-auto">
+              <table className="w-full">
+                <thead className="bg-gray-50">
+                  <tr>
+                    <th className="px-6 py-4 text-left text-sm font-semibold text-gray-900 border-r border-gray-200">MIESTAS</th>
+                    <th className="px-6 py-4 text-left text-sm font-semibold text-gray-900 border-r border-gray-200">EKRANAS</th>
+                    <th className="px-6 py-4 text-left text-sm font-semibold text-gray-900 border-r border-gray-200">TIPAS</th>
+                    <th className="px-6 py-4 text-left text-sm font-semibold text-gray-900">REZOLIUCIJA (px)</th>
+                  </tr>
+                </thead>
+                <tbody className="divide-y divide-gray-200">
+                  {filteredScreens.length === 0 ? (
                     <tr>
-                      <th className="px-6 py-4 text-left text-sm font-semibold text-gray-900 border-r border-gray-200">
-                        MIESTAS
-                      </th>
-                      <th className="px-6 py-4 text-left text-sm font-semibold text-gray-900 border-r border-gray-200">
-                        FORMATAS
-                      </th>
-                      <th className="px-6 py-4 text-left text-sm font-semibold text-gray-900 border-r border-gray-200">
-                        PLOTIS (PX)
-                      </th>
-                      <th className="px-6 py-4 text-left text-sm font-semibold text-gray-900">
-                        AUKŠTIS (PX)
-                      </th>
+                      <td colSpan={4} className="px-6 py-12 text-center text-gray-500">
+                        Nerasta ekranų pagal „{searchQuery}“
+                      </td>
                     </tr>
-                  </thead>
-                  <tbody className="divide-y divide-gray-200">
-                    {requirementsData.map((item, index) => {
-                      return (
-                        <tr key={index} className="hover:bg-gray-50 group relative">
-                          <td className="px-6 py-4 text-sm text-gray-900 border-r border-gray-200">
-                            {item.city}
-                          </td>
-                          <td className="px-6 py-4 text-sm text-gray-900 border-r border-gray-200">
-                            {item.format}
-                          </td>
-                          <td className="px-6 py-4 text-sm text-gray-900 border-r border-gray-200">
-                            {item.width}
-                          </td>
-                          <td className="px-6 py-4 text-sm text-gray-900">
-                            {item.height}
-                          </td>
-                          
-                          {/* Custom Tooltip with badges - spans entire row */}
-                          {item.tooltip && (
-                            <td className="absolute left-0 top-0 w-full h-full opacity-0 group-hover:opacity-100 transition-opacity duration-200 pointer-events-none z-10 p-0">
-                              <div className="absolute top-0 left-1/2 transform -translate-x-1/2 -translate-y-full bg-white text-gray-900 px-4 py-3 rounded-lg shadow-lg border border-gray-200 text-sm">
-                                <div className="flex flex-wrap gap-2 justify-center">
-                                  {item.tooltip.split(', ').map((screen, idx) => (
-                                    <span key={idx} className="bg-blue-100 text-blue-800 px-3 py-1 rounded-full text-xs font-medium whitespace-nowrap">
-                                      {screen}
-                                    </span>
-                                  ))}
-                                </div>
-                                <div className="absolute top-full left-1/2 transform -translate-x-1/2 w-0 h-0 border-l-4 border-r-4 border-t-4 border-transparent border-t-white"></div>
-                              </div>
-                            </td>
-                          )}
-                        </tr>
-                      );
-                    })}
-                  </tbody>
-                </table>
-              </div>
+                  ) : (
+                    filteredScreens.map((item) => (
+                      <tr key={item.id} className="hover:bg-gray-50">
+                        <td className="px-6 py-4 text-sm text-gray-900 border-r border-gray-200">{item.city}</td>
+                        <td className="px-6 py-4 text-sm font-semibold text-gray-900 border-r border-gray-200">{item.screen}</td>
+                        <td className="px-6 py-4 text-sm text-gray-900 border-r border-gray-200">{item.type}</td>
+                        <td className="px-6 py-4 text-sm text-gray-900">{item.resolution}</td>
+                      </tr>
+                    ))
+                  )}
+                </tbody>
+              </table>
             </div>
+          </div>
+        </div>
 
-            {/* Format Information */}
-            <div className="mt-12 space-y-8">
-              {/* Graphic Formats */}
-              <div>
-                <div className="flex items-center gap-3 mb-4">
-                  <Image className="w-5 h-5 text-gray-600" />
-                  <h3 className="text-lg font-medium text-gray-900">GRAFINIAI FORMATAI</h3>
-                </div>
-                <p className="text-gray-700 leading-relaxed">
-                  Yra tinkami JPEG, bei PNG formatai. Spalvų koduotė RGB. Netinka - PDF, GIF.
-                </p>
-              </div>
-
-              {/* Video Formats */}
-              <div>
-                <div className="flex items-center gap-3 mb-4">
-                  <Video className="w-5 h-5 text-gray-600" />
-                  <h3 className="text-lg font-medium text-gray-900">VIDEO FORMATAI</h3>
-                </div>
-                <p className="text-gray-700 leading-relaxed">
-                  Formatas MPEG-4 (be audio), taip pat ne didesnis nei 50MB dydžio. Tik lėta, neblaškanti ir neagresyvi animacija.
-                </p>
-              </div>
+        {/* Format Information */}
+        <div className="mt-12 space-y-8">
+          <div>
+            <div className="flex items-center gap-3 mb-4">
+              <Image className="w-5 h-5 text-gray-600" />
+              <h3 className="text-lg font-medium text-gray-900">GRAFINIAI FORMATAI</h3>
             </div>
+            <p className="text-gray-700 leading-relaxed">
+              PNG, JPG, spalvų koduotė RGB (netinka PDF, GIF).
+            </p>
+          </div>
+
+          <div>
+            <div className="flex items-center gap-3 mb-4">
+              <Video className="w-5 h-5 text-gray-600" />
+              <h3 className="text-lg font-medium text-gray-900">VIDEO FORMATAI</h3>
+            </div>
+            <p className="text-gray-700 leading-relaxed">
+              Formatas MPEG-4 (.mp4), ne ilgesnis nei 50MB/failas. Tik lėta, neblaškanti ir neagresyvi animacija.
+            </p>
+          </div>
+
+          <div>
+            <div className="flex items-center gap-3 mb-4">
+              <Square className="w-5 h-5 text-gray-600" />
+              <h3 className="text-lg font-medium text-gray-900">STATINIS KLIPAS</h3>
+            </div>
+            <p className="text-gray-700 leading-relaxed">
+              10s nejudantis klipas, pirma sekundė gali būti animuota.
+            </p>
+          </div>
+        </div>
       </div>
     </div>
   );
