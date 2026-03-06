@@ -57,6 +57,17 @@ export default function Home() {
   // Get LED screens from Supabase
   const { screens: ledScreens, loading, error } = useLEDScreens();
 
+  // Read city from URL query param on load (e.g. from Klipai/DUK sidebar: ?city=Regionai)
+  useEffect(() => {
+    if (typeof window === 'undefined') return;
+    const params = new URLSearchParams(window.location.search);
+    const city = params.get('city');
+    const validCities = ['Lietuva', 'Vilnius', 'Kaunas', 'Klaipėda', 'Šiauliai', 'Panevėžys', 'Regionai'];
+    if (city && validCities.includes(city)) {
+      setSelectedCity(city);
+    }
+  }, []);
+
   // Defer EmailJS until user opens inquiry form (faster initial load)
   useEffect(() => {
     if (showInquiryForm) initEmailJS();
