@@ -3,11 +3,13 @@
 import { useState } from 'react';
 import { Plus, Minus } from 'lucide-react';
 import Link from 'next/link';
+import { useNews } from '@/hooks/useNews';
 
 export default function DUKMobile() {
   const [openItems, setOpenItems] = useState<number[]>([0]); // First item open by default
   const [showContactPopup, setShowContactPopup] = useState(false);
   const [showHamburgerMenu, setShowHamburgerMenu] = useState(false);
+  const { news: newsItems } = useNews();
 
   const faqData = [
     {
@@ -451,6 +453,57 @@ export default function DUKMobile() {
 
             {/* Menu Items */}
             <div style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
+              <Link 
+                href="/"
+                style={{
+                  display: 'flex',
+                  alignItems: 'center',
+                  gap: '12px',
+                  padding: '12px',
+                  borderRadius: '8px',
+                  textDecoration: 'none',
+                  color: '#374151',
+                  backgroundColor: '#f9fafb',
+                  border: '1px solid #e5e7eb',
+                  fontSize: '14px',
+                  fontWeight: '500'
+                }}
+                onClick={() => setShowHamburgerMenu(false)}
+              >
+                <span>🗺️</span>
+                <span>Žemėlapis</span>
+              </Link>
+              <Link 
+                href="/naujienos"
+                style={{
+                  display: 'flex',
+                  alignItems: 'center',
+                  gap: '12px',
+                  padding: '12px',
+                  borderRadius: '8px',
+                  textDecoration: 'none',
+                  color: '#374151',
+                  backgroundColor: '#f9fafb',
+                  border: '1px solid #e5e7eb',
+                  fontSize: '14px',
+                  fontWeight: '500'
+                }}
+                onClick={() => setShowHamburgerMenu(false)}
+              >
+                <span>📰</span>
+                <span>Naujienos</span>
+                {newsItems.length > 0 && (
+                  <span style={{
+                    marginLeft: 'auto',
+                    background: '#3b82f6',
+                    color: 'white',
+                    fontSize: '11px',
+                    fontWeight: '600',
+                    padding: '2px 8px',
+                    borderRadius: '10px'
+                  }}>{newsItems.length}</span>
+                )}
+              </Link>
               <Link 
                 href="/klipai-mobile"
                 style={{

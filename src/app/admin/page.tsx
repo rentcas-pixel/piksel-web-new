@@ -16,8 +16,18 @@ export default function AdminPanel() {
   const [showForm, setShowForm] = useState(false)
   const [editingScreen, setEditingScreen] = useState<LEDScreen | null>(null)
   
-  // Clips data state
-  const [clipsData, setClipsData] = useState<ClipRequirement[]>(defaultClipsData)
+  // Clips data state – load from localStorage (admin saves here)
+  const [clipsData, setClipsData] = useState<ClipRequirement[]>(() => {
+    if (typeof window === 'undefined') return defaultClipsData
+    try {
+      const stored = localStorage.getItem('clipsData')
+      if (stored) {
+        const parsed = JSON.parse(stored) as ClipRequirement[]
+        if (Array.isArray(parsed) && parsed.length > 0) return parsed
+      }
+    } catch {}
+    return defaultClipsData
+  })
   const [draggedItem, setDraggedItem] = useState<number | null>(null)
   const [draggedScreen, setDraggedScreen] = useState<string | null>(null)
 

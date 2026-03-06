@@ -46,8 +46,8 @@ export default function NewsArticlePage() {
   }
 
   return (
-    <div className="min-h-screen bg-white pt-14 md:pt-0 ml-0 md:ml-80">
-      <article className="max-w-3xl mx-auto px-4 sm:px-6 py-8 md:py-12">
+    <div className="min-h-screen bg-white pt-14 md:pt-0 ml-0 md:ml-80 pb-8">
+      <article className="max-w-3xl mx-auto px-4 sm:px-6 py-6 sm:py-8 md:py-12">
         <Link
           href="/naujienos"
           className="inline-flex items-center gap-2 text-gray-600 hover:text-[#1329d4] mb-8 transition-colors"

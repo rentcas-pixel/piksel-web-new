@@ -7,6 +7,7 @@ import { generateScreenImageAlt } from '@/lib/seoImageUtils';
 import ResponsiveImage from './ResponsiveImage';
 import { sendInquiryEmail, initEmailJS } from '@/lib/emailjs';
 import { useToast } from '@/components/ui/Toast';
+import { useNews } from '@/hooks/useNews';
 
 interface MapProps {
   selectedCity: string;
@@ -26,6 +27,7 @@ interface MapProps {
 export default function Map({ selectedCity, selectedScreens: propSelectedScreens, screenCities: propScreenCities, selectedDateRange: propSelectedDateRange, onClearFilter, onSelectScreen, onDateRangeChange, onCityChange, ledScreens, loading, error }: MapProps) {
   const mapRef = useRef<HTMLDivElement>(null);
   const { toast } = useToast();
+  const { news: newsItems } = useNews();
   
   // Local state for mobile
   const [selectedScreens, setSelectedScreens] = useState<string[]>(propSelectedScreens || []);
@@ -1522,6 +1524,57 @@ export default function Map({ selectedCity, selectedScreens: propSelectedScreens
 
             {/* Menu Items */}
             <div style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
+              <Link 
+                href="/"
+                style={{
+                  display: 'flex',
+                  alignItems: 'center',
+                  gap: '12px',
+                  padding: '12px',
+                  borderRadius: '8px',
+                  textDecoration: 'none',
+                  color: '#374151',
+                  backgroundColor: '#f9fafb',
+                  border: '1px solid #e5e7eb',
+                  fontSize: '14px',
+                  fontWeight: '500'
+                }}
+                onClick={() => setShowHamburgerMenu(false)}
+              >
+                <span>🗺️</span>
+                <span>Žemėlapis</span>
+              </Link>
+              <Link 
+                href="/naujienos"
+                style={{
+                  display: 'flex',
+                  alignItems: 'center',
+                  gap: '12px',
+                  padding: '12px',
+                  borderRadius: '8px',
+                  textDecoration: 'none',
+                  color: '#374151',
+                  backgroundColor: '#f9fafb',
+                  border: '1px solid #e5e7eb',
+                  fontSize: '14px',
+                  fontWeight: '500'
+                }}
+                onClick={() => setShowHamburgerMenu(false)}
+              >
+                <span>📰</span>
+                <span>Naujienos</span>
+                {newsItems.length > 0 && (
+                  <span style={{
+                    marginLeft: 'auto',
+                    background: '#3b82f6',
+                    color: 'white',
+                    fontSize: '11px',
+                    fontWeight: '600',
+                    padding: '2px 8px',
+                    borderRadius: '10px'
+                  }}>{newsItems.length}</span>
+                )}
+              </Link>
               <Link 
                 href="/klipai-mobile"
                 style={{

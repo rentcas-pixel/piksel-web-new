@@ -13,7 +13,8 @@ export default function Klipai() {
     return clipScreensFromExcel.filter(
       item =>
         item.screen.toLowerCase().includes(q) ||
-        item.city.toLowerCase().includes(q)
+        item.city.toLowerCase().includes(q) ||
+        item.type.toLowerCase().includes(q)
     );
   }, [searchQuery]);
   return (

@@ -2,6 +2,7 @@
 
 import { useState } from 'react';
 import { useLEDScreens } from '@/hooks/useLEDScreens';
+import { useNews } from '@/hooks/useNews';
 import Image from 'next/image';
 import Link from 'next/link';
 import { MapPin, FileText, Calendar, Mail, ChevronRight, Play, HelpCircle, Phone, Monitor, Users, Clock, MapPin as LocationIcon, Search, X, Newspaper } from 'lucide-react';
@@ -15,6 +16,7 @@ interface SidebarProps {
 export default function Sidebar({ onCityFilter, selectedCity, onSearchResults }: SidebarProps) {
   // Get LED screens from Supabase
   const { screens: ledScreens, loading, error } = useLEDScreens();
+  const { news: newsItems } = useNews();
   
   // Search state
   const [searchQuery, setSearchQuery] = useState('');
@@ -198,6 +200,9 @@ export default function Sidebar({ onCityFilter, selectedCity, onSearchResults }:
             >
               <item.icon className="w-5 h-5 text-gray-400 group-hover:text-gray-600" />
               <span className="flex-1 text-left font-medium">{item.name}</span>
+              {item.href === '/naujienos' && newsItems.length > 0 && (
+                <span className="bg-[#1329d4] text-white text-xs font-semibold px-2 py-0.5 rounded-full">{newsItems.length}</span>
+              )}
               <ChevronRight className="w-4 h-4 text-gray-400 group-hover:text-gray-600 transition-colors" />
             </Link>
           ))}

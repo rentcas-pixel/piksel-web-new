@@ -4,8 +4,9 @@ import { useState } from 'react';
 import Image from 'next/image';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
-import { MapPin, FileText, Calendar, Mail, ChevronRight, Play, HelpCircle, Phone, Monitor, Users, Clock, MapPin as LocationIcon, Search, X, Flag, Newspaper } from 'lucide-react';
+import { MapPin, FileText, Calendar, Mail, ChevronRight, Play, HelpCircle, Phone, Monitor, Users, Clock, MapPin as LocationIcon, Search, X, Flag, Newspaper, Menu } from 'lucide-react';
 import { useLEDScreens } from '@/hooks/useLEDScreens';
+import { useNews } from '@/hooks/useNews';
 
 export default function GlobalSidebar() {
   const pathname = usePathname();
@@ -13,9 +14,11 @@ export default function GlobalSidebar() {
   const [searchQuery, setSearchQuery] = useState<string>('');
   const [searchResults, setSearchResults] = useState<any[]>([]);
   const [showSearchResults, setShowSearchResults] = useState<boolean>(false);
+  const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   
   // Get LED screens from Supabase
   const { screens: ledScreens, loading, error } = useLEDScreens();
+  const { news: newsItems } = useNews();
 
   const navigationItems = [
     { name: 'Naujienos', icon: Newspaper, href: '/naujienos' },
@@ -96,18 +99,38 @@ export default function GlobalSidebar() {
 
   return (
     <>
-      {/* Mobile: compact top bar with nav */}
+      {/* Mobile: top bar with hamburger menu */}
       <div className="md:hidden fixed top-0 left-0 right-0 h-14 bg-black z-30 flex items-center justify-between px-4">
-        <Link href="/" className="flex items-center">
+        <Link href="/" className="flex items-center flex-shrink-0" onClick={() => setMobileMenuOpen(false)}>
           <Image src="/Piksel-logo-black-2023.png" alt="Piksel" width={100} height={32} className="h-7 w-auto brightness-0 invert" />
         </Link>
-        <div className="flex items-center gap-1 sm:gap-2">
-          <Link href="/" className="px-2 sm:px-3 py-1.5 text-white text-sm font-medium rounded-lg hover:bg-white/10">Žemėlapis</Link>
-          <Link href="/naujienos" className="px-2 sm:px-3 py-1.5 text-white text-sm font-medium rounded-lg hover:bg-white/10">Naujienos</Link>
-          <Link href="/klipai" className="px-2 sm:px-3 py-1.5 text-white text-sm font-medium rounded-lg hover:bg-white/10">Klipai</Link>
-          <Link href="/duk" className="px-2 sm:px-3 py-1.5 text-white text-sm font-medium rounded-lg hover:bg-white/10">DUK</Link>
-        </div>
+        <button
+          onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
+          className="p-2 text-white rounded-lg hover:bg-white/10"
+          aria-label="Meniu"
+        >
+          <Menu className="w-6 h-6" />
+        </button>
       </div>
+      {/* Mobile menu dropdown */}
+      {mobileMenuOpen && (
+        <>
+          <div className="md:hidden fixed inset-0 top-14 bg-black/30 z-40" onClick={() => setMobileMenuOpen(false)} aria-hidden />
+          <div className="md:hidden fixed top-14 left-0 right-0 bg-black/95 z-50 py-4 px-4 shadow-lg">
+            <nav className="flex flex-col gap-1">
+            <Link href="/" className="px-4 py-3 text-white text-base font-medium rounded-lg hover:bg-white/10" onClick={() => setMobileMenuOpen(false)}>Žemėlapis</Link>
+            <Link href="/naujienos" className={`px-4 py-3 text-base font-medium rounded-lg hover:bg-white/10 flex items-center gap-2 ${pathname === '/naujienos' ? 'bg-white/20 text-white' : 'text-white'}`} onClick={() => setMobileMenuOpen(false)}>
+              Naujienos
+              {newsItems.length > 0 && (
+                <span className="bg-white/30 text-white text-xs font-semibold px-2 py-0.5 rounded-full">{newsItems.length}</span>
+              )}
+            </Link>
+            <Link href="/klipai" className={`px-4 py-3 text-base font-medium rounded-lg hover:bg-white/10 ${pathname === '/klipai' ? 'bg-white/20 text-white' : 'text-white'}`} onClick={() => setMobileMenuOpen(false)}>Klipai</Link>
+            <Link href="/duk" className={`px-4 py-3 text-base font-medium rounded-lg hover:bg-white/10 ${pathname === '/duk' ? 'bg-white/20 text-white' : 'text-white'}`} onClick={() => setMobileMenuOpen(false)}>DUK</Link>
+          </nav>
+          </div>
+        </>
+      )}
       {/* Desktop: full sidebar */}
     <div className="hidden md:flex fixed left-0 top-0 h-screen w-80 bg-gray-50 border-r border-gray-200 flex-col z-30">
       {/* Header */}
@@ -210,6 +233,9 @@ export default function GlobalSidebar() {
             >
               <item.icon className="w-5 h-5 text-gray-400 group-hover:text-gray-600" />
               <span className="flex-1 text-left font-medium">{item.name}</span>
+              {item.href === '/naujienos' && newsItems.length > 0 && (
+                <span className="bg-[#1329d4] text-white text-xs font-semibold px-2 py-0.5 rounded-full">{newsItems.length}</span>
+              )}
               <ChevronRight className="w-4 h-4 text-gray-400 group-hover:text-gray-600 transition-colors" />
             </Link>
           ))}

@@ -1,39 +1,16 @@
 'use client';
 
 import { Download, Image, Video } from 'lucide-react';
-import { ledScreens } from '@/data/ledScreens';
 import { useState } from 'react';
 import Link from 'next/link';
+import { useNews } from '@/hooks/useNews';
+import { useClipsData } from '@/hooks/useClipsData';
 
 export default function KlipaiMobile() {
   const [showContactPopup, setShowContactPopup] = useState(false);
   const [showHamburgerMenu, setShowHamburgerMenu] = useState(false);
-
-  const requirementsData = [
-    { city: 'Vilnius', format: 'Viadukai', width: '3040', height: '240' },
-    { city: 'Vilnius', format: 'Horizontalus', width: '1152', height: '576' },
-    { city: 'Vilnius', format: 'Vertikalus', width: '448', height: '672' },
-    { city: 'Vilnius (Outlet)', format: 'Horizontalus', width: '640', height: '288' },
-    { city: 'Kaunas ▲', format: 'Horizontalus', width: '1080', height: '450' },
-    { city: 'Kaunas', format: 'Horizontalus', width: '960', height: '576' },
-    { city: 'Klaipėda', format: 'Horizontalus', width: '1152', height: '576' },
-    { city: 'Klaipėda (Centras)', format: 'Vertikalus', width: '720', height: '864' },
-    { city: 'Šiauliai', format: 'Horizontalus', width: '1152', height: '576' },
-    { city: 'Panevėžys (RYO/Klaipėdos)', format: 'Horizontalus', width: '1309', height: '576' },
-    { city: 'Alytus', format: 'Horizontalus', width: '480', height: '270' },
-    { city: 'Marijampolė', format: 'Horizontalus', width: '1152', height: '576' },
-    { city: 'Mažeikiai', format: 'Horizontalus', width: '640', height: '288' },
-    { city: 'Utena', format: 'Horizontalus', width: '960', height: '576' }
-  ];
-
-  // Function to get screen names for a city and format
-  const getScreenNames = (city: string, format: string) => {
-    const cityName = city.replace(' ▲', '').replace(' (Outlet)', '').replace(' (Centras)', '').replace(' (RYO/Klaipėdos)', '');
-    return ledScreens.filter(screen => 
-      screen.city === cityName && 
-      (format === 'Horizontalus' || format === 'Vertikalus' || format === 'Viadukai')
-    ).map(screen => screen.name);
-  };
+  const { news: newsItems } = useNews();
+  const clipsData = useClipsData();
 
   return (
     <div style={{ 
@@ -219,44 +196,41 @@ export default function KlipaiMobile() {
                 </tr>
               </thead>
               <tbody>
-                {requirementsData.map((item, index) => {
-                  const screenNames = getScreenNames(item.city, item.format);
-                  return (
-                    <tr key={index} style={{ borderBottom: '1px solid #e5e7eb' }}>
-                      <td style={{ 
-                        padding: '12px 8px', 
-                        fontSize: '12px', 
-                        color: '#374151',
-                        borderRight: '1px solid #e5e7eb'
-                      }}>
-                        {item.city}
-                      </td>
-                      <td style={{ 
-                        padding: '12px 8px', 
-                        fontSize: '12px', 
-                        color: '#374151',
-                        borderRight: '1px solid #e5e7eb'
-                      }}>
-                        {item.format}
-                      </td>
-                      <td style={{ 
-                        padding: '12px 8px', 
-                        fontSize: '12px', 
-                        color: '#374151',
-                        borderRight: '1px solid #e5e7eb'
-                      }}>
-                        {item.width}
-                      </td>
-                      <td style={{ 
-                        padding: '12px 8px', 
-                        fontSize: '12px', 
-                        color: '#374151'
-                      }}>
-                        {item.height}
-                      </td>
-                    </tr>
-                  );
-                })}
+                {clipsData.map((item) => (
+                  <tr key={item.id} style={{ borderBottom: '1px solid #e5e7eb' }}>
+                    <td style={{ 
+                      padding: '12px 8px', 
+                      fontSize: '12px', 
+                      color: '#374151',
+                      borderRight: '1px solid #e5e7eb'
+                    }}>
+                      {item.city}
+                    </td>
+                    <td style={{ 
+                      padding: '12px 8px', 
+                      fontSize: '12px', 
+                      color: '#374151',
+                      borderRight: '1px solid #e5e7eb'
+                    }}>
+                      {item.format}
+                    </td>
+                    <td style={{ 
+                      padding: '12px 8px', 
+                      fontSize: '12px', 
+                      color: '#374151',
+                      borderRight: '1px solid #e5e7eb'
+                    }}>
+                      {item.width}
+                    </td>
+                    <td style={{ 
+                      padding: '12px 8px', 
+                      fontSize: '12px', 
+                      color: '#374151'
+                    }}>
+                      {item.height}
+                    </td>
+                  </tr>
+                ))}
               </tbody>
             </table>
           </div>
@@ -484,6 +458,57 @@ export default function KlipaiMobile() {
 
             {/* Menu Items */}
             <div style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
+              <Link 
+                href="/"
+                style={{
+                  display: 'flex',
+                  alignItems: 'center',
+                  gap: '12px',
+                  padding: '12px',
+                  borderRadius: '8px',
+                  textDecoration: 'none',
+                  color: '#374151',
+                  backgroundColor: '#f9fafb',
+                  border: '1px solid #e5e7eb',
+                  fontSize: '14px',
+                  fontWeight: '500'
+                }}
+                onClick={() => setShowHamburgerMenu(false)}
+              >
+                <span>🗺️</span>
+                <span>Žemėlapis</span>
+              </Link>
+              <Link 
+                href="/naujienos"
+                style={{
+                  display: 'flex',
+                  alignItems: 'center',
+                  gap: '12px',
+                  padding: '12px',
+                  borderRadius: '8px',
+                  textDecoration: 'none',
+                  color: '#374151',
+                  backgroundColor: '#f9fafb',
+                  border: '1px solid #e5e7eb',
+                  fontSize: '14px',
+                  fontWeight: '500'
+                }}
+                onClick={() => setShowHamburgerMenu(false)}
+              >
+                <span>📰</span>
+                <span>Naujienos</span>
+                {newsItems.length > 0 && (
+                  <span style={{
+                    marginLeft: 'auto',
+                    background: '#3b82f6',
+                    color: 'white',
+                    fontSize: '11px',
+                    fontWeight: '600',
+                    padding: '2px 8px',
+                    borderRadius: '10px'
+                  }}>{newsItems.length}</span>
+                )}
+              </Link>
               <Link 
                 href="/klipai-mobile"
                 style={{

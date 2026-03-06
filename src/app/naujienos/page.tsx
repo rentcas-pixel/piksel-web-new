@@ -18,8 +18,8 @@ export default function Naujienos() {
   }
 
   return (
-    <div className="min-h-screen bg-white pt-14 md:pt-0 ml-0 md:ml-80">
-      <div className="max-w-6xl mx-auto px-4 sm:px-6 py-8 md:py-12">
+    <div className="min-h-screen bg-white pt-14 md:pt-0 ml-0 md:ml-80 pb-8">
+      <div className="max-w-6xl mx-auto px-4 sm:px-6 py-6 sm:py-8 md:py-12">
         <div className="mb-12">
           <h1 className="text-3xl sm:text-4xl font-bold text-gray-900">
             Naujienos

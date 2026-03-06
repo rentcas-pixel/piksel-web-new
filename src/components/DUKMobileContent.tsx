@@ -3,11 +3,13 @@
 import { useState } from 'react';
 import { Plus, Minus } from 'lucide-react';
 import Link from 'next/link';
+import { useNews } from '@/hooks/useNews';
 
 export default function DUKMobileContent() {
   const [openItems, setOpenItems] = useState<number[]>([0]); // First item open by default
   const [showContactPopup, setShowContactPopup] = useState(false);
   const [showHamburgerMenu, setShowHamburgerMenu] = useState(false);
+  const { news: newsItems } = useNews();
 
   const faqData = [
     {
@@ -426,7 +428,55 @@ export default function DUKMobileContent() {
 
             {/* Menu Items */}
             <div style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
-              <a 
+              <Link 
+                href="/"
+                style={{
+                  display: 'flex',
+                  alignItems: 'center',
+                  padding: '16px',
+                  backgroundColor: '#f8fafc',
+                  borderRadius: '12px',
+                  textDecoration: 'none',
+                  color: '#374151',
+                  fontSize: '16px',
+                  fontWeight: '500',
+                  transition: 'all 0.2s ease',
+                  border: '1px solid #e5e7eb'
+                }}
+                onClick={() => setShowHamburgerMenu(false)}
+              >
+                🗺️ Žemėlapis
+              </Link>
+              <Link 
+                href="/naujienos"
+                style={{
+                  display: 'flex',
+                  alignItems: 'center',
+                  padding: '16px',
+                  backgroundColor: '#f8fafc',
+                  borderRadius: '12px',
+                  textDecoration: 'none',
+                  color: '#374151',
+                  fontSize: '16px',
+                  fontWeight: '500',
+                  transition: 'all 0.2s ease',
+                  border: '1px solid #e5e7eb'
+                }}
+                onClick={() => setShowHamburgerMenu(false)}
+              >
+                <span style={{ flex: 1 }}>📰 Naujienos</span>
+                {newsItems.length > 0 && (
+                  <span style={{
+                    background: '#3b82f6',
+                    color: 'white',
+                    fontSize: '11px',
+                    fontWeight: '600',
+                    padding: '2px 8px',
+                    borderRadius: '10px'
+                  }}>{newsItems.length}</span>
+                )}
+              </Link>
+              <Link 
                 href="/klipai-mobile"
                 style={{
                   display: 'flex',
@@ -441,20 +491,11 @@ export default function DUKMobileContent() {
                   transition: 'all 0.2s ease',
                   border: '1px solid #e5e7eb'
                 }}
-                onMouseEnter={(e) => {
-                  e.currentTarget.style.backgroundColor = '#3b82f6';
-                  e.currentTarget.style.color = 'white';
-                }}
-                onMouseLeave={(e) => {
-                  e.currentTarget.style.backgroundColor = '#f8fafc';
-                  e.currentTarget.style.color = '#374151';
-                }}
                 onClick={() => setShowHamburgerMenu(false)}
               >
                 📹 Klipai
-              </a>
-              
-              <a 
+              </Link>
+              <Link 
                 href="/duk-mobile"
                 style={{
                   display: 'flex',
@@ -469,18 +510,10 @@ export default function DUKMobileContent() {
                   transition: 'all 0.2s ease',
                   border: '1px solid #e5e7eb'
                 }}
-                onMouseEnter={(e) => {
-                  e.currentTarget.style.backgroundColor = '#3b82f6';
-                  e.currentTarget.style.color = 'white';
-                }}
-                onMouseLeave={(e) => {
-                  e.currentTarget.style.backgroundColor = '#f8fafc';
-                  e.currentTarget.style.color = '#374151';
-                }}
                 onClick={() => setShowHamburgerMenu(false)}
               >
                 ❓ DUK
-              </a>
+              </Link>
             </div>
           </div>
         </div>
