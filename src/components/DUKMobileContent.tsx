@@ -71,7 +71,7 @@ export default function DUKMobileContent() {
               <img 
                 src="/Piksel-logo-black-2023.png" 
                 alt="Piksel Logo" 
-                style={{ height: '22px', width: 'auto' }}
+                style={{ height: '31px', width: 'auto' }}
               />
             </Link>
           </div>
@@ -196,7 +196,7 @@ export default function DUKMobileContent() {
               >
                 <h3 style={{ 
                   fontSize: '16px', 
-                  fontWeight: '600', 
+                  fontWeight: '700', 
                   color: '#111827', 
                   margin: 0,
                   flex: 1
@@ -262,7 +262,7 @@ export default function DUKMobileContent() {
               <img 
                 src="/Piksel-logo-black-2023.png" 
                 alt="Piksel Logo" 
-                style={{ height: '22px', width: 'auto' }}
+                style={{ height: '31px', width: 'auto' }}
               />
               <button
                 onClick={() => setShowContactPopup(false)}
@@ -403,7 +403,7 @@ export default function DUKMobileContent() {
                   <img 
                     src="/Piksel-logo-black-2023.png" 
                     alt="Piksel - LED reklamos ekranai Lietuvoje, reklama ekranuose, led reklama"
-                    style={{ height: '24px' }}
+                    style={{ height: '35px' }}
                   />
                   <p style={{ fontSize: '12px', color: '#6b7280', margin: 0 }}>ryškių ekranų tinklas</p>
                 </div>

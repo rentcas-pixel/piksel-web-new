@@ -62,7 +62,7 @@ export default function KlipaiMobile() {
               <img 
                 src="/Piksel-logo-black-2023.png" 
                 alt="Piksel Logo" 
-                style={{ height: '22px', width: 'auto' }}
+                style={{ height: '31px', width: 'auto' }}
               />
             </Link>
           </div>
@@ -319,7 +319,7 @@ export default function KlipaiMobile() {
               <img 
                 src="/Piksel-logo-black-2023.png" 
                 alt="Piksel Logo" 
-                style={{ height: '22px', width: 'auto' }}
+                style={{ height: '31px', width: 'auto' }}
               />
               <button
                 onClick={() => setShowContactPopup(false)}
@@ -458,7 +458,7 @@ export default function KlipaiMobile() {
               <img 
                 src="/Piksel-logo-black-2023.png" 
                 alt="Piksel Logo" 
-                style={{ height: '22px', width: 'auto' }}
+                style={{ height: '31px', width: 'auto' }}
               />
               <button
                 onClick={() => setShowHamburgerMenu(false)}

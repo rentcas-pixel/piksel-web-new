@@ -2,7 +2,6 @@
 
 import { useEffect, useRef, useState } from 'react';
 import { LEDScreen } from '@/lib/supabase';
-import { useLEDScreens } from '@/hooks/useLEDScreens';
 import MapMobile from './MapMobile';
 
 interface MapProps {
@@ -14,13 +13,16 @@ interface MapProps {
   onSelectScreen?: (screenName: string) => void;
   onDateRangeChange?: (from: string, to: string) => void;
   onCityChange?: (city: string) => void;
+  /** Passed from page – single source of truth, no duplicate fetch */
+  ledScreens: LEDScreen[];
+  loading: boolean;
+  error: string | null;
 }
 
-export default function Map({ selectedCity, selectedScreens, screenCities, selectedDateRange, onClearFilter, onSelectScreen, onDateRangeChange, onCityChange }: MapProps) {
+export default function Map({ selectedCity, selectedScreens, screenCities, selectedDateRange, onClearFilter, onSelectScreen, onDateRangeChange, onCityChange, ledScreens, loading, error }: MapProps) {
   // Check if mobile
   const [isMobile, setIsMobile] = useState(false);
   const mapRef = useRef<HTMLDivElement>(null);
-  const { screens: ledScreens, loading, error } = useLEDScreens();
   
   
   // Detect Chrome browser
@@ -42,7 +44,6 @@ export default function Map({ selectedCity, selectedScreens, screenCities, selec
         const mediaQuery = window.matchMedia('(max-width: 767px)');
         const isMobileDevice = mediaQuery.matches || window.innerWidth <= 767;
         setIsMobile(isMobileDevice);
-        console.log('Mobile detection:', isMobileDevice, 'Window width:', window.innerWidth);
       }
     };
     
@@ -1172,7 +1173,6 @@ export default function Map({ selectedCity, selectedScreens, screenCities, selec
 
   // Use mobile component for mobile devices
   if (isMobile) {
-    console.log('Using MapMobile component');
     return (
       <MapMobile 
         selectedCity={selectedCity}
@@ -1183,7 +1183,33 @@ export default function Map({ selectedCity, selectedScreens, screenCities, selec
         onSelectScreen={onSelectScreen}
         onDateRangeChange={onDateRangeChange}
         onCityChange={onCityChange}
+        ledScreens={ledScreens}
+        loading={loading}
+        error={error}
       />
+    );
+  }
+
+  // Desktop: show skeleton/error while loading or on error
+  if (loading) {
+    return (
+      <div className="min-h-[60vh] bg-gray-100 animate-pulse" aria-hidden />
+    );
+  }
+  if (error) {
+    return (
+      <div className="min-h-[200px] flex items-center justify-center bg-gray-50">
+        <div className="text-center">
+          <p className="text-red-600 mb-2">Klaida: {error}</p>
+          <button
+            type="button"
+            onClick={() => window.location.reload()}
+            className="px-4 py-2 bg-[#1329d4] text-white rounded hover:bg-[#0f20a8] text-sm"
+          >
+            Bandyti vėl
+          </button>
+        </div>
+      </div>
     );
   }
 
@@ -1254,7 +1280,7 @@ export default function Map({ selectedCity, selectedScreens, screenCities, selec
     return (
       <div className="w-full h-screen flex items-center justify-center">
         <div className="text-center">
-          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-500 mx-auto mb-4"></div>
+          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-[#1329d4] mx-auto mb-4"></div>
           <p className="text-gray-600">Kraunama...</p>
         </div>
       </div>
@@ -1268,7 +1294,7 @@ export default function Map({ selectedCity, selectedScreens, screenCities, selec
           <p className="text-red-600 mb-4">Klaida: {error}</p>
           <button 
             onClick={() => window.location.reload()} 
-            className="px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600"
+            className="px-4 py-2 bg-[#1329d4] text-white rounded hover:bg-[#0f20a8]"
           >
             Bandyti vėl
           </button>
@@ -1300,7 +1326,7 @@ export default function Map({ selectedCity, selectedScreens, screenCities, selec
                     
                     // Miesto badge'as
                     allBadges.push(
-                      <div key={`city-${city}`} className="bg-blue-100 text-blue-800 px-3 py-1 rounded-full text-sm font-medium whitespace-nowrap">
+                      <div key={`city-${city}`} className="bg-[#dee7e1] text-[#141414] px-3 py-1 rounded-full text-sm font-medium whitespace-nowrap">
                         {city}
                       </div>
                     );
@@ -1355,7 +1381,7 @@ export default function Map({ selectedCity, selectedScreens, screenCities, selec
                       e.stopPropagation();
                     }
                   }}
-                  className="px-3 py-1 border border-gray-300 rounded text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+                  className="px-3 py-1 border border-gray-300 rounded text-sm focus:outline-none focus:ring-2 focus:ring-[#1329d4]"
                   style={{ 
                     pointerEvents: 'auto', 
                     userSelect: 'none',
@@ -1391,7 +1417,7 @@ export default function Map({ selectedCity, selectedScreens, screenCities, selec
                       e.stopPropagation();
                     }
                   }}
-                  className="px-3 py-1 border border-gray-300 rounded text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+                  className="px-3 py-1 border border-gray-300 rounded text-sm focus:outline-none focus:ring-2 focus:ring-[#1329d4]"
                   style={{ 
                     pointerEvents: 'auto', 
                     userSelect: 'none',

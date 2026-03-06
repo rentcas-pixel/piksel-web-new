@@ -16,21 +16,15 @@ export function CorporateSidebar({ onCitySelect }: CorporateSidebarProps) {
       className="fixed left-0 top-0 h-screen w-[374px] bg-slate-900 border-r border-slate-700 flex flex-col z-30"
     >
       {/* Logo Section */}
-      <div className="p-6 bg-slate-800 border-b border-slate-700">
-        <div className="flex items-center gap-4">
-          <div className="w-10 h-10 bg-blue-600 rounded-md flex items-center justify-center">
-            <span className="text-white font-bold text-lg">P</span>
-          </div>
-          <div>
+      <div className="p-6 bg-slate-800 border-b border-slate-700 flex justify-center">
+        <div className="flex flex-col items-center text-center">
             <Image
               src="/Piksel-logo-black-2023.png"
               alt="Piksel Logo"
               width={120}
               height={40}
-              className="h-[22px] w-auto brightness-0 invert"
+              className="h-[31px] w-auto brightness-0 invert"
             />
-            <p className="text-sm text-slate-400">ryškių ekranų tinklas</p>
-          </div>
         </div>
       </div>
 
@@ -75,7 +69,7 @@ export function CorporateSidebar({ onCitySelect }: CorporateSidebarProps) {
               >
                 <BarChart3 className="w-4 h-4 text-slate-400 group-hover:text-blue-400" />
                 <span className="flex-1 text-left font-medium">{city.name}</span>
-                            <span className="bg-blue-600/20 text-blue-300 text-xs font-medium px-2 py-1 rounded-full">
+                            <span className="bg-[#1329d4]/20 text-[#1329d4] text-xs font-medium px-2 py-1 rounded-full">
                   {city.badge}
                 </span>
                 <ChevronRight className="w-4 h-4 text-slate-500 group-hover:text-slate-300 transition-colors" />
@@ -98,7 +92,7 @@ export function CorporateSidebar({ onCitySelect }: CorporateSidebarProps) {
               <item.icon className="w-5 h-5 text-slate-400 group-hover:text-blue-400" />
               <span className="flex-1 text-left font-medium">{item.label}</span>
               {item.badge && (
-                            <span className="bg-blue-600/20 text-blue-300 text-xs font-medium px-2 py-1 rounded-full">
+                            <span className="bg-[#1329d4]/20 text-[#1329d4] text-xs font-medium px-2 py-1 rounded-full">
                   {item.badge}
                 </span>
               )}

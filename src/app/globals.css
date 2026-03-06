@@ -1,20 +1,26 @@
 @import "tailwindcss";
 
+/* PIKSEL brandbook – spalvos */
 :root {
-  --background: #ffffff;
-  --foreground: #000000;
-  --samsung-blue: #000000;
-  --samsung-light-blue: #333333;
-  --samsung-gray: #f8f9fa;
-  --samsung-dark-gray: #2c2c2c;
-  --samsung-accent: #666666;
+  --piksel-black: #141414;
+  --piksel-green: #bcf715;
+  --piksel-blue: #1329d4;
+  --piksel-gray: #dee7e1;
+  --piksel-white: #ffffff;
+  --background: var(--piksel-white);
+  --foreground: var(--piksel-black);
 }
 
 @theme inline {
   --color-background: var(--background);
   --color-foreground: var(--foreground);
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
+  --color-piksel-black: #141414;
+  --color-piksel-green: #bcf715;
+  --color-piksel-blue: #1329d4;
+  --color-piksel-gray: #dee7e1;
+  --color-piksel-white: #ffffff;
+  --font-sans: var(--font-manrope), 'Helvetica Neue', Helvetica, Arial, sans-serif;
+  --font-mono: ui-monospace, monospace;
 }
 
 @media (prefers-color-scheme: dark) {
@@ -27,31 +33,40 @@
 body {
   background: var(--background);
   color: var(--foreground);
-  font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  font-family: var(--font-manrope), 'Helvetica Neue', Helvetica, Arial, sans-serif;
   font-feature-settings: "rlig" 1, "calt" 1;
+  letter-spacing: 0.01em;
 }
 
 .font-manrope {
-  font-family: var(--font-manrope), -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  font-family: var(--font-manrope), 'Helvetica Neue', Helvetica, Arial, sans-serif;
 }
 
-/* Samsung Design System Components - Black & White */
-.samsung-card {
-  background: white;
+/* Antraštėms – Manrope SemiBold (brandbook 04.2) */
+h1, h2, h3, h4, h5, h6 {
+  font-weight: 600;
+}
+
+/* PIKSEL brand – kortelės ir mygtukai */
+.samsung-card,
+.piksel-card {
+  background: var(--piksel-white);
   border-radius: 24px;
-  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.15);
-  border: 1px solid rgba(0, 0, 0, 0.1);
+  box-shadow: 0 4px 20px rgba(20, 20, 20, 0.08);
+  border: 1px solid var(--piksel-gray);
   transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
-.samsung-card:hover {
-  box-shadow: 0 8px 40px rgba(0, 0, 0, 0.2);
+.samsung-card:hover,
+.piksel-card:hover {
+  box-shadow: 0 8px 40px rgba(20, 20, 20, 0.12);
   transform: translateY(-2px);
 }
 
-.samsung-button-primary {
-  background: linear-gradient(135deg, #000000 0%, #333333 100%);
-  color: white;
+.samsung-button-primary,
+.piksel-btn-primary {
+  background: var(--piksel-blue);
+  color: var(--piksel-white);
   padding: 16px 32px;
   border-radius: 16px;
   font-weight: 600;
@@ -59,18 +74,21 @@ body {
   border: none;
   cursor: pointer;
   transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.3);
+  box-shadow: 0 4px 16px rgba(19, 41, 212, 0.3);
 }
 
-.samsung-button-primary:hover {
-  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.4);
+.samsung-button-primary:hover,
+.piksel-btn-primary:hover {
+  background: #0f20a8;
+  box-shadow: 0 6px 20px rgba(19, 41, 212, 0.4);
   transform: translateY(-1px);
 }
 
-.samsung-button-secondary {
-  background: white;
-  color: #000000;
-  border: 2px solid #000000;
+.samsung-button-secondary,
+.piksel-btn-secondary {
+  background: var(--piksel-white);
+  color: var(--piksel-black);
+  border: 2px solid var(--piksel-black);
   padding: 14px 30px;
   border-radius: 16px;
   font-weight: 600;
@@ -79,40 +97,46 @@ body {
   transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
-.samsung-button-secondary:hover {
-  background: #000000;
-  color: white;
+.samsung-button-secondary:hover,
+.piksel-btn-secondary:hover {
+  background: var(--piksel-black);
+  color: var(--piksel-white);
   transform: translateY(-1px);
 }
 
-.samsung-gradient {
-  background: linear-gradient(135deg, #000000 0%, #333333 100%);
+.samsung-gradient,
+.piksel-gradient {
+  background: linear-gradient(135deg, var(--piksel-black) 0%, #2a2a2a 100%);
 }
 
 .samsung-text-gradient {
-  background: linear-gradient(135deg, #000000 0%, #333333 100%);
+  background: linear-gradient(135deg, var(--piksel-blue) 0%, var(--piksel-green) 100%);
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
   background-clip: text;
 }
 
-.samsung-section {
+.samsung-section,
+.piksel-section {
   padding: 96px 16px;
 }
 
 @media (min-width: 640px) {
-  .samsung-section {
+  .samsung-section,
+  .piksel-section {
     padding: 96px 24px;
   }
 }
 
 @media (min-width: 1024px) {
-  .samsung-section {
+  .samsung-section,
+  .piksel-section {
     padding: 96px 32px;
   }
 }
 
-.samsung-container {
+.samsung-container,
+.piksel-container {
   max-width: 1280px;
   margin: 0 auto;
 }
@@ -195,6 +219,6 @@ input[type="date"]::-webkit-calendar-picker-indicator {
 
 /* Ensure date inputs have proper focus states */
 input[type="date"]:focus {
-  outline: 2px solid #3b82f6;
+  outline: 2px solid var(--piksel-blue);
   outline-offset: 2px;
 }

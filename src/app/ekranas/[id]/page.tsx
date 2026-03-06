@@ -24,7 +24,7 @@ export default function ScreenPage() {
   if (loading) {
     return (
       <div className="min-h-screen bg-white flex items-center justify-center">
-        <div className="w-8 h-8 border-2 border-gray-200 border-t-blue-600 rounded-full animate-spin"></div>
+        <div className="w-8 h-8 border-2 border-gray-200 border-t-[#1329d4] rounded-full animate-spin"></div>
       </div>
     );
   }
@@ -36,7 +36,7 @@ export default function ScreenPage() {
           <h1 className="text-2xl font-semibold text-gray-900 mb-4">Ekranas nerastas</h1>
           <button 
             onClick={() => router.back()}
-            className="px-6 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors"
+            className="px-6 py-2 bg-[#1329d4] text-white rounded-lg hover:bg-[#0f20a8] transition-colors"
           >
             Grįžti atgal
           </button>
@@ -60,8 +60,8 @@ export default function ScreenPage() {
               </button>
               <div className="flex items-center gap-3">
                 <div className="flex items-center gap-2">
-                  <div className="w-2 h-2 bg-blue-600 rounded-full"></div>
-                  <div className="w-2 h-2 bg-blue-600 rounded-full"></div>
+                  <div className="w-2 h-2 bg-[#1329d4] rounded-full"></div>
+                  <div className="w-2 h-2 bg-[#1329d4] rounded-full"></div>
                 </div>
                 <h1 className="text-xl font-semibold text-gray-900">ledpro</h1>
               </div>
@@ -69,7 +69,7 @@ export default function ScreenPage() {
             <div className="flex items-center gap-6">
               <span className="text-sm text-gray-600">Skambinkite +370 690 666 33</span>
               <span className="text-sm text-gray-600">El. paštas: support@ledekranai.pro</span>
-              <button className="px-6 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors font-medium">
+              <button className="px-6 py-2 bg-[#1329d4] text-white rounded-lg hover:bg-[#0f20a8] transition-colors font-medium">
                 Susisiekti
               </button>
             </div>
@@ -95,7 +95,7 @@ export default function ScreenPage() {
             <div className="absolute top-6 left-6">
               <div className="bg-white/95 backdrop-blur-sm px-4 py-3 rounded-xl shadow-lg">
                 <div className="flex items-center gap-3">
-                  <Eye className="w-5 h-5 text-blue-600" />
+                  <Eye className="w-5 h-5 text-[#1329d4]" />
                   <div>
                     <p className="text-xs text-gray-600 font-medium uppercase tracking-wide">Srautas per savaitę</p>
                     <p className="text-xl font-bold text-gray-900">364 140</p>
@@ -136,7 +136,7 @@ export default function ScreenPage() {
 
               {/* Action Button */}
               <div className="mb-8">
-                <button className="px-8 py-3 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors font-semibold">
+                <button className="px-8 py-3 bg-[#1329d4] text-white rounded-lg hover:bg-[#0f20a8] transition-colors font-semibold">
                   Pateikti užklausą
                 </button>
               </div>
@@ -153,7 +153,7 @@ export default function ScreenPage() {
                     <h3 className="font-semibold text-gray-900">Raiška ir ryškumas</h3>
                     <span className="text-gray-400">-</span>
                   </div>
-                  <div className="p-4 bg-white border-l-4 border-blue-500 mt-2 rounded-r-lg">
+                  <div className="p-4 bg-white border-l-4 border-[#1329d4] mt-2 rounded-r-lg">
                     <p className="text-sm text-gray-700">
                       Lauko ekranų raiška - {screen.name === 'Compensa' ? '3.040 x 240' : '1152 x 576'} pikselių. 
                       Ekranų ryškumas 10.000-7.500 Nitų. Matymo kampas - 160/70°

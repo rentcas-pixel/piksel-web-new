@@ -1,18 +1,15 @@
 import type { Metadata } from "next";
-import { Inter, Manrope } from "next/font/google";
+import { Manrope } from "next/font/google";
 import "./globals.css";
 import Navigation from "@/components/Navigation";
 import Footer from "@/components/Footer";
 import GlobalSidebar from "@/components/GlobalSidebar";
 import StructuredData from "@/components/StructuredData";
-
-const inter = Inter({
-  subsets: ["latin"],
-  variable: "--font-inter",
-});
+import { ToastProvider } from "@/components/ui/Toast";
 
 const manrope = Manrope({
   subsets: ["latin"],
+  weight: ["400", "600"],
   variable: "--font-manrope",
 });
 
@@ -87,12 +84,14 @@ export default function RootLayout({
       <head>
         <StructuredData />
       </head>
-      <body className={`${inter.variable} ${manrope.variable} font-sans antialiased`}>
-        <GlobalSidebar />
-        <Navigation />
-        <main>
-          {children}
-        </main>
+      <body className={`${manrope.variable} font-sans antialiased`}>
+        <ToastProvider>
+          <GlobalSidebar />
+          <Navigation />
+          <main>
+            {children}
+          </main>
+        </ToastProvider>
       </body>
     </html>
   );

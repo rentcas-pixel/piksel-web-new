@@ -59,7 +59,7 @@ export default function Ekranai() {
   return (
     <div className="min-h-screen">
       {/* Hero Section */}
-      <section className="bg-gradient-to-r from-blue-600 to-blue-800 text-white py-20">
+      <section className="bg-gradient-to-r from-[#1329d4] to-[#bcf715] text-white py-20">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="text-center">
             <h1 className="text-4xl md:text-5xl font-bold mb-6">
@@ -115,10 +115,10 @@ export default function Ekranai() {
                 <p className="text-gray-600 text-sm mb-4">{screen.description}</p>
 
                 <div className="flex gap-2">
-                  <button className="flex-1 bg-blue-600 text-white py-2 px-4 rounded-lg font-semibold hover:bg-blue-700 transition-colors">
+                  <button className="flex-1 bg-[#1329d4] text-white py-2 px-4 rounded-lg font-semibold hover:bg-[#0f20a8] transition-colors">
                     Rezervuoti
                   </button>
-                  <button className="flex-1 border border-blue-600 text-blue-600 py-2 px-4 rounded-lg font-semibold hover:bg-blue-50 transition-colors">
+                  <button className="flex-1 border border-[#1329d4] text-[#1329d4] py-2 px-4 rounded-lg font-semibold hover:bg-blue-50 transition-colors">
                     Detaliau
                   </button>
                 </div>
@@ -151,7 +151,7 @@ export default function Ekranai() {
                   </div>
                   <div className="flex justify-between items-center">
                     <span className="text-gray-600">Vidiniai ekranai:</span>
-                    <span className="font-bold text-blue-600">1</span>
+                    <span className="font-bold text-[#1329d4]">1</span>
                   </div>
                   <div className="flex justify-between items-center">
                     <span className="text-gray-600">Bendras plotas:</span>
@@ -199,7 +199,7 @@ export default function Ekranai() {
       </section>
 
       {/* CTA Section */}
-      <section className="bg-blue-600 text-white py-16">
+      <section className="bg-[#1329d4] text-white py-16">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
           <h2 className="text-3xl md:text-4xl font-bold mb-6">
             Norite rezervuoti ekraną?
@@ -210,13 +210,13 @@ export default function Ekranai() {
           <div className="flex flex-col sm:flex-row gap-4 justify-center">
             <a
               href="/kontaktai"
-              className="bg-white text-blue-600 px-8 py-3 rounded-lg font-semibold hover:bg-blue-50 transition-colors"
+              className="bg-white text-[#1329d4] px-8 py-3 rounded-lg font-semibold hover:bg-blue-50 transition-colors"
             >
               Susisiekti
             </a>
             <a
               href="/kainos"
-              className="border-2 border-white text-white px-8 py-3 rounded-lg font-semibold hover:bg-white hover:text-blue-600 transition-colors"
+              className="border-2 border-white text-white px-8 py-3 rounded-lg font-semibold hover:bg-white hover:text-[#1329d4] transition-colors"
             >
               Žiūrėti kainas
             </a>

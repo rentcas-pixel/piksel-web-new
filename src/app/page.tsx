@@ -19,15 +19,21 @@
  */
 
 import { useState, useEffect } from 'react';
+import dynamic from 'next/dynamic';
 import Sidebar from '@/components/Sidebar';
-import Map from '@/components/Map';
 import ScreenList from '@/components/ScreenList';
 import { useLEDScreens } from '@/hooks/useLEDScreens';
 import { Building2, User, Mail, MessageSquare, Send, Calendar, MapPin, X, CheckCircle } from 'lucide-react';
 import { sendInquiryEmail, initEmailJS } from '@/lib/emailjs';
+import { useToast } from '@/components/ui/Toast';
 
+const Map = dynamic(() => import('@/components/Map'), {
+  ssr: false,
+  loading: () => <div className="min-h-[60vh] bg-gray-100 animate-pulse" aria-hidden />,
+});
 
 export default function Home() {
+  const { toast } = useToast();
   const [selectedCity, setSelectedCity] = useState<string>('Vilnius');
   const [selectedScreens, setSelectedScreens] = useState<string[]>([]);
   const [screenCities, setScreenCities] = useState<{[screenName: string]: string}>({});
@@ -51,28 +57,10 @@ export default function Home() {
   // Get LED screens from Supabase
   const { screens: ledScreens, loading, error } = useLEDScreens();
 
-  // Initialize EmailJS on component mount
+  // Defer EmailJS until user opens inquiry form (faster initial load)
   useEffect(() => {
-    initEmailJS();
-  }, []);
-
-  // Debug: Check image sizes when screens are loaded
-  useEffect(() => {
-    if (ledScreens.length > 0) {
-      console.log('=== IMAGE SIZE DEBUG ===');
-      ledScreens.forEach((screen, index) => {
-        const img = new Image();
-        img.onload = () => {
-          console.log(`${index + 1}. ${screen.name}: ${img.naturalWidth}x${img.naturalHeight}px (${screen.city})`);
-        };
-        img.onerror = () => {
-          console.log(`${index + 1}. ${screen.name}: Failed to load image (${screen.city})`);
-        };
-        img.src = screen.image_url;
-      });
-      console.log('=== END IMAGE DEBUG ===');
-    }
-  }, [ledScreens]);
+    if (showInquiryForm) initEmailJS();
+  }, [showInquiryForm]);
 
   // Handle pending popup after city change
   useEffect(() => {
@@ -411,17 +399,17 @@ export default function Home() {
     e.preventDefault();
     
     if (!inquiryForm.companyName || !inquiryForm.contactPerson || !inquiryForm.email) {
-      alert('Prašome užpildyti visus privalomus laukus');
+      toast('Prašome užpildyti visus privalomus laukus', 'error');
       return;
     }
     
     if (selectedScreens.length === 0) {
-      alert('Prašome pasirinkti bent vieną ekraną');
+      toast('Prašome pasirinkti bent vieną ekraną', 'error');
       return;
     }
     
     if (!dateRange) {
-      alert('Prašome pasirinkti reklamos periodą');
+      toast('Prašome pasirinkti reklamos periodą', 'error');
       return;
     }
     
@@ -489,41 +477,13 @@ export default function Home() {
       
     } catch (error) {
       console.error('Error submitting inquiry:', error);
-      alert('Klaida siunčiant užklausą. Bandykite dar kartą.');
+      toast('Klaida siunčiant užklausą. Bandykite dar kartą.', 'error');
     } finally {
       setSubmittingInquiry(false);
     }
   };
 
-  // Show loading state
-  if (loading) {
-    return (
-      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
-        <div className="text-center">
-          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-500 mx-auto mb-4"></div>
-          <p className="text-gray-600">Kraunama...</p>
-        </div>
-      </div>
-    );
-  }
-
-  // Show error state
-  if (error) {
-    return (
-      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
-        <div className="text-center">
-          <p className="text-red-600 mb-4">Klaida: {error}</p>
-          <button 
-            onClick={() => window.location.reload()} 
-            className="px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600"
-          >
-            Bandyti vėl
-          </button>
-        </div>
-      </div>
-    );
-  }
-
+  // Always show layout – loading/error handled inside ScreenList and Map (faster perceived load)
   return (
     <div className="min-h-screen bg-gray-50">
       {/* Success Notification */}
@@ -557,9 +517,12 @@ export default function Home() {
         onShowPopup={handleShowPopup}
         isLoading={isLoading}
         searchResults={searchResults}
+        ledScreens={ledScreens}
+        loading={loading}
+        error={error}
       />
       
-      {/* Map - Full Width with margin for sidebar */}
+      {/* Map - Full Width with margin for sidebar (dynamic import = smaller initial bundle) */}
       <div className={`ml-[640px] ${showInquiryForm ? 'mr-96' : 'mr-0'}`}>
         <Map 
           selectedCity={selectedCity} 
@@ -570,6 +533,9 @@ export default function Home() {
           onDateRangeChange={handleDateRangeChange}
           onClearFilter={handleClearFilter}
           onCityChange={setSelectedCity}
+          ledScreens={ledScreens}
+          loading={loading}
+          error={error}
         />
       </div>
 
@@ -641,7 +607,7 @@ export default function Home() {
                 value={inquiryForm.companyName}
                 onChange={(e) => setInquiryForm({...inquiryForm, companyName: e.target.value})}
                 placeholder="Įmonės pavadinimas"
-                className="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+                className="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-[#1329d4]"
                 required
               />
             </div>
@@ -654,7 +620,7 @@ export default function Home() {
                 value={inquiryForm.contactPerson}
                 onChange={(e) => setInquiryForm({...inquiryForm, contactPerson: e.target.value})}
                 placeholder="Jūsų vardas"
-                className="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+                className="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-[#1329d4]"
                 required
               />
             </div>
@@ -667,7 +633,7 @@ export default function Home() {
                 value={inquiryForm.email}
                 onChange={(e) => setInquiryForm({...inquiryForm, email: e.target.value})}
                 placeholder="el@paštas.lt"
-                className="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+                className="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-[#1329d4]"
                 required
               />
             </div>
@@ -680,7 +646,7 @@ export default function Home() {
                 value={inquiryForm.phone}
                 onChange={(e) => setInquiryForm({...inquiryForm, phone: e.target.value})}
                 placeholder="+370 600 12345"
-                className="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+                className="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-[#1329d4]"
               />
             </div>
 
@@ -692,7 +658,7 @@ export default function Home() {
                 onChange={(e) => setInquiryForm({...inquiryForm, message: e.target.value})}
                 placeholder="Jūsų komentaras ar papildoma informacija..."
                 rows={4}
-                className="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 resize-none"
+                className="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-[#1329d4] resize-none"
               />
             </div>
 
@@ -701,7 +667,7 @@ export default function Home() {
               <button
                 type="submit"
                 disabled={submittingInquiry}
-                className="w-full bg-blue-600 hover:bg-blue-700 disabled:bg-blue-400 text-white font-semibold py-3 px-4 rounded-lg transition-colors flex items-center justify-center gap-2"
+                className="w-full bg-[#1329d4] hover:bg-[#0f20a8] disabled:bg-[#1329d4]/50 text-white font-semibold py-3 px-4 rounded-lg transition-colors flex items-center justify-center gap-2"
               >
                 {submittingInquiry ? (
                   <>

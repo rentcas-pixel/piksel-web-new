@@ -4,6 +4,8 @@ import { Download, Image, Video } from 'lucide-react';
 import { ledScreens } from '@/data/ledScreens';
 import { defaultClipsData, ClipRequirement } from '@/data/clipsData';
 import { useEffect, useState } from 'react';
+import jsPDF from 'jspdf';
+import 'jspdf-autotable';
 
 export default function Klipai() {
   const [requirementsData, setRequirementsData] = useState<ClipRequirement[]>(defaultClipsData);
@@ -34,13 +36,60 @@ export default function Klipai() {
     ).map(screen => screen.name);
   };
 
+  // Function to download data as PDF
+  const handleDownload = () => {
+    const doc = new jsPDF('l', 'mm', 'a4'); // landscape orientation
+    
+    // Add title
+    doc.setFontSize(18);
+    doc.text('Reikalavimai klipams', 14, 15);
+    
+    // Prepare table data
+    const tableData = requirementsData.map(item => {
+      const screenNames = item.tooltip ? item.tooltip.split(', ').join(', ') : '';
+      return [
+        item.city,
+        item.format,
+        item.width.toString(),
+        item.height.toString(),
+        screenNames
+      ];
+    });
+    
+    // Create table
+    (doc as any).autoTable({
+      head: [['Miestas', 'Formatas', 'Plotis (PX)', 'Aukštis (PX)', 'Ekranai']],
+      body: tableData,
+      startY: 25,
+      styles: { fontSize: 9 },
+      headStyles: { fillColor: [249, 250, 251], textColor: [17, 24, 39], fontStyle: 'bold' },
+      alternateRowStyles: { fillColor: [255, 255, 255] },
+      columnStyles: {
+        0: { cellWidth: 40 },
+        1: { cellWidth: 40 },
+        2: { cellWidth: 30 },
+        3: { cellWidth: 30 },
+        4: { cellWidth: 100 }
+      }
+    });
+    
+    // Save PDF
+    doc.save(`klipu-reikalavimai-${new Date().toISOString().split('T')[0]}.pdf`);
+  };
+
   return (
     <div className="min-h-screen bg-white ml-80">
       {/* Main Content */}
       <div className="max-w-6xl mx-auto px-6 py-8">
         <div className="flex items-center gap-3 mb-8">
           <h2 className="text-4xl font-bold text-gray-900">Reikalavimai klipams</h2>
-          <Download className="w-5 h-5 text-gray-600" />
+          <button
+            onClick={handleDownload}
+            className="p-2 hover:bg-gray-100 rounded-lg transition-colors cursor-pointer"
+            title="Atsisiųsti PDF"
+          >
+            <Download className="w-5 h-5 text-gray-600" />
+          </button>
         </div>
             
             {/* Table */}

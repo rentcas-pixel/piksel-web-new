@@ -57,7 +57,7 @@ export default function DUKContent() {
               onClick={() => toggleItem(index)}
               className="w-full px-6 py-4 text-left flex items-center justify-between hover:bg-gray-50 transition-colors"
             >
-              <h3 className="text-lg font-medium text-gray-900 pr-4">
+              <h3 className="text-lg font-bold text-gray-900 pr-4">
                 {item.question}
               </h3>
               {openItems.includes(index) ? (
@@ -86,7 +86,7 @@ export default function DUKContent() {
         <div className="flex flex-col sm:flex-row gap-3">
           <a 
             href="tel:+37012345678" 
-            className="inline-flex items-center justify-center px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 transition-colors"
+            className="inline-flex items-center justify-center px-4 py-2 bg-[#1329d4] text-white rounded-md hover:bg-[#0f20a8] transition-colors"
           >
             📞 Skambinti
           </a>

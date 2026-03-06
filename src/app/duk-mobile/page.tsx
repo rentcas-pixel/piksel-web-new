@@ -83,7 +83,7 @@ export default function DUKMobile() {
               <img 
                 src="/Piksel-logo-black-2023.png" 
                 alt="Piksel Logo" 
-                style={{ height: '22px', width: 'auto' }}
+                style={{ height: '31px', width: 'auto' }}
               />
             </Link>
           </div>
@@ -218,7 +218,7 @@ export default function DUKMobile() {
               >
                 <span style={{ 
                   fontSize: '14px', 
-                  fontWeight: '500', 
+                  fontWeight: '700', 
                   color: '#111827',
                   paddingRight: '16px',
                   lineHeight: '1.4'
@@ -286,7 +286,7 @@ export default function DUKMobile() {
               <img 
                 src="/Piksel-logo-black-2023.png" 
                 alt="Piksel Logo" 
-                style={{ height: '22px', width: 'auto' }}
+                style={{ height: '31px', width: 'auto' }}
               />
               <button
                 onClick={() => setShowContactPopup(false)}
@@ -425,7 +425,7 @@ export default function DUKMobile() {
               <img 
                 src="/Piksel-logo-black-2023.png" 
                 alt="Piksel Logo" 
-                style={{ height: '22px', width: 'auto' }}
+                style={{ height: '31px', width: 'auto' }}
               />
               <button
                 onClick={() => setShowHamburgerMenu(false)}

@@ -3,9 +3,9 @@
 import { useEffect, useRef, useState } from 'react';
 import Link from 'next/link';
 import { LEDScreen } from '@/lib/supabase';
-import { useLEDScreens } from '@/hooks/useLEDScreens';
 import ResponsiveImage from './ResponsiveImage';
 import { sendInquiryEmail, initEmailJS } from '@/lib/emailjs';
+import { useToast } from '@/components/ui/Toast';
 
 interface MapProps {
   selectedCity: string;
@@ -16,11 +16,15 @@ interface MapProps {
   onSelectScreen?: (screenName: string) => void;
   onDateRangeChange?: (from: string, to: string) => void;
   onCityChange?: (city: string) => void;
+  /** From parent Map – single fetch, no duplicate useLEDScreens */
+  ledScreens: LEDScreen[];
+  loading: boolean;
+  error: string | null;
 }
 
-export default function Map({ selectedCity, selectedScreens: propSelectedScreens, screenCities: propScreenCities, selectedDateRange: propSelectedDateRange, onClearFilter, onSelectScreen, onDateRangeChange, onCityChange }: MapProps) {
+export default function Map({ selectedCity, selectedScreens: propSelectedScreens, screenCities: propScreenCities, selectedDateRange: propSelectedDateRange, onClearFilter, onSelectScreen, onDateRangeChange, onCityChange, ledScreens, loading, error }: MapProps) {
   const mapRef = useRef<HTMLDivElement>(null);
-  const { screens: ledScreens, loading, error } = useLEDScreens();
+  const { toast } = useToast();
   
   // Local state for mobile
   const [selectedScreens, setSelectedScreens] = useState<string[]>(propSelectedScreens || []);
@@ -124,14 +128,14 @@ export default function Map({ selectedCity, selectedScreens: propSelectedScreens
   // Handle inquiry submission
   const handleSubmitInquiry = async () => {
     if (!inquiryForm.companyName || !inquiryForm.contactPerson || !inquiryForm.email || !inquiryForm.phone) {
-      alert('Prašome užpildyti visus privalomus laukus');
+      toast('Prašome užpildyti visus privalomus laukus', 'error');
       return;
     }
 
     // Email validation
     const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
     if (!emailRegex.test(inquiryForm.email)) {
-      alert('Prašome įvesti teisingą el. pašto adresą');
+      toast('Prašome įvesti teisingą el. pašto adresą', 'error');
       return;
     }
 
@@ -189,11 +193,11 @@ export default function Map({ selectedCity, selectedScreens: propSelectedScreens
           message: ''
         });
       } else {
-        alert('Klaida siunčiant užklausą. Bandykite dar kartą.');
+        toast('Klaida siunčiant užklausą. Bandykite dar kartą.', 'error');
       }
     } catch (error) {
       console.error('Error submitting inquiry:', error);
-      alert('Klaida siunčiant užklausą. Bandykite dar kartą.');
+      toast('Klaida siunčiant užklausą. Bandykite dar kartą.', 'error');
     } finally {
       setSubmittingInquiry(false);
     }
@@ -717,7 +721,7 @@ export default function Map({ selectedCity, selectedScreens: propSelectedScreens
     return (
       <div className="w-full h-screen flex items-center justify-center">
         <div className="text-center">
-          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-500 mx-auto mb-4"></div>
+          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-[#1329d4] mx-auto mb-4"></div>
           <p className="text-gray-600">Kraunama...</p>
         </div>
       </div>
@@ -731,7 +735,7 @@ export default function Map({ selectedCity, selectedScreens: propSelectedScreens
           <p className="text-red-600 mb-4">Klaida: {error}</p>
           <button 
             onClick={() => window.location.reload()} 
-            className="px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600"
+            className="px-4 py-2 bg-[#1329d4] text-white rounded hover:bg-[#0f20a8]"
           >
             Bandyti vėl
           </button>
@@ -767,7 +771,7 @@ export default function Map({ selectedCity, selectedScreens: propSelectedScreens
             <img 
               src="/Piksel-logo-black-2023.png" 
               alt="Piksel Logo" 
-              style={{ height: '22px', width: 'auto' }}
+              style={{ height: '31px', width: 'auto' }}
             />
           </div>
           <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
@@ -775,7 +779,7 @@ export default function Map({ selectedCity, selectedScreens: propSelectedScreens
               onClick={() => setShowHamburgerMenu(true)}
               style={{ 
                 padding: '8px', 
-                backgroundColor: '#3b82f6', 
+                backgroundColor: '#1329d4', 
                 color: 'white', 
                 borderRadius: '11px', 
                 fontSize: '16px',
@@ -795,7 +799,7 @@ export default function Map({ selectedCity, selectedScreens: propSelectedScreens
               onClick={() => setShowContactPopup(true)}
               style={{ 
                 padding: '8px', 
-                backgroundColor: '#3b82f6', 
+                backgroundColor: '#1329d4', 
                 color: 'white', 
                 borderRadius: '11px', 
                 fontSize: '16px',
@@ -844,7 +848,7 @@ export default function Map({ selectedCity, selectedScreens: propSelectedScreens
               <img 
                 src="/Piksel-logo-black-2023.png" 
                 alt="Piksel Logo" 
-                style={{ height: '22px', width: 'auto' }}
+                style={{ height: '31px', width: 'auto' }}
               />
               <button
                 onClick={() => setShowContactPopup(false)}
@@ -885,7 +889,7 @@ export default function Map({ selectedCity, selectedScreens: propSelectedScreens
                   alignItems: 'center',
                   gap: '12px',
                   padding: '12px',
-                  backgroundColor: '#3b82f6',
+                  backgroundColor: '#1329d4',
                   borderRadius: '10px',
                   textDecoration: 'none',
                   color: 'white',
@@ -895,7 +899,7 @@ export default function Map({ selectedCity, selectedScreens: propSelectedScreens
                   e.currentTarget.style.backgroundColor = '#2563eb';
                 }}
                 onMouseOut={(e) => {
-                  e.currentTarget.style.backgroundColor = '#3b82f6';
+                  e.currentTarget.style.backgroundColor = '#1329d4';
                 }}
               >
                 <div style={{
@@ -995,7 +999,7 @@ export default function Map({ selectedCity, selectedScreens: propSelectedScreens
                 borderRadius: '9999px',
                 fontSize: '13px',
                 fontWeight: '500',
-                backgroundColor: selectedCity === city ? '#3b82f6' : 'white',
+                backgroundColor: selectedCity === city ? '#1329d4' : 'white',
                 color: selectedCity === city ? 'white' : '#374151',
                 border: selectedCity === city ? 'none' : '1px solid #d1d5db',
                 cursor: 'pointer',
@@ -1491,7 +1495,7 @@ export default function Map({ selectedCity, selectedScreens: propSelectedScreens
               <img 
                 src="/Piksel-logo-black-2023.png" 
                 alt="Piksel Logo" 
-                style={{ height: '22px', width: 'auto' }}
+                style={{ height: '31px', width: 'auto' }}
               />
               <button
                 onClick={() => setShowHamburgerMenu(false)}

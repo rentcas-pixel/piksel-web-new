@@ -94,23 +94,19 @@ export default function Sidebar({ onCityFilter, selectedCity, onSearchResults }:
   return (
     <div className="fixed left-0 top-0 h-screen w-80 bg-gray-50 border-r border-gray-200 flex flex-col z-30">
       {/* Header */}
-      <div className="p-6 bg-white border-b border-gray-200">
+      <div className="p-6 bg-black border-b border-gray-200 flex justify-center">
         <button 
           onClick={() => onCityFilter('Vilnius')}
-          className="flex items-center gap-4 w-full hover:bg-gray-50 rounded-lg p-2 -m-2 transition-colors"
+          className="flex flex-col items-center gap-1 w-full hover:bg-gray-900 rounded-lg p-2 -m-2 transition-colors"
         >
-          <div className="w-10 h-10 bg-blue-600 rounded-md flex items-center justify-center">
-            <span className="text-white font-bold text-lg">P</span>
-          </div>
-          <div>
+          <div className="flex flex-col items-center text-center">
             <Image
               src="/Piksel-logo-black-2023.png"
               alt="Piksel Logo"
               width={120}
               height={40}
-              className="h-[22px] w-auto"
+              className="h-[31px] w-auto brightness-0 invert"
             />
-            <p className="text-sm text-gray-500">ryškių ekranų tinklas</p>
           </div>
         </button>
       </div>
@@ -126,7 +122,7 @@ export default function Sidebar({ onCityFilter, selectedCity, onSearchResults }:
             placeholder="Ieškoti ekranų pagal pavadinimą, adresą, miestą..."
             value={searchQuery}
             onChange={(e) => handleSearch(e.target.value)}
-            className="block w-full pl-10 pr-10 py-3 border border-gray-300 rounded-lg text-sm placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+            className="block w-full pl-10 pr-10 py-3 border border-gray-300 rounded-lg text-sm placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-[#1329d4] focus:border-transparent"
           />
           {searchQuery && (
             <button
@@ -166,22 +162,22 @@ export default function Sidebar({ onCityFilter, selectedCity, onSearchResults }:
                   key={city.name}
                   onClick={() => onCityFilter(city.name)}
                   className={`w-full flex items-center gap-3 p-3 rounded-lg text-gray-600 hover:text-gray-900 transition-colors group mb-1 ${
-                    selectedCity === city.name ? 'bg-blue-100 text-blue-700' : ''
-                  } ${city.isSpecial ? 'bg-gradient-to-r from-blue-50 to-indigo-50 border border-blue-200' : ''}`}
+                    selectedCity === city.name ? 'bg-[#1329d4]/10 text-[#1329d4]' : ''
+                  } ${city.isSpecial ? 'bg-gradient-to-r from-[#1329d4]/5 to-[#1329d4]/10 border border-[#1329d4]/20' : ''}`}
                 >
                   {city.isSpecial ? (
                     <span className="text-lg">🇱🇹</span>
                   ) : (
                     <MapPin className={`w-4 h-4 group-hover:text-gray-600 ${
-                      city.isSpecial ? 'text-blue-500' : 'text-gray-400'
+                      city.isSpecial ? 'text-[#1329d4]' : 'text-gray-400'
                     }`} />
                   )}
-                  <span className={`flex-1 text-left ${
-                    city.isSpecial ? 'font-bold text-blue-800' : 'font-medium'
-                  }`}>{city.name}</span>
-                  <span className={`text-xs font-medium px-2 py-1 rounded-full ${
+                  <span className="flex-1 text-left font-bold">
+                    {city.name}
+                  </span>
+                  <span className={`text-xs font-semibold px-2 py-1 rounded-full ${
                     city.isSpecial 
-                      ? 'bg-blue-200 text-blue-800' 
+                      ? 'bg-[#1329d4]/20 text-[#1329d4]' 
                       : 'bg-gray-200 text-gray-600'
                   }`}>
                     {city.count}

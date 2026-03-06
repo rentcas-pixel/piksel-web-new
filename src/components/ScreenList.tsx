@@ -4,6 +4,7 @@ import { LEDScreen } from '@/lib/supabase';
 import { useLEDScreens } from '@/hooks/useLEDScreens';
 import Image from 'next/image';
 import { MapPin, Clock, Info, Plus, Check } from 'lucide-react';
+import { Skeleton } from '@/components/ui/skeleton';
 
 interface ScreenListProps {
   selectedCity: string;
@@ -12,11 +13,17 @@ interface ScreenListProps {
   onShowPopup?: (screenId: string) => void;
   isLoading?: boolean;
   searchResults?: any[];
+  /** From page – single fetch when provided */
+  ledScreens?: LEDScreen[];
+  loading?: boolean;
+  error?: string | null;
 }
 
-export default function ScreenList({ selectedCity, selectedScreens, onSelectScreen, onShowPopup, isLoading = false, searchResults = [] }: ScreenListProps) {
-  // Get LED screens from Supabase
-  const { screens: ledScreens, loading, error } = useLEDScreens();
+export default function ScreenList({ selectedCity, selectedScreens, onSelectScreen, onShowPopup, isLoading = false, searchResults = [], ledScreens: propScreens, loading: propLoading, error: propError }: ScreenListProps) {
+  const fromHook = useLEDScreens();
+  const ledScreens = propScreens ?? fromHook.screens;
+  const loading = propLoading ?? fromHook.loading;
+  const error = propError ?? fromHook.error;
   
   // Filter screens by selected city
   const filteredScreens = selectedCity === 'Lietuva'
@@ -30,10 +37,26 @@ export default function ScreenList({ selectedCity, selectedScreens, onSelectScre
 
   if (loading) {
     return (
-      <div className="fixed left-80 top-0 w-80 h-screen bg-gray-50 border-r border-gray-200 z-30 flex items-center justify-center">
-        <div className="text-center">
-          <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-500 mx-auto mb-2"></div>
-          <p className="text-gray-600 text-sm">Kraunama...</p>
+      <div className="fixed left-80 top-0 w-80 h-screen bg-gray-50 border-r border-gray-200 z-30 overflow-y-auto">
+        <div className="p-4 space-y-3">
+          {[1, 2, 3, 4, 5].map((i) => (
+            <div key={i} className="bg-white rounded-lg shadow-sm border border-gray-200 p-4">
+              <div className="relative mb-3">
+                <Skeleton className="w-full h-32 rounded-md" />
+              </div>
+              <div className="mb-3 space-y-2">
+                <Skeleton className="h-5 w-[75%] rounded" />
+                <div className="space-y-1">
+                  <Skeleton className="h-3 w-12 rounded" />
+                  <Skeleton className="h-4 w-full rounded" />
+                </div>
+              </div>
+              <div className="flex gap-2">
+                <Skeleton className="flex-1 h-9 rounded-md" />
+                <Skeleton className="flex-1 h-9 rounded-md" />
+              </div>
+            </div>
+          ))}
         </div>
       </div>
     );
@@ -46,7 +69,7 @@ export default function ScreenList({ selectedCity, selectedScreens, onSelectScre
           <p className="text-red-600 text-sm mb-2">Klaida: {error}</p>
           <button 
             onClick={() => window.location.reload()} 
-            className="px-3 py-1 bg-blue-500 text-white rounded text-sm hover:bg-blue-600"
+            className="px-3 py-1 bg-[#1329d4] text-white rounded text-sm hover:bg-[#0f20a8]"
           >
             Bandyti vėl
           </button>

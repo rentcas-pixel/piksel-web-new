@@ -60,7 +60,7 @@ export default function Kontaktai() {
                   service: ''
                 });
               }}
-              className="bg-blue-600 text-white px-6 py-3 rounded-lg font-medium hover:bg-blue-700 transition-colors"
+              className="bg-[#1329d4] text-white px-6 py-3 rounded-lg font-medium hover:bg-[#0f20a8] transition-colors"
             >
               Siųsti naują užklausą
             </button>
@@ -148,7 +148,7 @@ export default function Kontaktai() {
                       required
                       value={formData.name}
                       onChange={handleChange}
-                      className="w-full px-4 py-4 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent text-lg"
+                      className="w-full px-4 py-4 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#1329d4] focus:border-transparent text-lg"
                       placeholder="Vardas"
                     />
                     <input
@@ -156,7 +156,7 @@ export default function Kontaktai() {
                       name="company"
                       value={formData.company}
                       onChange={handleChange}
-                      className="w-full px-4 py-4 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent text-lg"
+                      className="w-full px-4 py-4 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#1329d4] focus:border-transparent text-lg"
                       placeholder="Pavardė"
                     />
                   </div>
@@ -172,7 +172,7 @@ export default function Kontaktai() {
                     required
                     value={formData.email}
                     onChange={handleChange}
-                    className="w-full px-4 py-4 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent text-lg"
+                    className="w-full px-4 py-4 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#1329d4] focus:border-transparent text-lg"
                     placeholder="Pvz. vardas@elpaštas.lt"
                   />
                 </div>
@@ -186,7 +186,7 @@ export default function Kontaktai() {
                     name="phone"
                     value={formData.phone}
                     onChange={handleChange}
-                    className="w-full px-4 py-4 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent text-lg"
+                    className="w-full px-4 py-4 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#1329d4] focus:border-transparent text-lg"
                     placeholder="Pvz. +370 6XX XXXXX"
                   />
                 </div>
@@ -201,7 +201,7 @@ export default function Kontaktai() {
                     rows={4}
                     value={formData.message}
                     onChange={handleChange}
-                    className="w-full px-4 py-4 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent text-lg resize-none"
+                    className="w-full px-4 py-4 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#1329d4] focus:border-transparent text-lg resize-none"
                     placeholder="Parašykite mums žinutę..."
                   />
                 </div>

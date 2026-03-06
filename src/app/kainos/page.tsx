@@ -73,7 +73,7 @@ export default function Kainos() {
   return (
     <div className="min-h-screen">
       {/* Hero Section */}
-      <section className="bg-gradient-to-r from-blue-600 to-blue-800 text-white py-20">
+      <section className="bg-gradient-to-r from-[#1329d4] to-[#bcf715] text-white py-20">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="text-center">
             <h1 className="text-4xl md:text-5xl font-bold mb-6">
@@ -103,12 +103,12 @@ export default function Kainos() {
               <div
                 key={index}
                 className={`relative bg-white p-8 rounded-lg shadow-lg border-2 ${
-                  plan.popular ? 'border-blue-500' : 'border-gray-200'
+                  plan.popular ? 'border-[#1329d4]' : 'border-gray-200'
                 }`}
               >
                 {plan.popular && (
                   <div className="absolute -top-4 left-1/2 transform -translate-x-1/2">
-                    <span className="bg-blue-500 text-white px-4 py-2 rounded-full text-sm font-semibold">
+                    <span className="bg-[#1329d4] text-white px-4 py-2 rounded-full text-sm font-semibold">
                       Populiariausias
                     </span>
                   </div>
@@ -137,7 +137,7 @@ export default function Kainos() {
                 <button
                   className={`w-full py-3 px-6 rounded-lg font-semibold transition-colors ${
                     plan.popular
-                      ? 'bg-blue-600 text-white hover:bg-blue-700'
+                      ? 'bg-[#1329d4] text-white hover:bg-[#0f20a8]'
                       : 'bg-gray-100 text-gray-900 hover:bg-gray-200'
                   }`}
                 >
@@ -165,7 +165,7 @@ export default function Kainos() {
             {additionalServices.map((service, index) => (
               <div key={index} className="bg-white p-6 rounded-lg shadow-lg">
                 <h3 className="text-lg font-bold text-gray-900 mb-2">{service.name}</h3>
-                <p className="text-2xl font-bold text-blue-600 mb-3">{service.price}€</p>
+                <p className="text-2xl font-bold text-[#1329d4] mb-3">{service.price}€</p>
                 <p className="text-gray-600 text-sm">{service.description}</p>
               </div>
             ))}
@@ -223,7 +223,7 @@ export default function Kainos() {
       </section>
 
       {/* CTA Section */}
-      <section className="bg-blue-600 text-white py-16">
+      <section className="bg-[#1329d4] text-white py-16">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
           <h2 className="text-3xl md:text-4xl font-bold mb-6">
             Norite pradėti kampaniją?
@@ -234,13 +234,13 @@ export default function Kainos() {
           <div className="flex flex-col sm:flex-row gap-4 justify-center">
             <a
               href="/kontaktai"
-              className="bg-white text-blue-600 px-8 py-3 rounded-lg font-semibold hover:bg-blue-50 transition-colors"
+              className="bg-white text-[#1329d4] px-8 py-3 rounded-lg font-semibold hover:bg-blue-50 transition-colors"
             >
               Susisiekti
             </a>
             <a
               href="tel:+37069066633"
-              className="border-2 border-white text-white px-8 py-3 rounded-lg font-semibold hover:bg-white hover:text-blue-600 transition-colors"
+              className="border-2 border-white text-white px-8 py-3 rounded-lg font-semibold hover:bg-white hover:text-[#1329d4] transition-colors"
             >
               Skambinti dabar
             </a>

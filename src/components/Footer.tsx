@@ -3,7 +3,7 @@ import Image from 'next/image';
 
 export default function Footer() {
   return (
-    <footer className="bg-gray-900 text-white">
+    <footer className="bg-[#141414] text-white">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
         <div className="grid grid-cols-1 md:grid-cols-4 gap-8">
           {/* Company Info */}
@@ -32,27 +32,27 @@ export default function Footer() {
             <h4 className="text-lg font-semibold mb-4">Nuorodos</h4>
             <ul className="space-y-2">
               <li>
-                <Link href="/" className="text-gray-300 hover:text-blue-400 transition-colors">
+                <Link href="/" className="text-gray-300 hover:text-[#bcf715] transition-colors">
                   Pagrindinis
                 </Link>
               </li>
               <li>
-                <Link href="/paslaugos" className="text-gray-300 hover:text-blue-400 transition-colors">
+                <Link href="/paslaugos" className="text-gray-300 hover:text-[#bcf715] transition-colors">
                   Paslaugos
                 </Link>
               </li>
               <li>
-                <Link href="/ekranai" className="text-gray-300 hover:text-blue-400 transition-colors">
+                <Link href="/ekranai" className="text-gray-300 hover:text-[#bcf715] transition-colors">
                   Ekranai
                 </Link>
               </li>
               <li>
-                <Link href="/kainos" className="text-gray-300 hover:text-blue-400 transition-colors">
+                <Link href="/kainos" className="text-gray-300 hover:text-[#bcf715] transition-colors">
                   Kainos
                 </Link>
               </li>
               <li>
-                <Link href="/kontaktai" className="text-gray-300 hover:text-blue-400 transition-colors">
+                <Link href="/kontaktai" className="text-gray-300 hover:text-[#bcf715] transition-colors">
                   Kontaktai
                 </Link>
               </li>
