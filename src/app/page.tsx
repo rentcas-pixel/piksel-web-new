@@ -22,6 +22,7 @@ import { useState, useEffect } from 'react';
 import dynamic from 'next/dynamic';
 import Sidebar from '@/components/Sidebar';
 import ScreenList from '@/components/ScreenList';
+import NewScreenCard, { getNewScreens } from '@/components/NewScreenCard';
 import { useLEDScreens } from '@/hooks/useLEDScreens';
 import { Building2, User, Mail, MessageSquare, Send, Calendar, MapPin, X, CheckCircle } from 'lucide-react';
 import { sendInquiryEmail, initEmailJS } from '@/lib/emailjs';
@@ -42,6 +43,8 @@ export default function Home() {
   const [isLoading, setIsLoading] = useState(false);
   const [searchResults, setSearchResults] = useState<any[]>([]);
   const [pendingPopupScreen, setPendingPopupScreen] = useState<string | null>(null);
+  const [newScreenCardDismissed, setNewScreenCardDismissed] = useState(false);
+  const [showNewCardDemo, setShowNewCardDemo] = useState(false);
   
   // Inquiry form state
   const [inquiryForm, setInquiryForm] = useState({
@@ -67,6 +70,33 @@ export default function Home() {
       setSelectedCity(city);
     }
   }, []);
+
+  // Demo: ?showNewCard=1 rodyti kortelę. ?city=Panevėžys – filtruoti pagal miestą. ?variant=3 – dizainas
+  const [cardVariant, setCardVariant] = useState<1 | 2 | 3>(3);
+  const [cardCityFilter, setCardCityFilter] = useState<string | null>(null);
+  useEffect(() => {
+    if (typeof window !== 'undefined') {
+      setShowNewCardDemo(new URLSearchParams(window.location.search).get('showNewCard') === '1');
+      const v = window.location.search.match(/[?&]variant=([123])/)?.[1];
+      if (v) setCardVariant(Number(v) as 1 | 2 | 3);
+      const city = new URLSearchParams(window.location.search).get('city');
+      if (city) setCardCityFilter(city);
+    }
+  }, []);
+  const newScreens = (() => {
+    let base = showNewCardDemo ? ledScreens : getNewScreens(ledScreens);
+    if (cardCityFilter && base.length > 0) {
+      const filtered = base.filter((s) => s.city === cardCityFilter);
+      if (filtered.length > 0) {
+        base = [...filtered].sort((a, b) => {
+          const da = a.created_at ? new Date(a.created_at).getTime() : 0;
+          const db = b.created_at ? new Date(b.created_at).getTime() : 0;
+          return db - da;
+        });
+      }
+    }
+    return base;
+  })();
 
   // Defer EmailJS until user opens inquiry form (faster initial load)
   useEffect(() => {
@@ -534,7 +564,16 @@ export default function Home() {
       />
       
       {/* Map - Full Width with margin for sidebar (dynamic import = smaller initial bundle) */}
-      <div className={`ml-[640px] ${showInquiryForm ? 'mr-96' : 'mr-0'}`}>
+      <div className={`ml-[640px] relative ${showInquiryForm ? 'mr-96' : 'mr-0'}`}>
+        {/* Naujo ekrano kortelė - rodoma kai pridėtas ekranas per paskutines 30 d. Arba ?showNewCard=1 demo */}
+        {!loading && newScreens.length > 0 && !newScreenCardDismissed && (
+          <NewScreenCard
+            screens={newScreens}
+            onClose={() => setNewScreenCardDismissed(true)}
+            onShowPopup={handleShowPopup}
+            variant={cardVariant}
+          />
+        )}
         <Map 
           selectedCity={selectedCity} 
           selectedScreens={selectedScreens} 
