@@ -64,14 +64,6 @@ export const metadata: Metadata = {
     description: "PIKSEL - didžiausias LED ekranų reklamos tinklas Lietuvoje. Reklama lauke su aukšta kokybe.",
     images: ["https://piksel.lt/sliede-1.jpeg"],
   },
-  icons: {
-    icon: [
-      { url: '/favicon.svg?v=2', type: 'image/svg+xml' },
-      { url: '/favicon.ico?v=2', sizes: 'any' },
-    ],
-    shortcut: '/favicon.svg?v=2',
-    apple: '/favicon.svg?v=2',
-  },
 };
 
 export default function RootLayout({

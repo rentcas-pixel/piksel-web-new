@@ -17,23 +17,19 @@ const config: NextConfig = {
     // Disable image optimization to avoid Vercel limits
     unoptimized: true,
   },
+  async rewrites() {
+    return [
+      { source: '/favicon.ico', destination: '/icon' },
+    ]
+  },
   async headers() {
     return [
       {
-        source: '/favicon.ico',
+        source: '/icon',
         headers: [
           {
             key: 'Cache-Control',
-            value: 'public, max-age=31536000, immutable',
-          },
-        ],
-      },
-      {
-        source: '/favicon.svg',
-        headers: [
-          {
-            key: 'Cache-Control',
-            value: 'public, max-age=31536000, immutable',
+            value: 'public, max-age=3600, must-revalidate',
           },
         ],
       },
