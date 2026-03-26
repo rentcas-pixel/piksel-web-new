@@ -8,14 +8,56 @@ import { X, MapPin, ChevronRight } from 'lucide-react';
 
 const NEW_DAYS = 30; // Ekranai pridėti per paskutines N dienų
 
+/** Išimtis: šis ekranas rodomas „Naujas“ kortelėje N dienų nuo kampanijos pradžios (ne nuo created_at). */
+const FEATURED_SCREEN_SLUGS = new Set(['narbuto-ziedas']);
+
+function isFeaturedScreen(s: LEDScreen): boolean {
+  const slug = (s.slug || '').toLowerCase();
+  if (FEATURED_SCREEN_SLUGS.has(slug)) return true;
+  const name = (s.name || '')
+    .toLowerCase()
+    .normalize('NFD')
+    .replace(/\p{M}/gu, '');
+  return name.includes('narbuto') && name.includes('zied');
+}
+
+/** Kampanijos pradžia. Po 30 d. nuo šios datos išimtis nebetaikoma. */
+const FEATURED_SCREEN_PROMO_START = new Date('2026-03-26T00:00:00+02:00');
+const FEATURED_SCREEN_PROMO_DAYS = 30;
+
+function isWithinFeaturedPromoWindow(now: Date = new Date()): boolean {
+  const end = new Date(FEATURED_SCREEN_PROMO_START);
+  end.setDate(end.getDate() + FEATURED_SCREEN_PROMO_DAYS);
+  end.setHours(23, 59, 59, 999);
+  return now >= FEATURED_SCREEN_PROMO_START && now <= end;
+}
+
 export function getNewScreens(screens: LEDScreen[]): LEDScreen[] {
   const cutoff = new Date();
   cutoff.setDate(cutoff.getDate() - NEW_DAYS);
-  return screens.filter((s) => {
-    if (!s.created_at) return false;
+  cutoff.setHours(0, 0, 0, 0);
+
+  const seen = new Set<string>();
+  const out: LEDScreen[] = [];
+
+  for (const s of screens) {
+    if (!isFeaturedScreen(s) || !isWithinFeaturedPromoWindow()) continue;
+    if (seen.has(s.id)) continue;
+    seen.add(s.id);
+    out.push(s);
+  }
+
+  for (const s of screens) {
+    if (seen.has(s.id)) continue;
+    if (!s.created_at) continue;
     const created = new Date(s.created_at);
-    return !isNaN(created.getTime()) && created >= cutoff;
-  });
+    if (!isNaN(created.getTime()) && created >= cutoff) {
+      seen.add(s.id);
+      out.push(s);
+    }
+  }
+
+  return out;
 }
 
 interface NewScreenCardProps {
