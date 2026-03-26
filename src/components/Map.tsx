@@ -594,7 +594,7 @@ export default function Map({ selectedCity, selectedScreens, screenCities, selec
         const group = new L.featureGroup(markers);
         map.fitBounds(group.getBounds().pad(0.1));
       }
-      
+
     };
 
       // Add window functions for screen selection and photo modal

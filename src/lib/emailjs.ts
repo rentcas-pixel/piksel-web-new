@@ -22,6 +22,8 @@ export const sendInquiryEmail = async (data: {
   phone?: string;
   message?: string;
   dateRange: string;
+  /** Kaip apie mus sužinojo – rodomas el. laiške */
+  howDidYouHearLabel?: string;
 }) => {
   // Format screens list for email
   const screensList = data.selectedScreens.map(screen => 
@@ -38,7 +40,8 @@ export const sendInquiryEmail = async (data: {
     selected_screens: screensList,
     date_range: data.dateRange,
     inquiry_date: new Date().toLocaleDateString('lt-LT'),
-    reply_to: data.email
+    reply_to: data.email,
+    how_did_you_hear: data.howDidYouHearLabel || 'Nepateikta',
   };
 
   try {

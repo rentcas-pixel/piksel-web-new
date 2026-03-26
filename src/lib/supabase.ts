@@ -75,6 +75,8 @@ export interface Inquiry {
   email: string
   phone?: string
   message?: string
+  /** Kaip apie mus sužinojo (optional): screen_in_city | linkedin | google | recommended */
+  how_did_you_hear?: string | null
   selected_dates: string // DATERANGE as string
   status: 'pending' | 'contacted' | 'completed' | 'cancelled'
   created_at: string

@@ -18,6 +18,7 @@ export async function POST(request: NextRequest) {
           email: body.email,
           phone: body.phone,
           message: body.message,
+          how_did_you_hear: body.howDidYouHear || null,
           selected_dates: body.dateRange, // Store as text instead of DATERANGE
           status: 'pending'
         }

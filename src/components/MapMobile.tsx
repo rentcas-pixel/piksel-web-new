@@ -9,6 +9,7 @@ import { sendInquiryEmail, initEmailJS } from '@/lib/emailjs';
 import { useToast } from '@/components/ui/Toast';
 import { useNews } from '@/hooks/useNews';
 import MobileNavMenu from './MobileNavMenu';
+import { INQUIRY_SOURCE_OPTIONS, getInquirySourceLabel } from '@/lib/inquirySource';
 
 interface MapProps {
   selectedCity: string;
@@ -45,7 +46,8 @@ export default function Map({ selectedCity, selectedScreens: propSelectedScreens
     contactPerson: '',
     email: '',
     phone: '',
-    message: ''
+    message: '',
+    howDidYouHear: '' as string,
   });
   const [submittingInquiry, setSubmittingInquiry] = useState(false);
   const [showSuccessMessage, setShowSuccessMessage] = useState(false);
@@ -159,7 +161,8 @@ export default function Map({ selectedCity, selectedScreens: propSelectedScreens
           email: inquiryForm.email,
           phone: inquiryForm.phone,
           message: inquiryForm.message,
-          dateRange: `${fromDate} - ${toDate}`
+          dateRange: `${fromDate} - ${toDate}`,
+          howDidYouHear: inquiryForm.howDidYouHear || undefined,
         }),
       });
 
@@ -173,7 +176,10 @@ export default function Map({ selectedCity, selectedScreens: propSelectedScreens
           email: inquiryForm.email,
           phone: inquiryForm.phone,
           message: inquiryForm.message,
-          dateRange: `${fromDate} - ${toDate}`
+          dateRange: `${fromDate} - ${toDate}`,
+          howDidYouHearLabel: inquiryForm.howDidYouHear
+            ? getInquirySourceLabel(inquiryForm.howDidYouHear)
+            : undefined,
         });
         
         if (!emailResult.success) {
@@ -194,7 +200,8 @@ export default function Map({ selectedCity, selectedScreens: propSelectedScreens
           contactPerson: '',
           email: '',
           phone: '',
-          message: ''
+          message: '',
+          howDidYouHear: '',
         });
       } else {
         toast('Klaida siunčiant užklausą. Bandykite dar kartą.', 'error');
@@ -686,6 +693,7 @@ export default function Map({ selectedCity, selectedScreens: propSelectedScreens
         });
         map.fitBounds(group.getBounds().pad(0.1));
       }
+
     };
 
     // Load Leaflet CSS and JS
@@ -782,21 +790,21 @@ export default function Map({ selectedCity, selectedScreens: propSelectedScreens
         <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
           <button 
             onClick={() => setShowHamburgerMenu(true)}
-            style={{ 
-              padding: '8px', 
-              backgroundColor: 'transparent', 
-              color: '#374151', 
-              borderRadius: '8px',
-              fontSize: '16px',
-              border: 'none',
-              cursor: 'pointer',
-              display: 'flex',
-              alignItems: 'center',
-              justifyContent: 'center'
-            }}
-          >
-            ☰
-          </button>
+              style={{ 
+                padding: '8px', 
+                backgroundColor: 'transparent', 
+                color: '#374151', 
+                borderRadius: '8px',
+                fontSize: '16px',
+                border: 'none',
+                cursor: 'pointer',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center'
+              }}
+            >
+              ☰
+            </button>
           <button 
             onClick={() => setShowContactPopup(true)}
             style={{ 
@@ -1329,6 +1337,29 @@ export default function Map({ selectedCity, selectedScreens: propSelectedScreens
                   color: '#111827 !important'
                 }}
               />
+              <label htmlFor="mobile-inquiry-how-did-you-hear" style={{ fontSize: '13px', fontWeight: '600', color: '#374151' }}>
+                Kaip apie mus sužinojote?
+              </label>
+              <select
+                id="mobile-inquiry-how-did-you-hear"
+                value={inquiryForm.howDidYouHear}
+                onChange={(e) => setInquiryForm(prev => ({ ...prev, howDidYouHear: e.target.value }))}
+                style={{
+                  padding: '8px 12px',
+                  border: '1px solid #d1d5db',
+                  borderRadius: '6px',
+                  fontSize: '14px',
+                  outline: 'none',
+                  color: '#111827',
+                  backgroundColor: 'white',
+                }}
+              >
+                {INQUIRY_SOURCE_OPTIONS.map((opt) => (
+                  <option key={opt.value || 'empty'} value={opt.value}>
+                    {opt.label}
+                  </option>
+                ))}
+              </select>
               <textarea
                 placeholder="Papildoma informacija"
                 rows={3}

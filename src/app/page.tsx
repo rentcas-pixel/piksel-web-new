@@ -26,6 +26,7 @@ import NewScreenCard, { getNewScreens } from '@/components/NewScreenCard';
 import { useLEDScreens } from '@/hooks/useLEDScreens';
 import { Building2, User, Mail, MessageSquare, Send, Calendar, MapPin, X, CheckCircle } from 'lucide-react';
 import { sendInquiryEmail, initEmailJS } from '@/lib/emailjs';
+import { INQUIRY_SOURCE_OPTIONS, getInquirySourceLabel } from '@/lib/inquirySource';
 import { useToast } from '@/components/ui/Toast';
 
 const Map = dynamic(() => import('@/components/Map'), {
@@ -52,7 +53,8 @@ export default function Home() {
     contactPerson: '',
     email: '',
     phone: '',
-    message: ''
+    message: '',
+    howDidYouHear: '' as string,
   });
   const [submittingInquiry, setSubmittingInquiry] = useState(false);
   const [showSuccessMessage, setShowSuccessMessage] = useState(false);
@@ -472,6 +474,7 @@ export default function Home() {
           phone: inquiryForm.phone,
           message: inquiryForm.message,
           dateRange: `${dateRange.from} - ${dateRange.to}`,
+          howDidYouHear: inquiryForm.howDidYouHear || undefined,
         }),
       });
       
@@ -491,6 +494,9 @@ export default function Home() {
         phone: inquiryForm.phone,
         message: inquiryForm.message,
         dateRange: `${dateRange.from} - ${dateRange.to}`,
+        howDidYouHearLabel: inquiryForm.howDidYouHear
+          ? getInquirySourceLabel(inquiryForm.howDidYouHear)
+          : undefined,
       });
       
       if (!emailResult.success) {
@@ -512,7 +518,8 @@ export default function Home() {
         contactPerson: '',
         email: '',
         phone: '',
-        message: ''
+        message: '',
+        howDidYouHear: '',
       });
       setShowInquiryForm(false);
       
@@ -698,6 +705,25 @@ export default function Home() {
                 placeholder="+370 600 12345"
                 className="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-[#1329d4]"
               />
+            </div>
+
+            {/* How did you hear about us */}
+            <div className="mb-4">
+              <label htmlFor="inquiry-how-did-you-hear" className="text-sm font-semibold text-gray-700 mb-2 block">
+                Kaip apie mus sužinojote?
+              </label>
+              <select
+                id="inquiry-how-did-you-hear"
+                value={inquiryForm.howDidYouHear}
+                onChange={(e) => setInquiryForm({ ...inquiryForm, howDidYouHear: e.target.value })}
+                className="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-[#1329d4] bg-white"
+              >
+                {INQUIRY_SOURCE_OPTIONS.map((opt) => (
+                  <option key={opt.value || 'empty'} value={opt.value}>
+                    {opt.label}
+                  </option>
+                ))}
+              </select>
             </div>
 
             {/* Comment */}
