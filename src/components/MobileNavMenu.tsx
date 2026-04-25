@@ -51,6 +51,9 @@ export default function MobileNavMenu({
           <Link href="/" className={linkClass('/')} onClick={onClose}>
             Ekranai
           </Link>
+          <Link href="/ieskome-plotu" className={linkClass('/ieskome-plotu')} onClick={onClose}>
+            Ieškome plotų
+          </Link>
           <Link href="/naujienos" className={linkClass('/naujienos')} onClick={onClose}>
             Naujienos
             {newsCount > 0 && (

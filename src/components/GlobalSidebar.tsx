@@ -4,7 +4,7 @@ import { useState } from 'react';
 import Image from 'next/image';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
-import { MapPin, FileText, Calendar, Mail, ChevronRight, Play, HelpCircle, Phone, Monitor, Users, Clock, MapPin as LocationIcon, Search, X, Flag, Newspaper, Menu } from 'lucide-react';
+import { MapPin, FileText, Calendar, Mail, ChevronRight, Play, HelpCircle, Phone, Monitor, Users, Clock, MapPin as LocationIcon, Search, X, Flag, Newspaper, Menu, LandPlot } from 'lucide-react';
 import MobileNavMenu from './MobileNavMenu';
 import { useLEDScreens } from '@/hooks/useLEDScreens';
 import { useNews } from '@/hooks/useNews';
@@ -22,9 +22,10 @@ export default function GlobalSidebar() {
   const { news: newsItems } = useNews();
 
   const navigationItems = [
+    { name: 'Ieškome plotų', icon: LandPlot, href: '/ieskome-plotu' },
     { name: 'Naujienos', icon: Newspaper, href: '/naujienos' },
     { name: 'Klipai', icon: Play, href: '/klipai' },
-    { name: 'DUK', icon: HelpCircle, href: '/duk' }
+    { name: 'DUK', icon: HelpCircle, href: '/duk' },
   ];
 
   const handleCityFilter = (city: string) => {

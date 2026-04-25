@@ -14,6 +14,7 @@ const staticRoutes: { path: string; changefreq: 'weekly' | 'monthly'; priority: 
   { path: 'klipai', changefreq: 'monthly', priority: 0.8 },
   { path: 'kontaktai', changefreq: 'monthly', priority: 0.8 },
   { path: 'paslaugos', changefreq: 'monthly', priority: 0.8 },
+  { path: 'ieskome-plotu', changefreq: 'monthly', priority: 0.8 },
   { path: 'duk', changefreq: 'monthly', priority: 0.7 },
   { path: 'skaiciuokle', changefreq: 'monthly', priority: 0.7 },
   { path: 'klipai-mobile', changefreq: 'monthly', priority: 0.6 },
