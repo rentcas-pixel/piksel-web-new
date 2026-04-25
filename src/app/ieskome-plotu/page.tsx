@@ -50,7 +50,9 @@ export default function IeskomePlotuPage() {
         </div>
 
         <div className="prose prose-gray max-w-none">
-          <p className="text-gray-700 leading-relaxed mb-4 font-semibold">Jei atsakymas "nieko" - mes galime tai pakeisti.</p>
+          <p className="text-gray-700 leading-relaxed mb-4 font-semibold">
+            Jei atsakymas &bdquo;nieko&ldquo; - mes galime tai pakeisti.
+          </p>
           <p className="text-gray-600 leading-relaxed mb-4">
             Ieškome strategiškai matomų vietų LED ekranams Vilniuje ir kituose miestuose. Įrengiame ekraną,
             pasirūpiname visais leidimais ir techniniais sprendimais.
