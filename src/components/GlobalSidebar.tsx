@@ -221,9 +221,17 @@ export default function GlobalSidebar() {
               href={item.href}
               className={`w-full flex items-center gap-3 p-3 rounded-lg text-gray-600 hover:text-gray-900 transition-colors group ${
                 pathname === item.href ? 'bg-blue-100 text-blue-700' : ''
+              } ${
+                item.href === '/ieskome-plotu'
+                  ? 'bg-[#bcf715]/20 border border-[#bcf715]/40 font-semibold'
+                  : ''
               }`}
             >
-              <item.icon className="w-5 h-5 text-gray-400 group-hover:text-gray-600" />
+              <item.icon
+                className={`w-5 h-5 group-hover:text-gray-600 ${
+                  item.href === '/ieskome-plotu' ? 'text-[#6c8a00]' : 'text-gray-400'
+                }`}
+              />
               <span className="flex-1 text-left font-medium">{item.name}</span>
               {item.href === '/naujienos' && newsItems.length > 0 && (
                 <span className="bg-[#1329d4] text-white text-xs font-semibold px-2 py-0.5 rounded-full">{newsItems.length}</span>

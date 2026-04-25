@@ -20,6 +20,7 @@ export default function MobileNavMenu({
   if (!isOpen) return null;
 
   const linkClass = (path: string) => {
+    const isSpecial = path === '/ieskome-plotu';
     const isActive =
       path === '/'
         ? pathname === '/'
@@ -31,7 +32,11 @@ export default function MobileNavMenu({
               ? pathname === '/duk-mobile' || pathname === '/duk'
               : pathname === path || pathname.startsWith(path + '/');
     return `px-4 py-3 text-base font-medium rounded-lg flex items-center gap-2 ${
-      isActive ? 'bg-blue-100 text-blue-700' : 'text-gray-700 hover:bg-gray-100'
+      isActive
+        ? 'bg-blue-100 text-blue-700'
+        : isSpecial
+          ? 'bg-[#bcf715]/20 text-gray-900 border border-[#bcf715]/40'
+          : 'text-gray-700 hover:bg-gray-100'
     }`;
   };
 
