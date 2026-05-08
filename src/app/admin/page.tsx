@@ -7,6 +7,17 @@ import { LEDScreen, NewsItem } from '@/lib/supabase'
 import { useAuth } from '@/hooks/useAuth'
 import LoginForm from '@/components/LoginForm'
 
+interface ClipScreenAdmin {
+  id: string
+  city: string
+  screen: string
+  type: string
+  resolution: string
+  display_order: number
+  is_active: boolean
+  created_at: string
+}
+
 export default function AdminPanel() {
   const { isAuthenticated, isLoading: authLoading, login, logout } = useAuth();
   const [activeTab, setActiveTab] = useState('screens')
@@ -29,6 +40,18 @@ export default function AdminPanel() {
     created_at: new Date().toISOString().slice(0, 10), // YYYY-MM-DD
   })
   const [newsUploading, setNewsUploading] = useState(false)
+  
+  // Clips state
+  const [clipItems, setClipItems] = useState<ClipScreenAdmin[]>([])
+  const [showClipForm, setShowClipForm] = useState(false)
+  const [editingClip, setEditingClip] = useState<ClipScreenAdmin | null>(null)
+  const [draggedClip, setDraggedClip] = useState<string | null>(null)
+  const [clipFormData, setClipFormData] = useState({
+    city: '',
+    screen: '',
+    type: 'Video',
+    resolution: '',
+  })
 
   // Screen drag and drop functions
   const handleScreenDragStart = (e: React.DragEvent, screenId: string) => {
@@ -138,10 +161,27 @@ export default function AdminPanel() {
     }
   }
 
+  const fetchClips = async () => {
+    try {
+      const { data, error } = await supabase
+        .from('clip_screens')
+        .select('*')
+        .order('display_order', { ascending: true })
+        .order('created_at', { ascending: true })
+
+      if (error) throw error
+      setClipItems((data || []) as ClipScreenAdmin[])
+    } catch (error) {
+      console.error('Error fetching clips:', error)
+      setClipItems([])
+    }
+  }
+
   useEffect(() => {
     if (isAuthenticated) {
       fetchScreens()
       fetchNews()
+      fetchClips()
     }
   }, [isAuthenticated])
 
@@ -235,6 +275,117 @@ export default function AdminPanel() {
     } catch (error) {
       console.error('Error deleting news:', error)
       alert('Klaida trinant')
+    }
+  }
+
+  const handleClipSubmit = async (e: React.FormEvent) => {
+    e.preventDefault()
+    try {
+      const payload = {
+        city: clipFormData.city,
+        screen: clipFormData.screen,
+        type: clipFormData.type,
+        resolution: clipFormData.resolution,
+        updated_at: new Date().toISOString(),
+      }
+
+      if (editingClip) {
+        const { error } = await supabase.from('clip_screens').update(payload).eq('id', editingClip.id)
+        if (error) throw error
+        alert('Klipas atnaujintas!')
+      } else {
+        const nextOrder = clipItems.length
+        const { error } = await supabase.from('clip_screens').insert({
+          ...payload,
+          is_active: true,
+          display_order: nextOrder,
+        })
+        if (error) throw error
+        alert('Klipas sukurtas!')
+      }
+
+      setShowClipForm(false)
+      setEditingClip(null)
+      setClipFormData({ city: '', screen: '', type: 'Video', resolution: '' })
+      fetchClips()
+    } catch (error) {
+      const errorMessage =
+        error instanceof Error
+          ? error.message
+          : typeof error === 'object' && error !== null && 'message' in error
+            ? String((error as { message?: unknown }).message || 'Nežinoma klaida')
+            : 'Nežinoma klaida'
+      console.error('Error saving clip:', error)
+      alert(`Klaida: ${errorMessage}`)
+    }
+  }
+
+  const handleEditClip = (item: ClipScreenAdmin) => {
+    setEditingClip(item)
+    setClipFormData({
+      city: item.city,
+      screen: item.screen,
+      type: item.type,
+      resolution: item.resolution,
+    })
+    setShowClipForm(true)
+  }
+
+  const handleDeleteClip = async (id: string) => {
+    if (!confirm('Ištrinti šį klipą?')) return
+    try {
+      const { error } = await supabase.from('clip_screens').delete().eq('id', id)
+      if (error) throw error
+      alert('Klipas ištrintas')
+      fetchClips()
+    } catch (error) {
+      console.error('Error deleting clip:', error)
+      alert('Klaida trinant klipą')
+    }
+  }
+
+  const handleClipDragStart = (e: React.DragEvent, clipId: string) => {
+    setDraggedClip(clipId)
+    e.dataTransfer.effectAllowed = 'move'
+  }
+
+  const handleClipDragOver = (e: React.DragEvent) => {
+    e.preventDefault()
+    e.dataTransfer.dropEffect = 'move'
+  }
+
+  const handleClipDrop = async (e: React.DragEvent, targetClipId: string) => {
+    e.preventDefault()
+    if (!draggedClip || draggedClip === targetClipId) return
+
+    try {
+      const newClips = [...clipItems]
+      const draggedIndex = newClips.findIndex((item) => item.id === draggedClip)
+      const targetIndex = newClips.findIndex((item) => item.id === targetClipId)
+
+      if (draggedIndex === -1 || targetIndex === -1) return
+
+      const [draggedItem] = newClips.splice(draggedIndex, 1)
+      newClips.splice(targetIndex, 0, draggedItem)
+
+      // Optimistic UI update
+      setClipItems(newClips.map((item, idx) => ({ ...item, display_order: idx + 1 })))
+
+      // Persist order in DB
+      for (let i = 0; i < newClips.length; i++) {
+        const { error } = await supabase
+          .from('clip_screens')
+          .update({ display_order: i + 1, updated_at: new Date().toISOString() })
+          .eq('id', newClips[i].id)
+
+        if (error) throw error
+      }
+    } catch (error) {
+      console.error('Error updating clip order:', error)
+      alert('Klaida atnaujinant klipų eiliškumą')
+      fetchClips()
+    } finally {
+      setDraggedClip(null)
     }
   }
 
@@ -1078,6 +1229,16 @@ export default function AdminPanel() {
               >
                 Naujienos ({newsItems.length})
               </button>
+              <button
+                onClick={() => setActiveTab('clips')}
+                className={`flex-shrink-0 py-4 px-6 text-sm font-medium border-b-2 whitespace-nowrap ${
+                  activeTab === 'clips'
+                    ? 'border-blue-500 text-blue-600'
+                    : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'
+                }`}
+              >
+                Klipai ({clipItems.length})
+              </button>
             </nav>
           </div>
         </div>
@@ -1317,6 +1478,146 @@ export default function AdminPanel() {
                           <div className="flex gap-2">
                             <button onClick={() => handleEditNews(item)} className="text-blue-600 hover:text-blue-900 text-sm">✏️ Redaguoti</button>
                             <button onClick={() => handleDeleteNews(item.id)} className="text-red-600 hover:text-red-900 text-sm">🗑️ Ištrinti</button>
+                          </div>
+                        </td>
+                      </tr>
+                    ))
+                  )}
+                </tbody>
+              </table>
+            </div>
+          </div>
+        )}
+
+        {/* Clips Tab */}
+        {activeTab === 'clips' && (
+          <div className="bg-white rounded-lg shadow-lg overflow-hidden">
+            <div className="px-6 py-4 border-b border-gray-200 flex justify-between items-center">
+              <div>
+                <h2 className="text-lg font-semibold">Klipai</h2>
+                <p className="text-sm text-gray-600 mt-1">Čia redaguojama lentelė iš „Reikalavimai klipams“ puslapio</p>
+              </div>
+              <button
+                onClick={() => {
+                  setEditingClip(null)
+                  setClipFormData({ city: '', screen: '', type: 'Video', resolution: '' })
+                  setShowClipForm(true)
+                }}
+                className="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 text-sm"
+              >
+                + Naujas klipas
+              </button>
+            </div>
+
+            {showClipForm && (
+              <div className="p-6 border-b border-gray-200 bg-gray-50">
+                <h3 className="font-medium text-gray-900 mb-4">{editingClip ? 'Redaguoti klipą' : 'Naujas klipas'}</h3>
+                <form onSubmit={handleClipSubmit} className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-1">Miestas</label>
+                    <input
+                      type="text"
+                      value={clipFormData.city}
+                      onChange={(e) => setClipFormData(prev => ({ ...prev, city: e.target.value }))}
+                      className="w-full border border-gray-300 rounded-lg px-3 py-2"
+                      required
+                    />
+                  </div>
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-1">Ekranas</label>
+                    <input
+                      type="text"
+                      value={clipFormData.screen}
+                      onChange={(e) => setClipFormData(prev => ({ ...prev, screen: e.target.value }))}
+                      className="w-full border border-gray-300 rounded-lg px-3 py-2"
+                      required
+                    />
+                  </div>
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-1">Tipas</label>
+                    <input
+                      type="text"
+                      value={clipFormData.type}
+                      onChange={(e) => setClipFormData(prev => ({ ...prev, type: e.target.value }))}
+                      className="w-full border border-gray-300 rounded-lg px-3 py-2"
+                      required
+                    />
+                  </div>
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-1">Rezoliucija</label>
+                    <input
+                      type="text"
+                      value={clipFormData.resolution}
+                      onChange={(e) => setClipFormData(prev => ({ ...prev, resolution: e.target.value }))}
+                      className="w-full border border-gray-300 rounded-lg px-3 py-2"
+                      placeholder="1152x576"
+                      required
+                    />
+                  </div>
+                  <div className="md:col-span-2 flex gap-2">
+                    <button type="submit" className="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700">
+                      {editingClip ? 'Atnaujinti' : 'Sukurti'}
+                    </button>
+                    <button
+                      type="button"
+                      onClick={() => {
+                        setShowClipForm(false)
+                        setEditingClip(null)
+                      }}
+                      className="bg-gray-200 text-gray-700 px-4 py-2 rounded-lg hover:bg-gray-300"
+                    >
+                      Atšaukti
+                    </button>
+                  </div>
+                </form>
+              </div>
+            )}
+
+            <div className="overflow-x-auto">
+              <table className="w-full">
+                <thead className="bg-gray-50">
+                  <tr>
+                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">#</th>
+                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Miestas</th>
+                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Ekranas</th>
+                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Tipas</th>
+                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Rezoliucija</th>
+                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Veiksmai</th>
+                  </tr>
+                </thead>
+                <tbody className="divide-y divide-gray-200">
+                  {clipItems.length === 0 ? (
+                    <tr>
+                      <td colSpan={6} className="px-6 py-8 text-center text-gray-500">
+                        Klipų nėra arba trūksta lentelės <code>clip_screens</code> Supabase sistemoje.
+                      </td>
+                    </tr>
+                  ) : (
+                    clipItems.map((item, index) => (
+                      <tr
+                        key={item.id}
+                        draggable
+                        onDragStart={(e) => handleClipDragStart(e, item.id)}
+                        onDragOver={handleClipDragOver}
+                        onDrop={(e) => handleClipDrop(e, item.id)}
+                        className={`cursor-move transition-colors ${
+                          draggedClip === item.id ? 'bg-blue-50 opacity-60' : 'hover:bg-gray-50'
+                        }`}
+                      >
+                        <td className="px-6 py-4 text-sm text-gray-500">
+                          <div className="flex items-center gap-2">
+                            <span className="text-gray-400">⋮⋮</span>
+                            {index + 1}
+                          </div>
+                        </td>
+                        <td className="px-6 py-4 text-sm text-gray-900">{item.city}</td>
+                        <td className="px-6 py-4 text-sm font-medium text-gray-900">{item.screen}</td>
+                        <td className="px-6 py-4 text-sm text-gray-900">{item.type}</td>
+                        <td className="px-6 py-4 text-sm text-gray-900">{item.resolution}</td>
+                        <td className="px-6 py-4">
+                          <div className="flex gap-2">
+                            <button onClick={() => handleEditClip(item)} className="text-blue-600 hover:text-blue-900 text-sm">✏️ Redaguoti</button>
+                            <button onClick={() => handleDeleteClip(item.id)} className="text-red-600 hover:text-red-900 text-sm">🗑️ Ištrinti</button>
                           </div>
                         </td>
                       </tr>

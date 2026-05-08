@@ -1,22 +1,23 @@
 'use client';
 
 import { Image, Video, Search, Square } from 'lucide-react';
-import { clipScreensFromExcel } from '@/data/clipsData';
 import { useState, useMemo } from 'react';
+import { useClipScreens } from '@/hooks/useClipScreens';
 
 export default function Klipai() {
   const [searchQuery, setSearchQuery] = useState('');
+  const { screens: clipScreens, loading } = useClipScreens();
 
   const filteredScreens = useMemo(() => {
-    if (!searchQuery.trim()) return clipScreensFromExcel;
+    if (!searchQuery.trim()) return clipScreens;
     const q = searchQuery.toLowerCase().trim();
-    return clipScreensFromExcel.filter(
+    return clipScreens.filter(
       item =>
         item.screen.toLowerCase().includes(q) ||
         item.city.toLowerCase().includes(q) ||
         item.type.toLowerCase().includes(q)
     );
-  }, [searchQuery]);
+  }, [searchQuery, clipScreens]);
   return (
     <div className="min-h-screen bg-white pt-14 md:pt-0 ml-0 md:ml-80">
       <div className="max-w-6xl mx-auto px-4 sm:px-6 py-8 md:py-12">
@@ -25,7 +26,7 @@ export default function Klipai() {
           <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 mb-6">
             <div>
               <h2 className="text-2xl sm:text-4xl font-bold text-gray-900">Reikalavimai klipams</h2>
-              <p className="text-sm text-gray-500 mt-1">Atnaujinta: 2026-03-06</p>
+              <p className="text-sm text-gray-500 mt-1">Atnaujinta: 2026-05-08</p>
             </div>
             <div className="relative w-full sm:w-72">
               <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" />
@@ -50,7 +51,13 @@ export default function Klipai() {
                   </tr>
                 </thead>
                 <tbody className="divide-y divide-gray-200">
-                  {filteredScreens.length === 0 ? (
+                  {loading ? (
+                    <tr>
+                      <td colSpan={4} className="px-4 sm:px-6 py-8 sm:py-12 text-center text-sm text-gray-500">
+                        Kraunama...
+                      </td>
+                    </tr>
+                  ) : filteredScreens.length === 0 ? (
                     <tr>
                       <td colSpan={4} className="px-4 sm:px-6 py-8 sm:py-12 text-center text-sm text-gray-500">
                         Nerasta ekranų pagal „{searchQuery}“

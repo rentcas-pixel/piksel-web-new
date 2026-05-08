@@ -1,0 +1,47 @@
+-- Užpildo clip_screens lentelę pradine klipų lentele
+-- Saugu leisti kelis kartus: prieš įkėlimą išvalo esamus duomenis
+
+delete from public.clip_screens;
+
+insert into public.clip_screens (city, screen, type, resolution, display_order, is_active)
+values
+  ('Vilnius', 'Viadukai', 'Statinis', '3040x240', 1, true),
+  ('Vilnius', 'Compensa', 'Video', '1152x576', 2, true),
+  ('Vilnius', 'Senukai', 'Video', '1152x576', 3, true),
+  ('Vilnius', 'Kareivių', 'Statinis', '1152x576', 4, true),
+  ('Vilnius', 'Ozo', 'Statinis', '1152x576', 5, true),
+  ('Vilnius', 'Ukmergės', 'Statinis', '1152x576', 6, true),
+  ('Vilnius', 'Pašilaičiai', 'Statinis', '1152x576', 7, true),
+  ('Vilnius', 'Pilaitė', 'Statinis', '1152x576', 8, true),
+  ('Vilnius', 'Spaudos rūmai', 'Statinis', '1152x576', 9, true),
+  ('Vilnius', 'Savanorių', 'Video', '1152x576', 10, true),
+  ('Vilnius', 'Kalvarijų', 'Video', '448x672', 11, true),
+  ('Vilnius', 'Nordika', 'Video', '448x672', 12, true),
+  ('Vilnius', 'Outlet', 'Video', '960x432', 13, true),
+  ('Kaunas', 'Urmas', 'Video', '1080x450', 14, true),
+  ('Kaunas', 'Urmas', 'Video', '1080x450', 15, true),
+  ('Kaunas', 'Pramonės', 'Video', '860x360', 16, true),
+  ('Kaunas', 'Girstučio', 'Video', '860x360', 17, true),
+  ('Kaunas', 'Molas', 'Video', '860x360', 18, true),
+  ('Kaunas', 'Centras', 'Video', '960x576', 19, true),
+  ('Kaunas', 'Centras', 'Video', '960x576', 20, true),
+  ('Kaunas', 'Vytauto pr.', 'Video', '960x576', 21, true),
+  ('Kaunas', 'Iš Senamiesčio', 'Video', '800x360', 22, true),
+  ('Kaunas', 'Į Senamiestį', 'Video', '800x360', 23, true),
+  ('Klaipėda', 'Baltijos', 'Video', '1152x576', 24, true),
+  ('Klaipėda', 'Šilutės', 'Video', '1152x576', 25, true),
+  ('Klaipėda', 'Centras', 'Video', '720x864', 26, true),
+  ('Šiauliai', 'Dubijos', 'Video', '1152x576', 27, true),
+  ('Šiauliai', 'Rūta', 'Video', '1152x576', 28, true),
+  ('Panevėžys', 'RYO', 'Video', '1309x576', 29, true),
+  ('Panevėžys', 'Vilniaus', 'Video', '576x288', 30, true),
+  ('Panevėžys', 'Klaipėdos', 'Video', '1309x576', 31, true),
+  ('Panevėžys', 'Centras', 'Video', '1152x576', 32, true),
+  ('Panevėžys', 'Maxima', 'Video', '1152x576', 33, true),
+  ('Mažeikiai', 'Mažeikiai', 'Video', '640x288', 34, true),
+  ('Alytus', 'Alytus', 'Video', '480x270', 35, true),
+  ('Marijampolė', 'Marijampolė', 'Video', '1152x576', 36, true),
+  ('Utena', 'Utena', 'Video', '960x576', 37, true),
+  ('Jonava', 'Jonava', 'Video', '768x384', 38, true),
+  ('Tauragė', 'Tauragė', 'Video', '840x360', 39, true),
+  ('Joniškis', 'Joniškis', 'Video', '720x480', 40, true);

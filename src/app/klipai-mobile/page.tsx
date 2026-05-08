@@ -4,13 +4,14 @@ import { Image, Video, Square } from 'lucide-react';
 import { useState } from 'react';
 import Link from 'next/link';
 import { useNews } from '@/hooks/useNews';
-import { clipScreensFromExcel } from '@/data/clipsData';
+import { useClipScreens } from '@/hooks/useClipScreens';
 import MobileNavMenu from '@/components/MobileNavMenu';
 
 export default function KlipaiMobile() {
   const [showContactPopup, setShowContactPopup] = useState(false);
   const [showHamburgerMenu, setShowHamburgerMenu] = useState(false);
   const { news: newsItems } = useNews();
+  const { screens: clipScreens, loading } = useClipScreens();
 
   return (
     <div style={{ 
@@ -189,7 +190,7 @@ export default function KlipaiMobile() {
                 </tr>
               </thead>
               <tbody>
-                {clipScreensFromExcel.map((item) => (
+                {(loading ? [] : clipScreens).map((item) => (
                   <tr key={item.id} style={{ borderBottom: '1px solid #e5e7eb' }}>
                     <td style={{ 
                       padding: '12px 8px', 
@@ -225,6 +226,20 @@ export default function KlipaiMobile() {
                     </td>
                   </tr>
                 ))}
+                {!loading && clipScreens.length === 0 && (
+                  <tr>
+                    <td colSpan={4} style={{ padding: '16px 8px', fontSize: '12px', color: '#6b7280', textAlign: 'center' }}>
+                      Duomenų nėra
+                    </td>
+                  </tr>
+                )}
+                {loading && (
+                  <tr>
+                    <td colSpan={4} style={{ padding: '16px 8px', fontSize: '12px', color: '#6b7280', textAlign: 'center' }}>
+                      Kraunama...
+                    </td>
+                  </tr>
+                )}
               </tbody>
             </table>
           </div>
