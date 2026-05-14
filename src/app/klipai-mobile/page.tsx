@@ -1,15 +1,20 @@
 'use client';
 
-import { Image, Video, Square } from 'lucide-react';
+import { Image, Video, Square, Info } from 'lucide-react';
 import { useState } from 'react';
 import Link from 'next/link';
 import { useNews } from '@/hooks/useNews';
 import { useClipScreens } from '@/hooks/useClipScreens';
 import MobileNavMenu from '@/components/MobileNavMenu';
+import { ClipSpecDiagramModal } from '@/components/ClipSpecDiagramModal';
+import type { ClipScreen } from '@/data/clipsData';
 
 export default function KlipaiMobile() {
   const [showContactPopup, setShowContactPopup] = useState(false);
   const [showHamburgerMenu, setShowHamburgerMenu] = useState(false);
+  const [diagramTarget, setDiagramTarget] = useState<Pick<ClipScreen, 'screen' | 'resolution' | 'spec_diagram_url'> | null>(
+    null
+  );
   const { news: newsItems } = useNews();
   const { screens: clipScreens, loading } = useClipScreens();
 
@@ -207,7 +212,39 @@ export default function KlipaiMobile() {
                       color: '#374151',
                       borderRight: '1px solid #e5e7eb'
                     }}>
-                      {item.screen}
+                      <div style={{ display: 'flex', alignItems: 'center', gap: '8px', flexWrap: 'wrap' }}>
+                        <span>{item.screen}</span>
+                        {item.spec_diagram_url ? (
+                          <button
+                            type="button"
+                            onClick={() =>
+                              setDiagramTarget({
+                                screen: item.screen,
+                                resolution: item.resolution,
+                                spec_diagram_url: item.spec_diagram_url,
+                              })
+                            }
+                            title="Techninė schema"
+                            aria-label={`${item.screen}: techninė schema`}
+                            style={{
+                              display: 'inline-flex',
+                              alignItems: 'center',
+                              justifyContent: 'center',
+                              width: '28px',
+                              height: '28px',
+                              borderRadius: '9999px',
+                              border: '1px solid #e5e7eb',
+                              backgroundColor: 'white',
+                              color: '#1329d4',
+                              cursor: 'pointer',
+                              flexShrink: 0,
+                              padding: 0,
+                            }}
+                          >
+                            <Info size={16} aria-hidden />
+                          </button>
+                        ) : null}
+                      </div>
                     </td>
                     <td style={{ 
                       padding: '12px 8px', 
@@ -427,6 +464,16 @@ export default function KlipaiMobile() {
         newsCount={newsItems.length}
         topOffset={56}
       />
+
+      {diagramTarget?.spec_diagram_url ? (
+        <ClipSpecDiagramModal
+          open
+          onClose={() => setDiagramTarget(null)}
+          title={diagramTarget.screen}
+          subtitle={`Rezoliucija: ${diagramTarget.resolution} px`}
+          imageUrl={diagramTarget.spec_diagram_url}
+        />
+      ) : null}
 
     </div>
   );

@@ -1,11 +1,16 @@
 'use client';
 
-import { Image, Video, Search, Square } from 'lucide-react';
+import { Image, Video, Search, Square, Info } from 'lucide-react';
 import { useState, useMemo } from 'react';
 import { useClipScreens } from '@/hooks/useClipScreens';
+import { ClipSpecDiagramModal } from '@/components/ClipSpecDiagramModal';
+import type { ClipScreen } from '@/data/clipsData';
 
 export default function Klipai() {
   const [searchQuery, setSearchQuery] = useState('');
+  const [diagramTarget, setDiagramTarget] = useState<Pick<ClipScreen, 'screen' | 'resolution' | 'spec_diagram_url'> | null>(
+    null
+  );
   const { screens: clipScreens, loading } = useClipScreens();
 
   const filteredScreens = useMemo(() => {
@@ -67,7 +72,28 @@ export default function Klipai() {
                     filteredScreens.map((item) => (
                       <tr key={item.id} className="hover:bg-gray-50">
                         <td className="px-3 sm:px-6 py-3 sm:py-4 text-xs sm:text-sm text-gray-900 border-r border-gray-200">{item.city}</td>
-                        <td className="px-3 sm:px-6 py-3 sm:py-4 text-xs sm:text-sm font-semibold text-gray-900 border-r border-gray-200">{item.screen}</td>
+                        <td className="px-3 sm:px-6 py-3 sm:py-4 text-xs sm:text-sm font-semibold text-gray-900 border-r border-gray-200">
+                          <span className="inline-flex items-center gap-2 flex-wrap">
+                            {item.screen}
+                            {item.spec_diagram_url ? (
+                              <button
+                                type="button"
+                                onClick={() =>
+                                  setDiagramTarget({
+                                    screen: item.screen,
+                                    resolution: item.resolution,
+                                    spec_diagram_url: item.spec_diagram_url,
+                                  })
+                                }
+                                className="inline-flex h-7 w-7 items-center justify-center rounded-full border border-gray-200 text-[#1329d4] hover:bg-gray-100 focus:outline-none focus:ring-2 focus:ring-[#1329d4]"
+                                title="Techninė schema"
+                                aria-label={`${item.screen}: techninė schema`}
+                              >
+                                <Info className="w-4 h-4" aria-hidden />
+                              </button>
+                            ) : null}
+                          </span>
+                        </td>
                         <td className="px-3 sm:px-6 py-3 sm:py-4 text-xs sm:text-sm text-gray-900 border-r border-gray-200">{item.type}</td>
                         <td className="px-3 sm:px-6 py-3 sm:py-4 text-xs sm:text-sm text-gray-900">{item.resolution}</td>
                       </tr>
@@ -112,6 +138,16 @@ export default function Klipai() {
           </div>
         </div>
       </div>
+
+      {diagramTarget?.spec_diagram_url ? (
+        <ClipSpecDiagramModal
+          open
+          onClose={() => setDiagramTarget(null)}
+          title={diagramTarget.screen}
+          subtitle={`Rezoliucija: ${diagramTarget.resolution} px`}
+          imageUrl={diagramTarget.spec_diagram_url}
+        />
+      ) : null}
     </div>
   );
 }

@@ -13,6 +13,7 @@ interface ClipScreenAdmin {
   screen: string
   type: string
   resolution: string
+  spec_diagram_url?: string | null
   display_order: number
   is_active: boolean
   created_at: string
@@ -51,7 +52,9 @@ export default function AdminPanel() {
     screen: '',
     type: 'Video',
     resolution: '',
+    spec_diagram_url: '',
   })
+  const [clipSpecUploading, setClipSpecUploading] = useState(false)
 
   // Screen drag and drop functions
   const handleScreenDragStart = (e: React.DragEvent, screenId: string) => {
@@ -218,6 +221,31 @@ export default function AdminPanel() {
     }
   }
 
+  const handleClipSpecUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0]
+    if (!file) return
+    try {
+      setClipSpecUploading(true)
+      if (file.size > 5 * 1024 * 1024) {
+        alert('Failo dydis negali viršyti 5MB')
+        return
+      }
+      const fileExt = file.name.split('.').pop() || 'png'
+      const base = slugify(clipFormData.screen || 'schema') || 'schema'
+      const fileName = `clip-spec-${base}-${Date.now()}.${fileExt}`
+      const { error } = await supabase.storage.from('led-screen-images').upload(fileName, file)
+      if (error) throw error
+      const { data: { publicUrl } } = supabase.storage.from('led-screen-images').getPublicUrl(fileName)
+      setClipFormData(prev => ({ ...prev, spec_diagram_url: publicUrl }))
+      alert('Schema įkelta; URL įrašytas į lauką.')
+    } catch (error) {
+      console.error('Error uploading clip spec:', error)
+      alert(`Klaida įkeliant: ${error instanceof Error ? error.message : 'Nežinoma klaida'}`)
+    } finally {
+      setClipSpecUploading(false)
+    }
+  }
+
   const handleNewsSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
     try {
@@ -286,6 +314,7 @@ export default function AdminPanel() {
         screen: clipFormData.screen,
         type: clipFormData.type,
         resolution: clipFormData.resolution,
+        spec_diagram_url: clipFormData.spec_diagram_url.trim() || null,
         updated_at: new Date().toISOString(),
       }
 
@@ -306,7 +335,7 @@ export default function AdminPanel() {
 
       setShowClipForm(false)
       setEditingClip(null)
-      setClipFormData({ city: '', screen: '', type: 'Video', resolution: '' })
+      setClipFormData({ city: '', screen: '', type: 'Video', resolution: '', spec_diagram_url: '' })
       fetchClips()
     } catch (error) {
       const errorMessage =
@@ -327,6 +356,7 @@ export default function AdminPanel() {
       screen: item.screen,
       type: item.type,
       resolution: item.resolution,
+      spec_diagram_url: item.spec_diagram_url ?? '',
     })
     setShowClipForm(true)
   }
@@ -1500,7 +1530,7 @@ export default function AdminPanel() {
               <button
                 onClick={() => {
                   setEditingClip(null)
-                  setClipFormData({ city: '', screen: '', type: 'Video', resolution: '' })
+                  setClipFormData({ city: '', screen: '', type: 'Video', resolution: '', spec_diagram_url: '' })
                   setShowClipForm(true)
                 }}
                 className="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 text-sm"
@@ -1554,6 +1584,30 @@ export default function AdminPanel() {
                       required
                     />
                   </div>
+                  <div className="md:col-span-2">
+                    <label className="block text-sm font-medium text-gray-700 mb-1">Techninės schemos URL (neprivaloma)</label>
+                    <input
+                      type="url"
+                      value={clipFormData.spec_diagram_url}
+                      onChange={(e) => setClipFormData(prev => ({ ...prev, spec_diagram_url: e.target.value }))}
+                      className="w-full border border-gray-300 rounded-lg px-3 py-2"
+                      placeholder="https://..."
+                    />
+                    <p className="text-xs text-gray-500 mt-1">
+                      Puslapyje „Klipai“ rodoma kaip informacijos ikona šalia ekrano pavadinimo (modalas su nuotrauka arba PDF nuoroda).
+                    </p>
+                    <div className="mt-2">
+                      <label className="block text-xs font-medium text-gray-600 mb-1">Arba įkelkite failą (PNG, JPG, PDF, iki 5 MB)</label>
+                      <input
+                        type="file"
+                        accept="image/png,image/jpeg,image/webp,application/pdf"
+                        onChange={handleClipSpecUpload}
+                        disabled={clipSpecUploading}
+                        className="text-sm"
+                      />
+                      {clipSpecUploading ? <span className="text-xs text-gray-500 ml-2">Įkeliama...</span> : null}
+                    </div>
+                  </div>
                   <div className="md:col-span-2 flex gap-2">
                     <button type="submit" className="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700">
                       {editingClip ? 'Atnaujinti' : 'Sukurti'}
@@ -1582,13 +1636,14 @@ export default function AdminPanel() {
                     <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Ekranas</th>
                     <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Tipas</th>
                     <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Rezoliucija</th>
+                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Schema</th>
                     <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Veiksmai</th>
                   </tr>
                 </thead>
                 <tbody className="divide-y divide-gray-200">
                   {clipItems.length === 0 ? (
                     <tr>
-                      <td colSpan={6} className="px-6 py-8 text-center text-gray-500">
+                      <td colSpan={7} className="px-6 py-8 text-center text-gray-500">
                         Klipų nėra arba trūksta lentelės <code>clip_screens</code> Supabase sistemoje.
                       </td>
                     </tr>
@@ -1614,6 +1669,7 @@ export default function AdminPanel() {
                         <td className="px-6 py-4 text-sm font-medium text-gray-900">{item.screen}</td>
                         <td className="px-6 py-4 text-sm text-gray-900">{item.type}</td>
                         <td className="px-6 py-4 text-sm text-gray-900">{item.resolution}</td>
+                        <td className="px-6 py-4 text-sm text-gray-600">{item.spec_diagram_url ? 'Taip' : '—'}</td>
                         <td className="px-6 py-4">
                           <div className="flex gap-2">
                             <button onClick={() => handleEditClip(item)} className="text-blue-600 hover:text-blue-900 text-sm">✏️ Redaguoti</button>

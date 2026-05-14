@@ -14,6 +14,8 @@ export interface ClipScreen {
   screen: string;
   type: string;
   resolution: string;
+  /** Viešas paveikslėlio URL (Supabase Storage arba kitas CDN) — schema / papildoma specifikacija */
+  spec_diagram_url?: string | null;
 }
 
 /** Reklaminiai ekranai: Miestas, Vieta, Tipas (Statinis/Video), Rezoliucija */

@@ -37,6 +37,11 @@ export default function Footer() {
                 </Link>
               </li>
               <li>
+                <Link href="/apie-mus" className="text-gray-300 hover:text-[#bcf715] transition-colors">
+                  Apie mus
+                </Link>
+              </li>
+              <li>
                 <Link href="/paslaugos" className="text-gray-300 hover:text-[#bcf715] transition-colors">
                   Paslaugos
                 </Link>

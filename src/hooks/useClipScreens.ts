@@ -10,7 +10,26 @@ interface DbClipScreen {
   screen: string;
   type: string;
   resolution: string;
+  spec_diagram_url?: string | null;
   display_order?: number;
+}
+
+/** Vietiniam testui: `.env.local` → `NEXT_PUBLIC_CLIP_SPEC_PREVIEW=1` (tik `next dev`). */
+const CLIP_SPEC_PREVIEW_ROW: ClipScreen = {
+  id: 999999,
+  city: 'Vilnius',
+  screen: 'Akropolis (vietinis testas)',
+  type: 'Statinis',
+  resolution: '4032x576',
+  spec_diagram_url:
+    'https://placehold.co/960x320/e8eef9/1e3a8a/png?text=Schema+mock+%28Info+ikona%29',
+};
+
+function appendClipSpecPreviewRowIfEnabled(list: ClipScreen[]): ClipScreen[] {
+  if (process.env.NODE_ENV !== 'development') return list;
+  if (process.env.NEXT_PUBLIC_CLIP_SPEC_PREVIEW !== '1') return list;
+  if (list.some((row) => row.id === CLIP_SPEC_PREVIEW_ROW.id)) return list;
+  return [...list, CLIP_SPEC_PREVIEW_ROW];
 }
 
 export function useClipScreens() {
@@ -24,7 +43,7 @@ export function useClipScreens() {
       try {
         const { data, error } = await supabase
           .from('clip_screens')
-          .select('id, city, screen, type, resolution, display_order')
+          .select('id, city, screen, type, resolution, spec_diagram_url, display_order')
           .order('display_order', { ascending: true })
           .order('created_at', { ascending: true });
 
@@ -32,7 +51,7 @@ export function useClipScreens() {
 
         if (!mounted) return;
         if (!data || data.length === 0) {
-          setScreens(clipScreensFromExcel);
+          setScreens(appendClipSpecPreviewRowIfEnabled(clipScreensFromExcel));
           return;
         }
 
@@ -42,12 +61,13 @@ export function useClipScreens() {
           screen: item.screen,
           type: item.type,
           resolution: item.resolution,
+          spec_diagram_url: item.spec_diagram_url ?? null,
         }));
 
-        setScreens(mapped);
+        setScreens(appendClipSpecPreviewRowIfEnabled(mapped));
       } catch (error) {
         console.warn('Falling back to static clip screens:', error);
-        if (mounted) setScreens(clipScreensFromExcel);
+        if (mounted) setScreens(appendClipSpecPreviewRowIfEnabled(clipScreensFromExcel));
       } finally {
         if (mounted) setLoading(false);
       }
