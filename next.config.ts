@@ -20,6 +20,11 @@ const config: NextConfig = {
   async rewrites() {
     return [
       { source: '/favicon.ico', destination: '/icon' },
+      // Partnerių plano / klipų gavimo patvirtinimas → Hub
+      {
+        source: '/c/:path*',
+        destination: 'https://hub.piksel.lt/c/:path*',
+      },
     ]
   },
   async headers() {
