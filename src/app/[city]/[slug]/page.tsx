@@ -4,19 +4,19 @@ import ScreenDetailView from '@/components/ScreenDetailView';
 import { generateScreenImageAlt } from '@/lib/seoImageUtils';
 import {
   fetchRelatedScreens,
-  fetchScreenByIdentifier,
+  fetchScreenByCustomPath,
   getScreenPath,
 } from '@/lib/screenUtils';
 
 const BASE = 'https://piksel.lt';
 
 type PageProps = {
-  params: Promise<{ id: string }>;
+  params: Promise<{ city: string; slug: string }>;
 };
 
 export async function generateMetadata({ params }: PageProps): Promise<Metadata> {
-  const { id } = await params;
-  const screen = await fetchScreenByIdentifier(id);
+  const { city, slug } = await params;
+  const screen = await fetchScreenByCustomPath(`${city}/${slug}`);
 
   if (!screen) {
     return { title: 'Ekranas nerastas | PIKSEL' };
@@ -47,9 +47,9 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
   };
 }
 
-export default async function ScreenPage({ params }: PageProps) {
-  const { id } = await params;
-  const screen = await fetchScreenByIdentifier(id);
+export default async function CustomUrlScreenPage({ params }: PageProps) {
+  const { city, slug } = await params;
+  const screen = await fetchScreenByCustomPath(`${city}/${slug}`);
 
   if (!screen) {
     notFound();

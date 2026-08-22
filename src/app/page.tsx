@@ -28,6 +28,8 @@ import { Building2, User, Mail, MessageSquare, Send, Calendar, MapPin, X, CheckC
 import { sendInquiryEmail, initEmailJS } from '@/lib/emailjs';
 import { INQUIRY_SOURCE_OPTIONS, getInquirySourceLabel } from '@/lib/inquirySource';
 import { useToast } from '@/components/ui/Toast';
+import LandingHeader from '@/components/LandingHeader';
+import CodexLanding from '@/components/CodexLanding';
 
 const Map = dynamic(() => import('@/components/Map'), {
   ssr: false,
@@ -46,6 +48,7 @@ export default function Home() {
   const [pendingPopupScreen, setPendingPopupScreen] = useState<string | null>(null);
   const [newScreenCardDismissed, setNewScreenCardDismissed] = useState(false);
   const [showNewCardDemo, setShowNewCardDemo] = useState(false);
+  const [toolMode, setToolMode] = useState(false);
   
   // Inquiry form state
   const [inquiryForm, setInquiryForm] = useState({
@@ -61,6 +64,46 @@ export default function Home() {
   
   // Get LED screens from Supabase
   const { screens: ledScreens, loading, error } = useLEDScreens();
+
+  const activeScreens = ledScreens.filter((s) => s.is_active);
+  const screenCount = activeScreens.length;
+  const mainCities = ['Vilnius', 'Kaunas', 'Klaipėda', 'Šiauliai', 'Panevėžys'];
+  const cityCount = new Set(
+    activeScreens.filter((s) => mainCities.includes(s.city)).map((s) => s.city)
+  ).size;
+
+  const scrollToMap = () => {
+    setToolMode(true);
+    requestAnimationFrame(() => {
+      document.getElementById('zemelapis')?.scrollIntoView({ behavior: 'smooth' });
+    });
+  };
+
+  // Auto-open map tool from hash or query
+  useEffect(() => {
+    if (typeof window === 'undefined') return;
+    const params = new URLSearchParams(window.location.search);
+    if (window.location.hash === '#zemelapis' || params.get('map') === '1' || params.has('city')) {
+      setToolMode(true);
+    }
+  }, []);
+
+  // Rodyti sidebar kai vartotojas pasiekia žemėlapį scroll'inant
+  useEffect(() => {
+    if (typeof window === 'undefined') return;
+    const el = document.getElementById('zemelapis');
+    if (!el) return;
+    const observer = new IntersectionObserver(
+      ([entry]) => {
+        if (entry.isIntersecting && entry.intersectionRatio > 0.3) {
+          setToolMode(true);
+        }
+      },
+      { threshold: [0.3] }
+    );
+    observer.observe(el);
+    return () => observer.disconnect();
+  }, []);
 
   // Read city from URL query param on load (e.g. from Klipai/DUK sidebar: ?city=Regionai)
   useEffect(() => {
@@ -550,28 +593,50 @@ export default function Home() {
           </button>
         </div>
       )}
-      {/* Sidebar */}
-      <Sidebar 
-        onCityFilter={handleCityFilter}
-        selectedCity={selectedCity}
-        onSearchResults={handleSearchResults}
-      />
-      
-      {/* Screen List */}
-      <ScreenList 
-        selectedCity={selectedCity}
-        selectedScreens={selectedScreens}
-        onSelectScreen={handleSelectScreen}
-        onShowPopup={handleShowPopup}
-        isLoading={isLoading}
-        searchResults={searchResults}
-        ledScreens={ledScreens}
-        loading={loading}
-        error={error}
-      />
-      
-      {/* Map - Full Width with margin for sidebar (dynamic import = smaller initial bundle) */}
-      <div className={`ml-[640px] relative ${showInquiryForm ? 'mr-96' : 'mr-0'}`}>
+      {/* Sidebar – tik map įrankyje (desktop) */}
+      {toolMode && (
+        <>
+          <div className="hidden md:block">
+            <Sidebar
+              onCityFilter={handleCityFilter}
+              selectedCity={selectedCity}
+              onSearchResults={handleSearchResults}
+            />
+          </div>
+
+          <div className="hidden md:block">
+            <ScreenList
+              selectedCity={selectedCity}
+              selectedScreens={selectedScreens}
+              onSelectScreen={handleSelectScreen}
+              onShowPopup={handleShowPopup}
+              isLoading={isLoading}
+              searchResults={searchResults}
+              ledScreens={ledScreens}
+              loading={loading}
+              error={error}
+            />
+          </div>
+        </>
+      )}
+
+      {/* Codex landing – pilnas plotis, be sidebar */}
+      <div className="hidden md:block">
+        <LandingHeader onScrollToMap={scrollToMap} onGetOffer={scrollToMap} />
+        <CodexLanding
+          screenCount={screenCount}
+          cityCount={cityCount}
+          ledScreens={ledScreens}
+          loading={loading}
+          onScrollToMap={scrollToMap}
+        />
+      </div>
+
+      {/* Map įrankis */}
+      <div
+        id="zemelapis"
+        className={`relative scroll-mt-0 min-h-screen ${toolMode ? 'md:ml-[640px]' : ''} ${showInquiryForm ? 'md:mr-96' : ''}`}
+      >
         {/* Naujo ekrano kortelė - rodoma kai pridėtas ekranas per paskutines 30 d. Arba ?showNewCard=1 demo */}
         {!loading && newScreens.length > 0 && !newScreenCardDismissed && (
           <NewScreenCard

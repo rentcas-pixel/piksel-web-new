@@ -2,6 +2,7 @@
 
 import { LEDScreen } from '@/lib/supabase';
 import { generateScreenImageAlt } from '@/lib/seoImageUtils';
+import { getScreenPath } from '@/lib/screenUtils';
 import { useLEDScreens } from '@/hooks/useLEDScreens';
 import Image from 'next/image';
 import { MapPin, Clock, Info, Plus, Check } from 'lucide-react';
@@ -38,7 +39,7 @@ export default function ScreenList({ selectedCity, selectedScreens, onSelectScre
 
   if (loading) {
     return (
-      <div className="fixed left-80 top-0 w-80 h-screen bg-gray-50 border-r border-gray-200 z-30 overflow-y-auto">
+      <div className="hidden md:block fixed left-80 top-0 w-80 h-screen bg-gray-50 border-r border-gray-200 z-30 overflow-y-auto">
         <div className="p-4 space-y-3">
           {[1, 2, 3, 4, 5].map((i) => (
             <div key={i} className="bg-white rounded-lg shadow-sm border border-gray-200 p-4">
@@ -65,7 +66,7 @@ export default function ScreenList({ selectedCity, selectedScreens, onSelectScre
 
   if (error) {
     return (
-      <div className="fixed left-80 top-0 w-80 h-screen bg-gray-50 border-r border-gray-200 z-30 flex items-center justify-center">
+      <div className="hidden md:flex fixed left-80 top-0 w-80 h-screen bg-gray-50 border-r border-gray-200 z-30 items-center justify-center">
         <div className="text-center">
           <p className="text-red-600 text-sm mb-2">Klaida: {error}</p>
           <button 
@@ -80,7 +81,7 @@ export default function ScreenList({ selectedCity, selectedScreens, onSelectScre
   }
 
   return (
-    <div className="fixed left-80 top-0 w-80 h-screen bg-gray-50 border-r border-gray-200 z-30 overflow-y-auto">
+    <div className="hidden md:block fixed left-80 top-0 w-80 h-screen bg-gray-50 border-r border-gray-200 z-30 overflow-y-auto">
       <div className="p-4">
         {searchResults.length > 0 && (
           <div className="mb-4 p-3 bg-blue-50 border border-blue-200 rounded-lg">
@@ -169,7 +170,7 @@ export default function ScreenList({ selectedCity, selectedScreens, onSelectScre
                       )}
                     </button>
                     <button
-                      onClick={() => onShowPopup ? onShowPopup(screen.id) : window.open(`/ekranas/${screen.id}`, '_blank')}
+                      onClick={() => onShowPopup ? onShowPopup(screen.id) : window.open(getScreenPath(screen), '_blank')}
                       className="flex-1 bg-gray-50 text-gray-600 hover:bg-gray-100 border border-gray-200 py-2 px-3 rounded-md text-sm transition-colors flex items-center justify-center gap-2"
                     >
                       <Info className="w-3 h-3" />

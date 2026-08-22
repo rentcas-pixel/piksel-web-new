@@ -96,7 +96,7 @@ export default function Sidebar({ onCityFilter, selectedCity, onSearchResults }:
   ];
 
   return (
-    <div className="fixed left-0 top-0 h-screen w-80 bg-gray-50 border-r border-gray-200 flex flex-col z-30">
+    <div className="hidden md:flex fixed left-0 top-0 h-screen w-80 bg-gray-50 border-r border-gray-200 flex-col z-30">
       {/* Header */}
       <div className="p-6 bg-black border-b border-gray-200 flex justify-center">
         <button 
